@@ -1,0 +1,188 @@
+//+----------------------------------------------------------------------------------------------------------------------------------+
+//¦ Call of Duty 4: Modern Warfare                                                                                                   ¦
+//¦----------------------------------------------------------------------------------------------------------------------------------¦
+//¦ Mod				: [SHIFT]SPEARHEAD INTERNATIONAL FREEZETAG                                                           ¦
+//¦ Modifications By		: [SHIFT]Newfie                                                                                      ¦
+//+----------------------------------------------------------------------------------------------------------------------------------+
+//¦ Colour Codes For RGB	Colour Codes For Text                                                                                ¦
+//+----------------------------------------------------------------------------------------------------------------------------------+
+//¦ Black  0 0 0		^0 = Black                                                                                           ¦
+//¦ White  1 1 1 		^7 = White                                                                                           ¦
+//¦ Red    1 0 0		^1 = Red                                                                                             ¦
+//¦ Green  0 1 0		^2 = Green                                                                                           ¦
+//¦ Blue   0 0 1		^4 = Blue                                                                                            ¦
+//¦ Yellow 1 1 0		^3 = Yellow                                                                                          ¦
+//¦ 				^5 = Cyan                                                                                            ¦
+//¦ 				^6 = pink/Magenta                                                                                    ¦
+//+----------------------------------------------------------------------------------------------------------------------------------+
+
+VERSION          "1"
+CONFIG           "C:\trees\cod3\cod3\bin\StringEd.cfg"
+FILENOTES        ""
+
+//+----------------------------------------------------------------------------------------+
+//¦ Quick Voice Bind Menu                                                                  ¦
+//+----------------------------------------------------------------------------------------+
+
+REFERENCE	VOICEBIND_FOLLOW_ME
+LANG_ENGLISH	"On me!"
+
+REFERENCE	VOICEBIND_MOVE_IN
+LANG_ENGLISH	"Move in!"
+
+REFERENCE	VOICEBIND_FALL_BACK
+LANG_ENGLISH	"Fall back!"
+
+REFERENCE	VOICEBIND_SUPPRESSING_FIRE
+LANG_ENGLISH	"Base of fire!"
+
+REFERENCE	VOICEBIND_ATTACK_LEFT_FLANK
+LANG_ENGLISH	"Attack left flank!"
+
+REFERENCE	VOICEBIND_ATTACK_RIGHT_FLANK
+LANG_ENGLISH	"Attack right flank!"
+
+REFERENCE	VOICEBIND_HOLD_THIS_POSITION
+LANG_ENGLISH	"Hold this position!"
+
+REFERENCE	VOICEBIND_REGROUP
+LANG_ENGLISH	"Regroup!"
+
+REFERENCE	VOICEBIND_ENEMY_SPOTTED
+LANG_ENGLISH	"Contact!"
+
+REFERENCE	VOICEBIND_ENEMIES_SPOTTED
+LANG_ENGLISH	"Multiple contacts!"
+
+REFERENCE	VOICEBIND_IM_IN_POSITION
+LANG_ENGLISH	"In position."
+
+REFERENCE	VOICEBIND_AREA_SECURE
+LANG_ENGLISH	"Area secure!"
+
+REFERENCE	VOICEBIND_WATCH_SIX
+LANG_ENGLISH	"Watch your six!"
+
+REFERENCE	VOICEBIND_SNIPER
+LANG_ENGLISH	"Sniper!"
+
+REFERENCE	VOICEBIND_NEED_REINFORCEMENTS
+LANG_ENGLISH	"Need reinforcements!"
+
+REFERENCE	VOICEBIND_YES_SIR
+LANG_ENGLISH	"Roger."
+
+REFERENCE	VOICEBIND_NO_SIR
+LANG_ENGLISH	"Negative."
+
+REFERENCE	VOICEBIND_IM_ON_MY_WAY
+LANG_ENGLISH	"Moving."
+
+REFERENCE	VOICEBIND_SORRY
+LANG_ENGLISH	"Sorry."
+
+REFERENCE	VOICEBIND_GREAT_SHOT
+LANG_ENGLISH	"Nice shot!"
+
+REFERENCE	VOICEBIND_COME_ON
+LANG_ENGLISH	"Come on."
+
+REFERENCE	VOICEBIND
+LANG_ENGLISH	"Quick Command Binds"
+
+//+----------------------------------------------------------------------------------------------------------------------------------+
+//¦ Unreal Message Strings                                                                                                           ¦
+//+----------------------------------------------------------------------------------------------------------------------------------+
+
+REFERENCE	HEADSHOT
+LANG_ENGLISH	"^2HEADSHOT"
+
+REFERENCE	FIRSTBLOOD_REPORT_ALL
+LANG_ENGLISH	"^2FIRSTBLOOD AWARDED TO"
+
+REFERENCE	FIRSTBLOOD_REPORT_SELF
+LANG_ENGLISH	"^2FIRSTBLOOD"
+
+//+----------------------------------------------------------------------------------------------------------------------------------+
+//¦ Freezetag Feature Strings                                                                                                        ¦
+//+----------------------------------------------------------------------------------------------------------------------------------+
+
+REFERENCE 	FTAG
+LANG_ENGLISH 	"^5FreezeTag"
+
+REFERENCE 	FTAG_MELT_DISTANCE
+LANG_ENGLISH 	"^5You are too far away to Freeze ^3&&1"
+
+REFERENCE 	FTAG_DEFROSTING
+LANG_ENGLISH 	"^5Defrosting..."
+
+REFERENCE 	FTAG_ALREADY_FROZEN_ANNOY
+LANG_ENGLISH 	"&&1 ^3has been ^5frozen ^3for annoying ^7&&2"
+
+REFERENCE 	FTAG_ALREADY_FROZEN
+LANG_ENGLISH 	"^3&&1^5 is Already Frozen, ^3and now so are you!"
+
+REFERENCE 	FTAG_ALREADY_FROZEN2
+LANG_ENGLISH 	"^3&&1^5 will also get your last kill points!"
+
+REFERENCE 	FTAG_ALREADY_FROZEN3
+LANG_ENGLISH 	"^5For annoying your team, you are now frozen!"
+
+REFERENCE 	FTAG_ALREADY_FROZEN4
+LANG_ENGLISH 	"^3&&1 ^5will also get your last kill points!"
+
+REFERENCE 	FTAG_ALREADY_FROZEN5
+LANG_ENGLISH 	"^5You just received the last kill points from ^3&&1"
+
+REFERENCE 	FTAG_ALREADY_FROZEN6
+LANG_ENGLISH 	"^5and froze them because they were annoying you!"
+
+REFERENCE 	FTAG_FROZE
+LANG_ENGLISH 	"&&1 ^5Froze ^3&&2"
+
+REFERENCE 	FTAG_HUD_POINTS
+LANG_ENGLISH 	"^5You have been awarded ^3&&1 ^5points!"
+
+REFERENCE 	FTAG_DEFROSTED
+LANG_ENGLISH 	"&&1 ^5Defrosted ^3&&2"
+
+REFERENCE 	FTAG_AUTO_DEFROSTED
+LANG_ENGLISH 	"&&1 ^3Auto ^5Defrosted"
+
+REFERENCE 	FTAG_HUD_DEFROSTED
+LANG_ENGLISH 	"^3You ^5Defrosted ^3&&1"
+
+REFERENCE 	FTAG_HUD_DEFROSTEDBY
+LANG_ENGLISH 	"^3You were ^5Defrosted by ^3&&1"
+
+REFERENCE 	FTAG_HUD_AUTO_DEFROSTED
+LANG_ENGLISH 	"^3You Auto ^5Defrosted"
+
+REFERENCE 	FTAG_HUD_FROZENBY
+LANG_ENGLISH 	"^3You were ^5Frozen by ^3&&1"
+
+REFERENCE 	FTAG_HUD_YOUFROZE
+LANG_ENGLISH 	"^3You ^5Froze ^3&&1"
+
+REFERENCE 	FTAG_HUD_YOUFROZE_SELF
+LANG_ENGLISH 	"^3You ^5Froze ^3Yourself!"
+
+REFERENCE 	FTAG_HUD_FROZE_HIMSELF
+LANG_ENGLISH 	"&&1 ^5froze ^3Himself!"
+
+REFERENCE 	FTAG_MATCH_TIE
+LANG_ENGLISH 	"^5Both teams have been frozen!"
+
+REFERENCE 	FTAG_SAS_FROZEN
+LANG_ENGLISH 	"^5All the ^3SAS^5 have been frozen!"
+
+REFERENCE 	FTAG_OPFOR_FROZEN
+LANG_ENGLISH 	"^5All the ^3OpFor^5 have been frozen!"
+
+REFERENCE 	FTAG_MARINES_FROZEN
+LANG_ENGLISH 	"^5All the ^3Marines^5 have been frozen!"
+
+REFERENCE 	FTAG_SPETSNAZ_FROZEN
+LANG_ENGLISH 	"^5All the ^3Spetsnaz^5 have been frozen!"
+
+ENDMARKER
