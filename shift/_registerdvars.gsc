@@ -26,5 +26,14 @@ init()
 	// Misc Variables
 	level.scr_OneLeftSoundEvent = getdvarx( "scr_OneLeftSoundEvent", "int", 1, 0, 1 );
 
+	// Show always the minimap in hardcore mode
+	level.scr_hud_hardcore_show_minimap = getdvarx( "scr_hardcore_show_minimap", "int", 0, 0, 1 );
+
+	// Show only the compass (North, South, West, East)
+	level.scr_hud_hardcore_show_compass = getdvarx( "scr_hardcore_show_compass", "int", 0, 0, 1 );
+
+	// Variables used in menu files
+	level.scr_hud_show_inventory = getdvarx( "scr_hud_show_inventory", "int", 0, 0, 2 );
+
 	return;
 }

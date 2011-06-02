@@ -22,5 +22,6 @@ init()
 	thread shift\_annoykill::init();
 	thread shift\_menuitems::init();
 	thread shift\_showunrealmess::init();
+	thread shift\_statusicon::init();
 	// End of shift modules	
 }

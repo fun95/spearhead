@@ -30,6 +30,7 @@ echo    Copying localized strings...
 xcopy english ..\..\raw\english /SYI > NUL
 
 echo    Copying game resources...
+xcopy configs ..\..\raw\configs /SYI > NUL
 xcopy images ..\..\raw\images /SYI > NUL
 xcopy fx ..\..\raw\fx /SYI > NUL
 xcopy maps ..\..\raw\maps /SYI > NUL

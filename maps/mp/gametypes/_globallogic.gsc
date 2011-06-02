@@ -1258,7 +1258,12 @@ endGame( winner, endReasonText )
 		
 				player setClientDvars( "ui_hud_hardcore", 1,
 									   "cg_drawSpectatorMessages", 0,
-									   "g_compassShowEnemies", 0 );
+									   "g_compassShowEnemies", 0,
+									   "ui_hud_hardcore_show_minimap", 0 );
+
+				player setClientDvars( "ui_hud_hardcore_show_compass", 0,
+									   "ui_hud_show_inventory", 0,
+									   "ui_hud_showammo", 0 );
 			}
 
 			if ( level.teamBased && !(hitRoundLimit() || hitScoreLimit()) )
@@ -1325,7 +1330,11 @@ endGame( winner, endReasonText )
 						break;
 				}
 				player thread maps\mp\gametypes\_hud_message::teamOutcomeNotify( switchType, true, level.halftimeSubCaption );
-				player setClientDvar( "ui_hud_hardcore", 1 );
+				player setClientDvars( "ui_hud_hardcore", 1,
+									  "ui_hud_hardcore_show_minimap", 0,
+									  "ui_hud_hardcore_show_compass", 0,
+									  "ui_hud_show_inventory", 0,
+									  "ui_hud_showammo", 0 );
 			}
 			
 			roundEndWait( level.halftimeRoundEndDelay, false );
@@ -1373,7 +1382,11 @@ endGame( winner, endReasonText )
 						break;
 				}
 				player thread maps\mp\gametypes\_hud_message::teamOutcomeNotify( switchType, true, endReasonText );
-				player setClientDvar( "ui_hud_hardcore", 1 );
+				player setClientDvars( "ui_hud_hardcore", 1,
+									   "ui_hud_hardcore_show_minimap", 0,
+									   "ui_hud_hardcore_show_compass", 0,
+									   "ui_hud_show_inventory", 0,
+									   "ui_hud_showammo", 0 );
 			}			
 
 			roundEndWait( level.halftimeRoundEndDelay, !(hitRoundLimit() || hitScoreLimit()) );
@@ -1427,7 +1440,12 @@ endGame( winner, endReasonText )
 		
 		player setClientDvars( "ui_hud_hardcore", 1,
 							   "cg_drawSpectatorMessages", 0,
-							   "g_compassShowEnemies", 0 );
+							   "g_compassShowEnemies", 0,
+							   "ui_hud_hardcore_show_minimap", 0 );
+
+		player setClientDvars( "ui_hud_hardcore_show_compass", 0,
+							   "ui_hud_show_inventory", 0,
+							   "ui_hud_showammo", 0 );
 	}
 	
 	if ( level.teamBased )
@@ -1476,7 +1494,12 @@ endGame( winner, endReasonText )
 		player closeInGameMenu();
 		player notify ( "reset_outcome" );
 		player thread spawnIntermission();
-		player setClientDvar( "ui_hud_hardcore", 0 );
+
+		player setClientDvars( "ui_hud_hardcore", 0,
+							   "ui_hud_hardcore_show_minimap", level.scr_hud_hardcore_show_minimap,
+							   "ui_hud_hardcore_show_compass", level.scr_hud_hardcore_show_compass,
+							   "ui_hud_show_inventory", level.scr_hud_show_inventory );
+
 		player setclientdvar( "g_scriptMainMenu", game["menu_eog_main"] );
 	}
 	
@@ -3057,7 +3080,15 @@ waitForPlayers( maxTime )
 prematchPeriod()
 {
 	makeDvarServerInfo( "ui_hud_hardcore", 1 );
+	makeDvarServerInfo( "ui_hud_hardcore_show_minimap", 0 );
+	makeDvarServerInfo( "ui_hud_hardcore_show_compass", 0 );
+	makeDvarServerInfo( "ui_hud_show_inventory", 0 );
+	makedvarServerInfo( "ui_hud_showammo", 0 );
 	setDvar( "ui_hud_hardcore", 1 );
+	setDvar( "ui_hud_hardcore_show_minimap", 0 );
+	setDvar( "ui_hud_hardcore_show_compass", 0 );
+	setDvar( "ui_hud_show_inventory", 0 );
+	setDvar( "ui_hud_showammo", 0 );
 	level endon( "game_ended" );
 	
 	if ( level.prematchPeriod > 0 )
@@ -3092,6 +3123,9 @@ prematchPeriod()
 		return;
 
 	setDvar( "ui_hud_hardcore", level.hardcoreMode );
+	setDvar( "ui_hud_hardcore_show_minimap", level.scr_hud_hardcore_show_minimap );
+	setDvar( "ui_hud_hardcore_show_compass", level.scr_hud_hardcore_show_compass );
+	setDvar( "ui_hud_show_inventory", level.scr_hud_show_inventory );
 }
 
 
@@ -4011,6 +4045,10 @@ Callback_PlayerConnect()
 						 "player_sprintTime", getDvar( "scr_player_sprinttime" ),
 						 "ui_uav_client", getDvar( "ui_uav_client" ) );
 
+	self setClientDvars( "ui_hud_hardcore_show_minimap", level.scr_hud_hardcore_show_minimap,
+						 "ui_hud_hardcore_show_compass", level.scr_hud_hardcore_show_compass,
+						 "ui_hud_show_inventory", level.scr_hud_show_inventory );
+
 	if ( level.hardcoreMode )
 	{
 		self setClientDvars( "cg_drawTalk", 3,
@@ -4135,7 +4173,12 @@ Callback_PlayerConnect()
 		self.team = "spectator";
 
 		self setClientDvars( "ui_hud_hardcore", 1,
-							   "cg_drawSpectatorMessages", 0 );
+							   "cg_drawSpectatorMessages", 0,
+							   "ui_hud_hardcore_show_minimap", 0,
+							   "ui_hud_hardcore_show_compass", 0 );
+
+		self setClientDvars( "ui_hud_show_inventory", 0,
+												 "ui_hud_showammo", 0 );
 		
 		[[level.spawnIntermission]]();
 		self closeMenu();
