@@ -951,6 +951,7 @@ defrosted(player, beam, defroststicker)
 			iPrintln(&"SHIFT_FTAG_AUTO_DEFROSTED" , self.name);
 	}
 
+	self.health = self.maxhealth;
 	self.defrostprogresstime = undefined;
 	self.frozen = false;
 	self unlink();
@@ -960,8 +961,6 @@ defrosted(player, beam, defroststicker)
 
 	self notify("stop_ice_fx");
 	self notify("defrosted");
-
-	self.health = self.maxhealth;
 	level.playedlastoneSound = false;
 
 	self thread maps\mp\gametypes\_globallogic::spawnPlayer();

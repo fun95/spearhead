@@ -1,6 +1,7 @@
 localize,shift
 
 rawfile,maps/mp/gametypes/_globallogic.gsc
+rawfile,maps/mp/gametypes/_healthoverlay.gsc
 rawfile,maps/mp/gametypes/war.txt
 
 fx,freezetag/defrostbeam
@@ -10,9 +11,14 @@ fx,freezetag/defrostmelt
 material,hud_freeze
 material,hud_frozen
 material,hud_fznred
+material,hud_status_amem
+material,hud_status_bmem
+material,hud_status_cmem
+material,hud_status_marshal
 material,iceberg_inner
 material,iceberg_inred
 
+menufile,ui_mp/hud.menu
 menufile,ui_mp/controls_multi.menu
 menufile,ui_mp/scriptmenus/voicebind.menu
 
@@ -22,6 +28,7 @@ rawfile,shift/_globalinit.gsc
 rawfile,shift/_menuitems.gsc
 rawfile,shift/_registerdvars.gsc
 rawfile,shift/_showunrealmess.gsc
+rawfile,shift/_statusicon.gsc
 rawfile,shift/_utils.gsc
 
 sound,shift,,all_mp
