@@ -23,17 +23,17 @@
 init()
 {
 	// Get the main module's dvar
-	level.scr_allow_statusicons = getdvarx( "scr_allow_statusicons", "int", 0 , 0, 2 );
+	level.scr_allow_statusicons = getdvardefault( "scr_allow_statusicons", "int", 0 , 0, 2 );
 
 	// If the statusicons is not enabled then there's nothing else to do here
 	if ( level.scr_allow_statusicons == 0 )
 		return;
 
 	// Get member status from dvar
-	level.scr_admin_names = getdvarx( "scr_admin_names", "string", "" );
-	level.scr_amember_names = getdvarx( "scr_amember_names", "string", "" );
-	level.scr_bmember_names = getdvarx( "scr_bmember_names", "string", "" );
-	level.scr_cmember_names = getdvarx( "scr_cmember_names", "string", "" );
+	level.scr_admin_names = getdvardefault( "scr_admin_names", "string", "" );
+	level.scr_amember_names = getdvardefault( "scr_amember_names", "string", "" );
+	level.scr_bmember_names = getdvardefault( "scr_bmember_names", "string", "" );
+	level.scr_cmember_names = getdvardefault( "scr_cmember_names", "string", "" );
 
 	precacheStatusIcon( "hud_status_amem" );  	//A Member
 	precacheStatusIcon( "hud_status_bmem" );  	//B Member
@@ -169,29 +169,5 @@ SetStatusIcon()
 	if ( self.isadmin ) 
 		self.statusicon = "hud_status_marshal";
 
-	return;
-}
-
-getmemberstatus()
-{
-	self endon("disconnect");
-	
-	// Check for amember
-	if ( level.scr_amember_names == "" && level.scr_bmember_names == "" && level.scr_cmember_names == "" && level.scr_admin_names == "" ) 
-		return;
-
-	self.isadmin = 0;
-	self.isamember = 0;
-	self.isbmember = 0;
-	self.iscmember = 0;
-
-	if ( issubstr( level.scr_admin_names, self.name ) ) 
-		self.isadmin = 1;
-	else if ( issubstr( level.scr_amember_names, self.name ) ) 
-		self.isamember = 1;
-	else if ( issubstr( level.scr_bmember_names, self.name ) ) 
-		self.isbmember = 1;
-	else if ( issubstr( level.scr_cmember_names, self.name ) ) 
-		self.iscmember = 1;
 	return;
 }

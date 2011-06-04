@@ -20,8 +20,9 @@ init()
 {
 	// Initialize shift modules
 	thread shift\_annoykill::init();
-	thread shift\_menuitems::init();
 	thread shift\_showunrealmess::init();
+	thread shift\_shiftmenu::init();
 	thread shift\_statusicon::init();
+	thread shift\_shiftrcon::init();
 	// End of shift modules	
 }

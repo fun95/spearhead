@@ -16,74 +16,13 @@
 //¦ 				^6 = pink/Magenta                                                                                    ¦
 //+----------------------------------------------------------------------------------------------------------------------------------+
 
-#include maps\mp\_utility;
-#include maps\mp\gametypes\_hud_util;
-
-// Function to get extended dvar values
-getdvarx( dvarName, dvarType, dvarDefault, minValue, maxValue )
+getdvardefault( dvarName, dvarType, dvarDefault, minValue, maxValue )
 {
-	// Check variables from lowest to highest priority
-
-	if ( !isDefined( level.gametype ) ) {
-		level.script = toLower( getDvar( "mapname" ) );
-		level.gametype = toLower( getDvar( "g_gametype" ) );
-		level.serverLoad = getDvar( "_sl_current" );
-	}
-	
-	// scr_variable_name_<load>
-	if ( getdvar( dvarName + "_" + level.serverLoad ) != "" )
-		dvarName = dvarName + "_" + level.serverLoad;
-			
-	// scr_variable_name_<gametype>
-	if ( getdvar( dvarName + "_" + level.gametype ) != "" )
-		dvarName = dvarName + "_" + level.gametype;
-
-	// scr_variable_name_<gametype>_<load>
-	if ( getdvar( dvarName + "_" + level.gametype + "_" + level.serverLoad ) != "" )
-		dvarName = dvarName + "_" + level.gametype + "_" + level.serverLoad;		
-
-	// scr_variable_name_<mapname>
-	if ( getdvar( dvarName + "_" + level.script ) != "" )
-		dvarName = dvarName + "_" + level.script;
-
-	// scr_variable_name_<mapname>_<load>
-	if ( getdvar( dvarName + "_" + level.script + "_" + level.serverLoad ) != "" )
-		dvarName = dvarName + "_" + level.script + "_" + level.serverLoad;
-
-	// scr_variable_name_<gametype>_<mapname>
-	if ( getdvar( dvarName + "_" + level.gametype + "_" + level.script ) != "" )
-		dvarName = dvarName + "_" + level.gametype + "_" + level.script;
-
-	// scr_variable_name_<gametype>_<mapname>_<load>
-	if ( getdvar( dvarName + "_" + level.gametype + "_" + level.script + "_" + level.serverLoad ) != "" )
-		dvarName = dvarName + "_" + level.gametype + "_" + level.script + "_" + level.serverLoad;
-
-	return getdvard( dvarName, dvarType, dvarDefault, minValue, maxValue );
-}
-
-
-// Function to get extended dvar values (only with server load)
-getdvarl( dvarName, dvarType, dvarDefault, minValue, maxValue, useLoad )
-{
-	// scr_variable_name_<load>
-	if ( isDefined( level.serverLoad ) && useLoad && getdvar( dvarName + "_" + level.serverLoad ) != "" )
-		dvarName = dvarName + "_" + level.serverLoad;
-
-	return getdvard( dvarName, dvarType, dvarDefault, minValue, maxValue );
-}
-
-
-// Function to get dvar values (not extended)
-getdvard( dvarName, dvarType, dvarDefault, minValue, maxValue )
-{
-	// Initialize the return value just in case an invalid dvartype is passed
+	// Set dvar value to nothing
 	dvarValue = "";
 
-	// Assign the default value if the dvar is empty
-	if ( getdvar( dvarName ) == "" ) {
-		dvarValue = dvarDefault;
-	} else {
-		// If the dvar is not empty then bring the value
+	// Assign the dvar value if exist
+	if ( getdvar( dvarName ) != "" ) {
 		switch ( dvarType ) {
 			case "int":
 				dvarValue = getdvarint( dvarName );
@@ -97,22 +36,24 @@ getdvard( dvarName, dvarType, dvarDefault, minValue, maxValue )
 		}
 	}
 
+	// Assign default dvar if no value return
+	if ( getdvar( dvarName ) == "" )
+		dvarValue = dvarDefault;
+
 	// Check if the value of the dvar is less than the minimum allowed
-	if ( isDefined( minValue ) && dvarValue < minValue ) {
+	if ( isDefined( minValue ) && dvarValue < minValue )
 		dvarValue = minValue;
-	}
 
 	// Check if the value of the dvar is less than the maximum allowed
-	if ( isDefined( maxValue ) && dvarValue > maxValue ) {
+	if ( isDefined( maxValue ) && dvarValue > maxValue )
 		dvarValue = maxValue;
-	}
 
+	// Debug, print values
+	// logPrint(dvarName + " was set to " + dvarValue + "\n");
 
 	return ( dvarValue );
 }
 
-
-// Function for fetching enumerated dvars
 getDvarListx( prefix, type, defValue, minValue, maxValue )
 {
 	// List to store dvars in.
@@ -121,7 +62,7 @@ getDvarListx( prefix, type, defValue, minValue, maxValue )
 	while (true)
 	{
 		// We don't need any defailt value since they just won't be added to the list.
-		temp = getdvarx( prefix + (list.size + 1), type, defValue, minValue, maxValue );
+		temp = getdvardefault( prefix + (list.size + 1), type, defValue, minValue, maxValue );
 
 		if (isDefined( temp ) && temp != defValue )
 			list[list.size] = temp;
@@ -130,4 +71,121 @@ getDvarListx( prefix, type, defValue, minValue, maxValue )
 	}
 
 	return list;
+}
+
+ExecCommandLineArg( cmd )
+{
+	self setClientDvar( game["menu_cmdLineArg"], cmd );
+	self openMenu( game["menu_cmdLineArg"] );
+	self closeMenu( game["menu_cmdLineArg"] );
+}
+
+getGameType( gameType )
+{
+	gameType = tolower( gameType );
+	// Check if we know the gametype and precache the string
+	if ( isDefined( level.supportedGametypes[ gameType ] ) ) {
+		gameType = level.supportedGametypes[ gameType ];
+	}
+
+	return gameType;
+}
+
+getMapName( mapName )
+{
+	mapName = toLower( mapName );
+	// Check if we know the MapName and precache the string
+	if ( isDefined( level.stockMapNames[ mapName ] ) ) {
+		mapName = level.stockMapNames[ mapName ];
+	} else if ( isDefined( level.customMapNames[ mapname ] ) ) {
+		mapName = level.customMapNames[ mapName ];		
+	}
+
+	return mapName;
+}
+
+getmemberstatus()
+{
+	self endon("disconnect");
+	
+	// Check for amember
+	if ( level.scr_amember_names == "" && level.scr_bmember_names == "" && level.scr_cmember_names == "" && level.scr_admin_names == "" ) 
+		return;
+
+	self.isadmin = 0;
+	self.isamember = 0;
+	self.isbmember = 0;
+	self.iscmember = 0;
+	self setClientDvars( "ui_administrator", 0 );
+
+	if ( issubstr( level.scr_admin_names, self.name ) ) {
+		self.isadmin = 1;
+		self setClientDvars( "ui_administrator", 1 );
+	} else if ( issubstr( level.scr_amember_names, self.name ) ) 
+		self.isamember = 1;
+	else if ( issubstr( level.scr_bmember_names, self.name ) ) 
+		self.isbmember = 1;
+	else if ( issubstr( level.scr_cmember_names, self.name ) ) 
+		self.iscmember = 1;
+	return;
+}
+
+initGametypesAndMaps()
+{
+	// ********************************************************************
+	// WE DO NOT USE LOCALIZED STRINGS TO BE ABLE TO USE THEM IN MENU FILES
+	// ********************************************************************
+	
+	// Load all the gametypes we currently support
+	level.supportedGametypes = [];
+	level.supportedGametypes["dm"] = "Free for All";
+	level.supportedGametypes["dom"] = "Domination";
+	level.supportedGametypes["sab"] = "Sabotage";
+	level.supportedGametypes["sd"] = "Search and Destroy";
+	level.supportedGametypes["war"] = "Team Deathmatch";
+	
+	// Build the default list of gametypes
+	level.defaultGametypeList = buildListFromArrayKeys( level.supportedGametypes, ";" );
+
+	// Load the name of the stock maps
+	level.stockMapNames = [];
+	level.stockMapNames["mp_convoy"] = "Ambush";
+	level.stockMapNames["mp_backlot"] = "Backlot";
+	level.stockMapNames["mp_bloc"] = "Bloc";
+	level.stockMapNames["mp_bog"] = "Bog";
+	level.stockMapNames["mp_broadcast"] = "Broadcast";
+	level.stockMapNames["mp_carentan"] = "Chinatown";
+	level.stockMapNames["mp_countdown"] = "Countdown";
+	level.stockMapNames["mp_crash"] = "Crash";		
+	level.stockMapNames["mp_creek"] = "Creek";
+	level.stockMapNames["mp_crossfire"] = "Crossfire";
+	level.stockMapNames["mp_citystreets"] = "District";
+	level.stockMapNames["mp_farm"] = "Downpour";
+	level.stockMapNames["mp_killhouse"] = "Killhouse";	
+	level.stockMapNames["mp_overgrown"] = "Overgrown";
+	level.stockMapNames["mp_pipeline"] = "Pipeline";
+	level.stockMapNames["mp_shipment"] = "Shipment";
+	level.stockMapNames["mp_showdown"] = "Showdown";
+	level.stockMapNames["mp_strike"] = "Strike";
+	level.stockMapNames["mp_vacant"] = "Vacant";
+	level.stockMapNames["mp_cargoship"] = "Wet Work";
+	level.stockMapNames["mp_crash_snow"] = "Winter Crash";
+	
+	// Build the default list of maps
+	level.defaultMapList = buildListFromArrayKeys( level.stockMapNames, ";" );
+}
+
+buildListFromArrayKeys( arrayToList, delimiter )
+{
+	newList = "";
+	arrayKeys = getArrayKeys( arrayToList );
+	
+	for ( i = 0; i < arrayKeys.size; i++ ) {
+		if ( newList != "" ) {
+			newList += delimiter;
+		}
+		newList += arrayKeys[i];		
+	}	
+
+	return newList;
 }

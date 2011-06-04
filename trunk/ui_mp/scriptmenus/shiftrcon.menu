@@ -1,0 +1,711 @@
+//+----------------------------------------------------------------------------------------------------------------------------------+
+//¦ Call of Duty 4: Modern Warfare                                                                                                   ¦
+//¦----------------------------------------------------------------------------------------------------------------------------------¦
+//¦ Mod				: [SHIFT]SPEARHEAD INTERNATIONAL FREEZETAG                                                           ¦
+//¦ Modifications By		: [SHIFT]Newfie                                                                                      ¦
+//+----------------------------------------------------------------------------------------------------------------------------------+
+//¦ Colour Codes For RGB	Colour Codes For Text                                                                                ¦
+//+----------------------------------------------------------------------------------------------------------------------------------+
+//¦ Black  0 0 0		^0 = Black                                                                                           ¦
+//¦ White  1 1 1 		^7 = White                                                                                           ¦
+//¦ Red    1 0 0		^1 = Red                                                                                             ¦
+//¦ Green  0 1 0		^2 = Green                                                                                           ¦
+//¦ Blue   0 0 1		^4 = Blue                                                                                            ¦
+//¦ Yellow 1 1 0		^3 = Yellow                                                                                          ¦
+//¦ 				^5 = Cyan                                                                                            ¦
+//¦ 				^6 = pink/Magenta                                                                                    ¦
+//+----------------------------------------------------------------------------------------------------------------------------------+
+
+#include "ui/menudef.h"
+#include "ui_mp/common_macro.inc"
+
+#include "ui_mp/menustyle.inc"
+#include "ui_mp/choices_setup_teams.menu"
+
+{
+
+
+	menuDef
+	{
+		name			"shiftrcon"
+		rect			0 0 640 480
+		focuscolor		COLOR_FOCUSED
+		style			WINDOW_STYLE_EMPTY
+		blurWorld		7.0
+		onEsc
+		{
+			play "mouse_click";
+			close self;
+			//open "class";
+		}
+
+		// background overlay
+		itemDef
+		{
+			style			WINDOW_STYLE_FILLED
+			rect			0 0 640 480 HORIZONTAL_ALIGN_FULLSCREEN VERTICAL_ALIGN_FULLSCREEN
+			backcolor		0 0 0 0.75 //0 0.05 0.15 0.5
+			visible			1
+			decoration
+		}
+
+		// gradient_top
+		itemDef
+		{
+			style			WINDOW_STYLE_SHADER
+			rect			0 0 854 75 HORIZONTAL_ALIGN_FULLSCREEN 0
+			background		"gradient_top"
+			visible			1
+			decoration
+		}
+
+		// gradient_bottom
+		itemDef
+		{
+			style			WINDOW_STYLE_SHADER
+			rect			0 405 854 75 HORIZONTAL_ALIGN_FULLSCREEN 0
+			background		"gradient_bottom"
+			visible			1
+			decoration
+		}
+
+		// ------------------ TREE TITLE ------------------
+
+		CHOICE_MENU_TITLE( "@SHIFT_TITLE" )
+
+		// ------------------ buttons ---------------------
+		//#define BACK_OPEN open "class";
+		#define BACK_CLOSE "@MENU_CLOSE";
+		#include "ui_mp/navcontrols.inc"
+
+		// PC widescreen fix
+		#undef	CHOICE_HORIZONTAL_ALIGN
+		#define CHOICE_HORIZONTAL_ALIGN HORIZONTAL_ALIGN_CENTER
+
+		#undef TEXTSIZE_SMALL
+		#define TEXTSIZE_SMALL 0.3
+		#undef TEXTSIZE_MEDIUM
+		#define TEXTSIZE_MEDIUM 0.4		
+		
+		#define TITLES_ORIGIN 52
+		#define POSITION_Y( yOffset ) 		(TITLES_ORIGIN + yOffset)
+
+
+		// Sub-titles
+		itemDef	{
+			style			WINDOW_STYLE_SHADER
+			rect			-240 TITLES_ORIGIN 240 0.5 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			background		"line_horizontal"
+			forecolor		1 1 1 0.85
+			visible			1	
+			decoration	}
+		itemDef	{
+			style			WINDOW_STYLE_SHADER
+			rect			-300 TITLES_ORIGIN 300 10 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			origin			30 1
+			background		"line_horizontal"
+			forecolor		OBJECTIVE_COLOR_MARINES
+			visible			1
+			decoration	}
+		itemDef	{
+			style			WINDOW_STYLE_SHADER
+			rect			-300 TITLES_ORIGIN 240 0.5 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			origin			0 12
+			background		"line_horizontal"
+			forecolor		1 1 1 0.85
+			visible			1
+			decoration	}
+
+		itemDef
+		{
+			type			ITEM_TYPE_TEXT
+			rect			-160 TITLES_ORIGIN 0 0 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			text      		"@SHIFT_MAP_CONTROL"
+			textfont		UI_FONT_NORMAL
+			textscale		TEXTSIZE_TITLE
+			textstyle		ITEM_TEXTSTYLE_SHADOWED
+			textAlign		ITEM_ALIGN_MIDDLE_CENTER
+			forecolor		COLOR_TITLE
+			visible			1
+			decoration	}		
+	
+		// ***
+
+		itemDef	{
+			style			WINDOW_STYLE_SHADER
+			rect			80 TITLES_ORIGIN 240 0.5 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			background		"line_horizontal"
+			forecolor		1 1 1 0.85
+			visible			1	
+			decoration	}
+		itemDef	{
+			style			WINDOW_STYLE_SHADER
+			rect			10 TITLES_ORIGIN 300 10 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			origin			30 1
+			background		"line_horizontal"
+			forecolor		OBJECTIVE_COLOR_MARINES
+			visible			1
+			decoration	}
+		itemDef	{
+			style			WINDOW_STYLE_SHADER
+			rect			10 TITLES_ORIGIN 240 0.5 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			origin			0 12
+			background		"line_horizontal"
+			forecolor		1 1 1 0.85
+			visible			1	
+			decoration	}
+		itemDef
+		{
+			type			ITEM_TYPE_TEXT
+			rect			160 TITLES_ORIGIN 0 0 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			text      		"@SHIFT_PLAYER_CONTROL"
+			textfont		UI_FONT_NORMAL
+			textscale		TEXTSIZE_TITLE
+			textstyle		ITEM_TEXTSTYLE_SHADOWED
+			textAlign		ITEM_ALIGN_MIDDLE_CENTER
+			forecolor		COLOR_TITLE
+			visible			1
+			decoration	}				
+		
+		// Map rotation
+		itemDef
+		{
+			type			ITEM_TYPE_TEXT
+			rect			-160 POSITION_Y(38) 0 0 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			textfont		UI_FONT_NORMAL
+			textscale		TEXTSIZE_DEFAULT
+			textstyle		ITEM_TEXTSTYLE_SHADOWED
+			textAlign		ITEM_ALIGN_MIDDLE_CENTER
+			forecolor		COLOR_TITLE
+			exp			text( dvarstring( ui_rcon_map ) );
+			visible			1
+			decoration	}		
+
+		itemDef {
+			name 			"previousmap"
+			type			1
+			style			WINDOW_STYLE_SHADER
+			rect			-177 POSITION_Y(48) 16 16 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			background		"ui_arrow_left"
+			forecolor		COLOR_FOCUSED
+			visible			1
+		  	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "previousmap"; }	
+			}		
+		
+		itemDef {
+			name 			"nextmap"
+			type			1
+			style			WINDOW_STYLE_SHADER
+			rect			-159 POSITION_Y(48) 16 16 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			background		"ui_arrow_right"
+			forecolor		COLOR_FOCUSED
+			visible			1
+		  	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "nextmap"; }	
+			}		
+				
+		// Gametype
+		itemDef
+		{
+			type			ITEM_TYPE_TEXT
+			rect			-160 POSITION_Y(80) 0 0 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			textfont		UI_FONT_NORMAL
+			textscale		TEXTSIZE_DEFAULT
+			textstyle		ITEM_TEXTSTYLE_SHADOWED
+			textAlign		ITEM_ALIGN_MIDDLE_CENTER
+			forecolor		COLOR_TITLE
+			exp			text( dvarstring( ui_rcon_gametype ) );
+			visible			1
+			decoration	}		
+
+		itemDef {
+			name 			"previoustype"
+			type			1
+			style			WINDOW_STYLE_SHADER
+			rect			-177 POSITION_Y(90) 16 16 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			background		"ui_arrow_left"
+			forecolor		COLOR_FOCUSED
+			visible			1
+		  	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "previoustype"; }	
+			}		
+		
+		itemDef {
+			name 			"nexttype"
+			type			1
+			style			WINDOW_STYLE_SHADER
+			rect			-159 POSITION_Y(90) 16 16 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			background		"ui_arrow_right"
+			forecolor		COLOR_FOCUSED
+			visible			1
+		  	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "nexttype"; }	
+			}		
+
+
+		// LOAD MAP
+		itemDef
+		{
+			name      		"loadmap"
+			text      		"@SHIFT_MAP_LOAD"
+			type			1
+		  	style			WINDOW_STYLE_FILLED
+		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
+			rect			-200 POSITION_Y(112) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
+		  	textfont		CHOICE_TEXTFONT
+		  	textscale		TEXTSIZE_MEDIUM
+			forecolor		COLOR_FOCUSED
+			visible			1
+		  	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "loadmap"; }	
+			}		
+		itemDef
+		{
+			type			ITEM_TYPE_TEXT
+			rect			-200 POSITION_Y(112) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			text      		"@SHIFT_MAP_LOAD"
+			textfont		CHOICE_TEXTFONT
+			textscale		TEXTSIZE_MEDIUM
+			textstyle		ITEM_TEXTSTYLE_SHADOWED
+			textAlign		ITEM_ALIGN_MIDDLE_CENTER
+			forecolor		COLOR_DISABLED
+			visible			1
+			decoration	}		
+		itemDef
+		{
+			name      		"setnext"
+			text      		"@SHIFT_SET_NEXT"
+			type			1
+		  	style			WINDOW_STYLE_FILLED
+		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
+			rect			-200 POSITION_Y(134) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
+		  	textfont		CHOICE_TEXTFONT
+		  	textscale		TEXTSIZE_MEDIUM
+			forecolor		COLOR_FOCUSED
+			visible			1
+		  	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "setnext"; }	
+			}		
+		itemDef
+		{
+			type			ITEM_TYPE_TEXT
+			rect			-200 POSITION_Y(134) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			text      		"@SHIFT_SET_NEXT"
+			textfont		CHOICE_TEXTFONT
+			textscale		TEXTSIZE_MEDIUM
+			textstyle		ITEM_TEXTSTYLE_SHADOWED
+			textAlign		ITEM_ALIGN_MIDDLE_CENTER
+			forecolor		COLOR_DISABLED
+			visible			1
+			decoration	}				
+		
+		itemDef	{
+			style			WINDOW_STYLE_SHADER
+			rect			-220 POSITION_Y(161) 120 0.5 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			background		"line_horizontal"
+			forecolor		1 1 1 0.85
+			visible			1	decoration	}
+
+		// END MAP
+		itemDef
+		{
+			name      		"endmap"
+			text      		"@SHIFT_MAP_END"
+			type			1
+		  	style			WINDOW_STYLE_FILLED
+		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
+			rect			-200 POSITION_Y(168) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
+		  	textfont		CHOICE_TEXTFONT
+		  	textscale		TEXTSIZE_MEDIUM
+			forecolor		COLOR_FOCUSED
+			visible			1
+		 	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "endmap"; }	
+			}		
+		itemDef
+		{
+			type			ITEM_TYPE_TEXT
+			rect			-200 POSITION_Y(168) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			text      		"@SHIFT_MAP_END"
+			textfont		CHOICE_TEXTFONT
+			textscale		TEXTSIZE_MEDIUM
+			textstyle		ITEM_TEXTSTYLE_SHADOWED
+			textAlign		ITEM_ALIGN_MIDDLE_CENTER
+			forecolor		COLOR_DISABLED
+			visible			1
+			decoration	}		
+
+		// NEXT MAP
+		itemDef
+		{
+			name      		"rotatemap"
+			text      		"@SHIFT_MAP_NEXT"
+			type			1
+		  	style			WINDOW_STYLE_FILLED
+		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
+			rect			-200 POSITION_Y(190) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
+		  	textfont		CHOICE_TEXTFONT
+		  	textscale		TEXTSIZE_MEDIUM
+			forecolor		COLOR_FOCUSED
+			visible			1
+		  	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "rotatemap"; }	
+			}		
+		itemDef
+		{
+			type			ITEM_TYPE_TEXT
+			rect			-200 POSITION_Y(190) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			text      		"@SHIFT_MAP_NEXT"
+			textfont		CHOICE_TEXTFONT
+			textscale		TEXTSIZE_MEDIUM
+			textstyle		ITEM_TEXTSTYLE_SHADOWED
+			textAlign		ITEM_ALIGN_MIDDLE_CENTER
+			forecolor		COLOR_DISABLED
+			visible			1
+			decoration	}	
+
+		// RESTART MAP
+		itemDef
+		{
+			name      		"restartmap"
+			text      		"@SHIFT_MAP_RESTART"
+			type			1
+		  	style			WINDOW_STYLE_FILLED
+		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
+			rect			-200 POSITION_Y(212) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
+		  	textfont		CHOICE_TEXTFONT
+		  	textscale		TEXTSIZE_MEDIUM
+			forecolor		COLOR_FOCUSED
+			visible			1
+		  	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "restartmap"; }	
+			}		
+		itemDef
+		{
+			type			ITEM_TYPE_TEXT
+			rect			-200 POSITION_Y(212) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			text      		"@SHIFT_MAP_RESTART"
+			textfont		CHOICE_TEXTFONT
+			textscale		TEXTSIZE_MEDIUM
+			textstyle		ITEM_TEXTSTYLE_SHADOWED
+			textAlign		ITEM_ALIGN_MIDDLE_CENTER
+			forecolor		COLOR_DISABLED
+			visible			1
+			decoration	}	
+
+		// FAST NEXT MAP
+		itemDef
+		{
+			name      		"fastrestartmap"
+			text      		"@SHIFT_MAP_FASTRESTART"
+			type			1
+		  	style			WINDOW_STYLE_FILLED
+		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
+			rect			-200 POSITION_Y(234) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
+		  	textfont		CHOICE_TEXTFONT
+		  	textscale		TEXTSIZE_MEDIUM
+			forecolor		COLOR_FOCUSED
+			visible			1
+		  	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "fastrestartmap"; }	
+			}		
+		itemDef
+		{
+			type			ITEM_TYPE_TEXT
+			rect			-200 POSITION_Y(234) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			text      		"@SHIFT_MAP_FASTRESTART"
+			textfont		CHOICE_TEXTFONT
+			textscale		TEXTSIZE_MEDIUM
+			textstyle		ITEM_TEXTSTYLE_SHADOWED
+			textAlign		ITEM_ALIGN_MIDDLE_CENTER
+			forecolor		COLOR_DISABLED
+			visible			1
+			decoration	}		
+
+
+		// PLAYER CONTROL PANEL
+
+		// Player name
+		itemDef
+		{
+			type			ITEM_TYPE_TEXT
+			rect			160 POSITION_Y(38) 0 0 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			textfont		UI_FONT_NORMAL
+			textscale		TEXTSIZE_DEFAULT
+			textstyle		ITEM_TEXTSTYLE_SHADOWED
+			textAlign		ITEM_ALIGN_MIDDLE_CENTER
+			forecolor		COLOR_TITLE
+			exp			text( dvarstring( ui_rcon_player ) );
+			visible			1
+			decoration	}		
+
+		itemDef {
+			name 			"previousplayer"
+			type			1
+			style			WINDOW_STYLE_SHADER
+			rect			143 POSITION_Y(48) 16 16 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			background		"ui_arrow_left"
+			forecolor		COLOR_FOCUSED
+			visible			1
+		  	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "previousplayer"; }	
+			}		
+		
+		itemDef {
+			name 			"nextplayer"
+			type			1
+			style			WINDOW_STYLE_SHADER
+			rect			161 POSITION_Y(48) 16 16 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			background		"ui_arrow_right"
+			forecolor		COLOR_FOCUSED
+			visible			1
+		  	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "nextplayer"; }	
+			}		
+
+		// Custom reason
+		itemDef
+		{
+			type			ITEM_TYPE_TEXT
+			rect			160 POSITION_Y(80) 0 0 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			textfont		UI_FONT_NORMAL
+			textscale		TEXTSIZE_DEFAULT
+			textstyle		ITEM_TEXTSTYLE_SHADOWED
+			textAlign		ITEM_ALIGN_MIDDLE_CENTER
+			forecolor		COLOR_TITLE
+			exp			text( dvarstring( ui_rcon_reason ) );
+			visible			1
+			decoration	}		
+
+		itemDef {
+			name 			"previousreason"
+			type			1
+			style			WINDOW_STYLE_SHADER
+			rect			143 POSITION_Y(90) 16 16 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			background		"ui_arrow_left"
+			forecolor		COLOR_FOCUSED
+			visible			1
+		  	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "previousreason"; }	
+			}		
+		
+		itemDef {
+			name 			"nextreason"
+			type			1
+			style			WINDOW_STYLE_SHADER
+			rect			161 POSITION_Y(90) 16 16 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			background		"ui_arrow_right"
+			forecolor		COLOR_FOCUSED
+			visible			1
+		  	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "nextreason"; }	
+			}		
+
+		itemDef	{
+			style			WINDOW_STYLE_SHADER
+			rect			100 POSITION_Y(117) 120 0.5 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			background		"line_horizontal"
+			forecolor		1 1 1 0.85
+			visible			1	
+			decoration	}
+		
+		// RETURN PLAYER TO SPAWN
+		itemDef
+		{
+			name      		"returnspawn"
+			text      		"@SHIFT_PLAYER_RETURNSPAWN"
+			type			1
+		  	style			WINDOW_STYLE_FILLED
+		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
+			rect			120 POSITION_Y(124) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
+		  	textfont		CHOICE_TEXTFONT
+		  	textscale		TEXTSIZE_MEDIUM
+			forecolor		COLOR_FOCUSED
+			visible			1
+		  	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "returnspawn"; }	
+			}		
+		itemDef
+		{
+			type			ITEM_TYPE_TEXT
+			rect			120 POSITION_Y(124) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			text      		"@SHIFT_PLAYER_RETURNSPAWN"
+			textfont		CHOICE_TEXTFONT
+			textscale		TEXTSIZE_MEDIUM
+			textstyle		ITEM_TEXTSTYLE_SHADOWED
+			textAlign		ITEM_ALIGN_MIDDLE_CENTER
+			forecolor		COLOR_DISABLED
+			visible			1
+			decoration	}
+
+		// KILL PLAYER
+		itemDef
+		{
+			name      		"killplayer"
+			text      		"@SHIFT_PLAYER_KILL"
+			type			1
+		  	style			WINDOW_STYLE_FILLED
+		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
+			rect			120 POSITION_Y(146) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
+		  	textfont		CHOICE_TEXTFONT
+		  	textscale		TEXTSIZE_MEDIUM
+			forecolor		COLOR_FOCUSED
+			visible			1
+		  	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "killplayer"; }	
+			}		
+		itemDef
+		{
+			type			ITEM_TYPE_TEXT
+			rect			120 POSITION_Y(146) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			text      		"@SHIFT_PLAYER_KILL"
+			textfont		CHOICE_TEXTFONT
+			textscale		TEXTSIZE_MEDIUM
+			textstyle		ITEM_TEXTSTYLE_SHADOWED
+			textAlign		ITEM_ALIGN_MIDDLE_CENTER
+			forecolor		COLOR_DISABLED
+			visible			1
+			decoration	}
+						
+		// KICK PLAYER
+		itemDef
+		{
+			name      		"kickplayer"
+			text      		"@SHIFT_PLAYER_KICK"
+			type			1
+		  	style			WINDOW_STYLE_FILLED
+		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
+			rect			120 POSITION_Y(168) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
+		  	textfont		CHOICE_TEXTFONT
+		  	textscale		TEXTSIZE_MEDIUM
+			forecolor		COLOR_FOCUSED
+			visible			1
+		  	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "kickplayer"; }	
+			}		
+		itemDef
+		{
+			type			ITEM_TYPE_TEXT
+			rect			120 POSITION_Y(168) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			text      		"@SHIFT_PLAYER_KICK"
+			textfont		CHOICE_TEXTFONT
+			textscale		TEXTSIZE_MEDIUM
+			textstyle		ITEM_TEXTSTYLE_SHADOWED
+			textAlign		ITEM_ALIGN_MIDDLE_CENTER
+			forecolor		COLOR_DISABLED
+			visible			1
+			decoration	}
+			
+		// BAN PLAYER
+		itemDef
+		{
+			name      		"banplayer"
+			text      		"@SHIFT_PLAYER_BAN"
+			type			1
+		  	style			WINDOW_STYLE_FILLED
+		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
+			rect			120 POSITION_Y(190) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
+		  	textfont		CHOICE_TEXTFONT
+		  	textscale		TEXTSIZE_MEDIUM
+			forecolor		COLOR_FOCUSED
+			visible			1
+		  	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "banplayer"; }	
+			}		
+		itemDef
+		{
+			type			ITEM_TYPE_TEXT
+			rect			120 POSITION_Y(190) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			text      		"@SHIFT_PLAYER_BAN"
+			textfont		CHOICE_TEXTFONT
+			textscale		TEXTSIZE_MEDIUM
+			textstyle		ITEM_TEXTSTYLE_SHADOWED
+			textAlign		ITEM_ALIGN_MIDDLE_CENTER
+			forecolor		COLOR_DISABLED
+			visible			1
+			decoration	}
+
+		itemDef	{
+			style			WINDOW_STYLE_SHADER
+			rect			100 POSITION_Y(227) 120 0.5 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			background		"line_horizontal"
+			forecolor		1 1 1 0.85
+			visible			1	
+			decoration	}
+
+		// FREEZETAG GAME TYPE
+		itemDef
+		{
+			name      		"freezetag"
+			text      		"@SHIFT_FREEZETAG_ON"
+			type			1
+		  	style			WINDOW_STYLE_FILLED
+		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
+			rect			120 POSITION_Y(234) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
+		  	textfont		CHOICE_TEXTFONT
+		  	textscale		TEXTSIZE_MEDIUM
+			forecolor		COLOR_FOCUSED
+			visible			when ( !dvarbool( ui_gameplay_ftag ) );
+		  	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "freezetag"; }	
+			}
+
+		itemDef
+		{
+			type			ITEM_TYPE_TEXT
+			rect			120 POSITION_Y(234) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			text      		"@SHIFT_FREEZETAG_ON"
+			textfont		CHOICE_TEXTFONT
+			textscale		TEXTSIZE_MEDIUM
+			textstyle		ITEM_TEXTSTYLE_SHADOWED
+			textAlign		ITEM_ALIGN_MIDDLE_CENTER
+			forecolor		COLOR_DISABLED
+			visible			when ( !dvarbool( ui_gameplay_ftag ) );
+			decoration	}
+
+		itemDef
+		{
+			name      		"freezetag"
+			text      		"@SHIFT_FREEZETAG_OFF"
+			type			1
+		  	style			WINDOW_STYLE_FILLED
+		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
+			rect			120 POSITION_Y(234) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
+		  	textfont		CHOICE_TEXTFONT
+		  	textscale		TEXTSIZE_MEDIUM
+			forecolor		COLOR_FOCUSED
+			visible			when ( dvarbool( ui_gameplay_ftag ) );
+		  	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "freezetag"; }	
+			}
+
+		itemDef
+		{
+			type			ITEM_TYPE_TEXT
+			rect			120 POSITION_Y(234) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			text      		"@SHIFT_FREEZETAG_OFF"
+			textfont		CHOICE_TEXTFONT
+			textscale		TEXTSIZE_MEDIUM
+			textstyle		ITEM_TEXTSTYLE_SHADOWED
+			textAlign		ITEM_ALIGN_MIDDLE_CENTER
+			forecolor		COLOR_DISABLED
+			visible			when ( dvarbool( ui_gameplay_ftag ) );
+			decoration	}		
+
+		#include "ui/safearea.menu"
+	}
+}
+		

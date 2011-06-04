@@ -20,6 +20,12 @@ VERSION          "1"
 CONFIG           "C:\trees\cod3\cod3\bin\StringEd.cfg"
 FILENOTES        ""
 
+REFERENCE	LOGOTEXT
+LANG_ENGLISH	"^2[SHIFT] ^1SPEARHEAD ^3INTERNATIONAL ^5FREEZETAG"
+
+REFERENCE	FREEZETAG
+LANG_ENGLISH	"^2[SHIFT] ^5FREEZETAG ^2GAMEPLAY"
+
 //+----------------------------------------------------------------------------------------+
 //¦ Quick Voice Bind Menu                                                                  ¦
 //+----------------------------------------------------------------------------------------+
@@ -184,5 +190,65 @@ LANG_ENGLISH 	"^5All the ^3Marines^5 have been frozen!"
 
 REFERENCE 	FTAG_SPETSNAZ_FROZEN
 LANG_ENGLISH 	"^5All the ^3Spetsnaz^5 have been frozen!"
+
+//******************************************************************************
+// Shift Rcon Menu
+//******************************************************************************
+REFERENCE	TITLE
+LANG_ENGLISH 	"RCON MENU"
+
+REFERENCE	MAP_CONTROL
+LANG_ENGLISH 	"^3Map Control Panel"
+
+REFERENCE	MAP_LOAD
+LANG_ENGLISH 	"Load Map/Gametype"
+
+REFERENCE	SET_NEXT
+LANG_ENGLISH 	"Set as Next Map/Gametype"
+
+REFERENCE	MAP_END
+LANG_ENGLISH 	"End Current Map"
+
+REFERENCE	MAP_FASTRESTART
+LANG_ENGLISH 	"Fast Restart Map"
+
+REFERENCE	MAP_RESTART
+LANG_ENGLISH 	"Restart Current Map"
+
+REFERENCE	MAP_NEXT
+LANG_ENGLISH 	"Rotate to Next Map"
+
+REFERENCE	PLAYER_CONTROL
+LANG_ENGLISH 	"^3Player Control Panel"
+
+REFERENCE PLAYER_RETURNSPAWN
+LANG_ENGLISH 	"Return Player to Spawn"
+
+REFERENCE PLAYER_RETURNED
+LANG_ENGLISH 	"^3You have been returned to your last spawn!"
+
+REFERENCE	PLAYER_KILL
+LANG_ENGLISH 	"Kill Player"
+
+REFERENCE	PLAYER_KICK
+LANG_ENGLISH 	"Kick Player"
+
+REFERENCE	PLAYER_BAN
+LANG_ENGLISH 	"Ban Player"
+
+REFERENCE 	WARNING
+LANG_ENGLISH 	"^1Warning &&1 out of &&2 before getting kicked!"
+
+REFERENCE	NOTENABLED
+LANG_ENGLISH 	"Advanced ACP is not enabled in this server."
+
+REFERENCE	NOACCESS
+LANG_ENGLISH 	"You do not have access to the Advanced ACP via GUID ^3&&1^7."
+
+REFERENCE	FREEZETAG_ON
+LANG_ENGLISH 	"Turn on freezetag"
+
+REFERENCE	FREEZETAG_OFF
+LANG_ENGLISH 	"Turn off freezetag"
 
 ENDMARKER

@@ -39,7 +39,7 @@ init()
 	level.overrideTeamScore = true;
 	level.displayRoundEndText = true;
 
-	level.scr_game_spawn_type = getdvarx("scr_game_spawn_type","int",0,0,4);
+	level.scr_game_spawn_type = getdvardefault("scr_game_spawn_type","int",0,0,4);
 	level.hardcoreMode = getDvarInt( "scr_hardcore" );
 	level.oldschool = ( getDvarInt( "scr_oldschool" ) == 1 );
 
@@ -47,11 +47,11 @@ init()
 		level.onSpawnPlayer = ::onSpawnPlayer;
 
 	if ( level.hardcoreMode )
-		level.maxhealth = getdvarx( "scr_player_maxhealth", "int", 30, 1, 500 );
+		level.maxhealth = getdvardefault( "scr_player_maxhealth", "int", 30, 1, 500 );
 	else if ( level.oldschool )
-		level.maxhealth = getdvarx( "scr_player_maxhealth", "int", 200, 1, 500 );
+		level.maxhealth = getdvardefault( "scr_player_maxhealth", "int", 200, 1, 500 );
 	else
-		level.maxhealth = getdvarx( "scr_player_maxhealth", "int", 100, 1, 500 );
+		level.maxhealth = getdvardefault( "scr_player_maxhealth", "int", 100, 1, 500 );
 
 	// Add more detail to the type of game being played
 	if ( isdefined ( level.ftagactive ) && level.ftagactive ) {
@@ -126,26 +126,26 @@ onPrecacheFtag()
 			break;
 	}
 
-	level.freezedist = getdvarx("scr_ftag_freezemaxrange","int",0,0,999999);
-	level.defrostdist = getdvarx("scr_ftag_defrostmaxrange","int",0,0,999999);
-	level.defrosttime = getdvarx("scr_ftag_defrosttime","int",15,5,100) / 100;
-	level.defrostmode = getdvarx("scr_ftag_defrostmode","int",0,0,2);
+	level.freezedist = getdvardefault("scr_ftag_freezemaxrange","int",0,0,999999);
+	level.defrostdist = getdvardefault("scr_ftag_defrostmaxrange","int",0,0,999999);
+	level.defrosttime = getdvardefault("scr_ftag_defrosttime","int",15,5,100) / 100;
+	level.defrostmode = getdvardefault("scr_ftag_defrostmode","int",0,0,2);
 
-	level.defrostrespawn = getdvarx("scr_ftag_defrostrespawn","int",1,0,1);
-	level.autodefrost = getdvarx("scr_ftag_autodefrost","int",0,0,120);
+	level.defrostrespawn = getdvardefault("scr_ftag_defrostrespawn","int",1,0,1);
+	level.autodefrost = getdvardefault("scr_ftag_autodefrost","int",0,0,120);
 
-	level.ftag_sd_spec = getdvarx("scr_ftag_sd_spec","int",1,0,1);
-	level.ftag_sd_time = getdvarx("scr_ftag_sd_time","int",90,0,999999);
-	level.scr_ftag_rotate_ann = getdvarx("scr_ftag_rotate_ann","int",1,0,1);
-	level.scr_ftag_rotate_angle = getdvarx("scr_ftag_rotate_angle","int",1,1,180);
-	level.scr_ftag_unfreeze_button = getdvarx( "scr_ftag_unfreeze_button", "string", "use" );
-	level.scr_ftag_showdefrostbeam = getdvarx("scr_ftag_showdefrostbeam","int",0,0,1);
-	level.scr_ftag_showteamstatus = getdvarx("scr_ftag_showteamstatus","int",1,0,1);
-	level.scr_ftag_showcentermessage = getdvarx("scr_ftag_showcentermessage","int",1,0,1);
-	level.scr_ftag_showstatusmessage = getdvarx("scr_ftag_showstatusmessage","int",1,0,1);
+	level.ftag_sd_spec = getdvardefault("scr_ftag_sd_spec","int",1,0,1);
+	level.ftag_sd_time = getdvardefault("scr_ftag_sd_time","int",90,0,999999);
+	level.scr_ftag_rotate_ann = getdvardefault("scr_ftag_rotate_ann","int",1,0,1);
+	level.scr_ftag_rotate_angle = getdvardefault("scr_ftag_rotate_angle","int",1,1,180);
+	level.scr_ftag_unfreeze_button = getdvardefault( "scr_ftag_unfreeze_button", "string", "use" );
+	level.scr_ftag_showdefrostbeam = getdvardefault("scr_ftag_showdefrostbeam","int",0,0,1);
+	level.scr_ftag_showteamstatus = getdvardefault("scr_ftag_showteamstatus","int",1,0,1);
+	level.scr_ftag_showcentermessage = getdvardefault("scr_ftag_showcentermessage","int",1,0,1);
+	level.scr_ftag_showstatusmessage = getdvardefault("scr_ftag_showstatusmessage","int",1,0,1);
 
 	level.thismap = toLower( getDvar( "mapname" ) );
-	level.spawn_type_map = getdvarx("scr_spawn_type_" + level.thismap,"int",0,0,4);
+	level.spawn_type_map = getdvardefault("scr_spawn_type_" + level.thismap,"int",0,0,4);
 
 	level.fx_defrostmelt = loadFx("freezetag/defrostmelt");
 	level.barsize = 100;

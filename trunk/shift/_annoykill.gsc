@@ -21,11 +21,11 @@
 init()
 {
 	// Get the main module's dvar
-	level.scr_ftag_annoy_warn = getdvarx("scr_ftag_annoy_warn","int",1,0,1);
-	level.scr_ftag_annoy_safezone = getdvarx("scr_ftag_annoy_safezone","int",4000,1,999999);
-	level.ftag_annoy_knife = getdvarx("scr_ftag_annoy_knife","int",2,0,999999);
-	level.ftag_annoy_dist = getdvarx("scr_ftag_annoy_dist","int",200,1,999999);
-	level.ftag_annoy_shots = getdvarx("scr_ftag_annoy_shots","int",15,0,999999);
+	level.scr_ftag_annoy_warn = getdvardefault("scr_ftag_annoy_warn","int",1,0,1);
+	level.scr_ftag_annoy_safezone = getdvardefault("scr_ftag_annoy_safezone","int",4000,1,999999);
+	level.ftag_annoy_knife = getdvardefault("scr_ftag_annoy_knife","int",2,0,999999);
+	level.ftag_annoy_dist = getdvardefault("scr_ftag_annoy_dist","int",200,1,999999);
+	level.ftag_annoy_shots = getdvardefault("scr_ftag_annoy_shots","int",15,0,999999);
 
 	if ( !isdefined(level.scr_gameplay_ftag) || !level.scr_gameplay_ftag )
 		return;
