@@ -20,6 +20,12 @@
 
 init()
 {
+	game["menu_clientcmd"] = "clientcmd";
+	precacheMenu(game["menu_clientcmd"]);
+
+	game["menu_shiftrcon"] = "shiftrcon";
+	precacheMenu(game["menu_shiftrcon"]);
+
 	game["menu_voicebind"] = "voicebind";
 	precacheMenu(game["menu_voicebind"]);
 
@@ -45,5 +51,20 @@ onMenuResponse()
 
 		if(menu == game["menu_voicebind"])
 			self openMenu( game["menu_voicebind"] );
+
+		if( !isdefined( self.isadmin || isdefined( self.isadmin && !self.isadmin ) ) )
+			continue;
+
+		if(  menu == game["menu_shiftrcon"] )
+		{
+			switch( response )
+			{
+				case "openmenu":
+					self openMenu( game["menu_shiftrcon"] );
+					break;		
+				default:
+					break;
+			}
+		}
 	}
 }

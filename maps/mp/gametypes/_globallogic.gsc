@@ -3525,7 +3525,7 @@ removeSpawnMessageShortly( delay )
 
 Callback_StartGameType()
 {
-	if ( isdefined( level.scr_gameplay_ftag ) && level.scr_gameplay_ftag )
+	if ( isdefined ( level.scr_gameplay_ftag ) && level.scr_gameplay_ftag )
 		level thread shift\_ftagplay::init();
 
 	level.prematchPeriod = 0;
