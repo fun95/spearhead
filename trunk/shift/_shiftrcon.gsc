@@ -33,18 +33,18 @@ init()
 	for ( index=0; index < OurGametypes.size; index++ )
 		level.scr_rcon_gametypes[ index ] = OurGametypes[index];
 		
-	// Custom reasons
-	tempReasons = getdvarlistx( "scr_rcon_reason_", "string", "" );
+	// Custom warnings
+	tempWarnings = getdvarlistx( "scr_rcon_warning_", "string", "" );
 	level.scr_rcon_warning_abv = [];
 	level.scr_rcon_warning = [];
 	
-	// Add no custom reason option
-	level.scr_rcon_warning_abv[0] = "<No Custom Reason>";
+	// Add no custom warning option
+	level.scr_rcon_warning_abv[0] = "<No Custom Warning>";
 	level.scr_rcon_warning[0] = "";
-	for ( iLine=0; iLine < tempReasons.size; iLine++ ) {
-		thisLine = strtok( tempReasons[iLine], ";" );
+	for ( iLine=0; iLine < tempWarnings.size; iLine++ ) {
+		thisLine = strtok( tempWarnings[iLine], ";" );
 		
-		// Add the new custom reason
+		// Add the new custom warning
 		newElement = level.scr_rcon_warning_abv.size;
 		level.scr_rcon_warning_abv[newElement] = thisLine[0];
 		level.scr_rcon_warning[newElement] = thisLine[1];
@@ -84,8 +84,8 @@ initRCON()
 	self setClientDvars(	
 		"ui_rcon_map", self getCurrentMap(),
 		"ui_rcon_gametype", self getCurrentGametype(),
-		"ui_rcon_player", self getFirstPlayer(),
-		"ui_rcon_reason", self getFirstReason()
+		"ui_rcon_player", level.RconPlayers[0].name,
+		"ui_rcon_warning", level.scr_rcon_warning_abv[0]
 	);
 	
 	self thread onMenuResponse();
@@ -132,20 +132,6 @@ getCurrentGametype()
 	
 	self.RconGametype = index;
 	return getGameType( currentType );	
-}
-
-
-getFirstPlayer()
-{
-	// Get the first defined player
-	return level.RconPlayers[0].name;	
-}
-
-
-getFirstReason()
-{
-	self.WarningIndex = 0;
-	return level.scr_rcon_warning_abv[self.WarningIndex];
 }
 
 
@@ -214,7 +200,7 @@ getNextPlayer()
 }
 
 
-getPreviousReason()
+getPreviousWarning()
 {
 	// Check if we are going outside the array
 	if ( self.WarningIndex == 0 ) {
@@ -226,7 +212,7 @@ getPreviousReason()
 }
 
 
-getNextReason()
+getNextWarning()
 {
 	// Check if we are going outside the array
 	if ( self.WarningIndex == level.scr_rcon_warning_abv.size - 1 ) {
@@ -334,29 +320,14 @@ onMenuResponse()
 					self setClientDvar( "ui_rcon_player", self getNextPlayer() );
 					break;
 
-				case "previousreason":
-					self setClientDvar( "ui_rcon_reason", self getPreviousReason() );
+				case "previouswarning":
+					self setClientDvar( "ui_rcon_warning", self getPreviousWarning() );
 					break;
 					
-				case "nextreason":
-					self setClientDvar( "ui_rcon_reason", self getNextReason() );
+				case "nextwarning":
+					self setClientDvar( "ui_rcon_warning", self getNextWarning() );
 					break;
 					
-				case "returnspawn":
-					// Check if this player is still connected and alive
-					player = self getCurrentPlayer( false );
-					if ( isDefined( player ) ) {
-						if ( isDefined( player.pers ) && isDefined( player.pers["team"] ) && player.pers["team"] != "spectator" && isAlive( player ) ) {
-							// Return player to his/her last known spawn
-							player iprintlnbold( &"SHIFT_PLAYER_RETURNED" );
-							player setOrigin( player.spawnOrigin );
-							player setPlayerAngles( player.spawnAngles );
-						}
-					} else {
-						self setClientDvar( "ui_rcon_player", self getNextPlayer() );
-					}
-					break;
-
 				case "killplayer":
 					// Check if this player is still connected and alive
 					player = self getCurrentPlayer( false );
@@ -365,16 +336,14 @@ onMenuResponse()
 							// Check if we should display a custom message
 							if ( level.scr_rcon_warning[ self.WarningIndex ] != "" ) {
 								player iprintlnbold( level.scr_rcon_warning[ self.WarningIndex ] );
-							} else {
-								player iprintlnbold( &"OW_B3_PUNISHED" );
-							}
+							} 
 							player suicide();
 						}
 					} else {
 						self setClientDvar( "ui_rcon_player", self getNextPlayer() );
 					}
 					break;
-					
+
 				case "kickplayer":
 					// Check if this player is still connected
 					player = self getCurrentPlayer( false );
@@ -382,7 +351,7 @@ onMenuResponse()
 						// Check if we should display a custom message or just kick the player directly
 						if ( level.scr_rcon_warning[ self.WarningIndex ] != "" ) {
 							player iprintlnbold( level.scr_rcon_warning[ self.WarningIndex ] );
-							wait (2.0);
+							wait (3.0);
 						}
 						kick( player getEntityNumber() );
 					}
@@ -396,7 +365,7 @@ onMenuResponse()
 						// Check if we should display a custom message or just kick the player directly
 						if ( level.scr_rcon_warning[ self.WarningIndex ] != "" ) {
 							player iprintlnbold( level.scr_rcon_warning[ self.WarningIndex ] );
-							wait (2.0);
+							wait (3.0);
 						}						
 						ban( player getEntityNumber() );
 					}

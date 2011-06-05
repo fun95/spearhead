@@ -429,6 +429,74 @@
 			visible			1
 			decoration	}		
 
+		itemDef	{
+			style			WINDOW_STYLE_SHADER
+			rect			-220 POSITION_Y(261) 120 0.5 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			background		"line_horizontal"
+			forecolor		1 1 1 0.85
+			visible			1	
+			decoration	}
+
+		// FREEZETAG GAME TYPE
+		itemDef
+		{
+			name      		"freezetag"
+			text      		"@SHIFT_FREEZETAG_ON"
+			type			1
+		  	style			WINDOW_STYLE_FILLED
+		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
+			rect			-200 POSITION_Y(268) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
+		  	textfont		CHOICE_TEXTFONT
+		  	textscale		TEXTSIZE_MEDIUM
+			forecolor		COLOR_FOCUSED
+			visible			when ( !dvarbool( ui_gameplay_ftag ) );
+		  	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "freezetag"; }	
+			}
+
+		itemDef
+		{
+			type			ITEM_TYPE_TEXT
+			rect			-200 POSITION_Y(268) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			text      		"@SHIFT_FREEZETAG_ON"
+			textfont		CHOICE_TEXTFONT
+			textscale		TEXTSIZE_MEDIUM
+			textstyle		ITEM_TEXTSTYLE_SHADOWED
+			textAlign		ITEM_ALIGN_MIDDLE_CENTER
+			forecolor		COLOR_DISABLED
+			visible			when ( !dvarbool( ui_gameplay_ftag ) );
+			decoration	}
+
+		itemDef
+		{
+			name      		"freezetag"
+			text      		"@SHIFT_FREEZETAG_OFF"
+			type			1
+		  	style			WINDOW_STYLE_FILLED
+		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
+			rect			-200 POSITION_Y(268) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
+		  	textfont		CHOICE_TEXTFONT
+		  	textscale		TEXTSIZE_MEDIUM
+			forecolor		COLOR_FOCUSED
+			visible			when ( dvarbool( ui_gameplay_ftag ) );
+		  	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "freezetag"; }	
+			}
+
+		itemDef
+		{
+			type			ITEM_TYPE_TEXT
+			rect			-200 POSITION_Y(268) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			text      		"@SHIFT_FREEZETAG_OFF"
+			textfont		CHOICE_TEXTFONT
+			textscale		TEXTSIZE_MEDIUM
+			textstyle		ITEM_TEXTSTYLE_SHADOWED
+			textAlign		ITEM_ALIGN_MIDDLE_CENTER
+			forecolor		COLOR_DISABLED
+			visible			when ( dvarbool( ui_gameplay_ftag ) );
+			decoration	}
 
 		// PLAYER CONTROL PANEL
 
@@ -470,7 +538,7 @@
 		  	action { play "mouse_click"; scriptMenuResponse "nextplayer"; }	
 			}		
 
-		// Custom reason
+		// Custom warning
 		itemDef
 		{
 			type			ITEM_TYPE_TEXT
@@ -480,12 +548,12 @@
 			textstyle		ITEM_TEXTSTYLE_SHADOWED
 			textAlign		ITEM_ALIGN_MIDDLE_CENTER
 			forecolor		COLOR_TITLE
-			exp			text( dvarstring( ui_rcon_reason ) );
+			exp			text( dvarstring( ui_rcon_warning ) );
 			visible			1
 			decoration	}		
 
 		itemDef {
-			name 			"previousreason"
+			name 			"previouswarning"
 			type			1
 			style			WINDOW_STYLE_SHADER
 			rect			143 POSITION_Y(90) 16 16 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
@@ -493,11 +561,11 @@
 			forecolor		COLOR_FOCUSED
 			visible			1
 		  	mouseEnter { play "mouse_over"; } 
-		  	action { play "mouse_click"; scriptMenuResponse "previousreason"; }	
+		  	action { play "mouse_click"; scriptMenuResponse "previouswarning"; }	
 			}		
 		
 		itemDef {
-			name 			"nextreason"
+			name 			"nextwarning"
 			type			1
 			style			WINDOW_STYLE_SHADER
 			rect			161 POSITION_Y(90) 16 16 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
@@ -505,7 +573,7 @@
 			forecolor		COLOR_FOCUSED
 			visible			1
 		  	mouseEnter { play "mouse_over"; } 
-		  	action { play "mouse_click"; scriptMenuResponse "nextreason"; }	
+		  	action { play "mouse_click"; scriptMenuResponse "nextwarning"; }	
 			}		
 
 		itemDef	{
@@ -516,36 +584,6 @@
 			visible			1	
 			decoration	}
 		
-		// RETURN PLAYER TO SPAWN
-		itemDef
-		{
-			name      		"returnspawn"
-			text      		"@SHIFT_PLAYER_RETURNSPAWN"
-			type			1
-		  	style			WINDOW_STYLE_FILLED
-		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
-			rect			120 POSITION_Y(124) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
-		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
-		  	textfont		CHOICE_TEXTFONT
-		  	textscale		TEXTSIZE_MEDIUM
-			forecolor		COLOR_FOCUSED
-			visible			1
-		  	mouseEnter { play "mouse_over"; } 
-		  	action { play "mouse_click"; scriptMenuResponse "returnspawn"; }	
-			}		
-		itemDef
-		{
-			type			ITEM_TYPE_TEXT
-			rect			120 POSITION_Y(124) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
-			text      		"@SHIFT_PLAYER_RETURNSPAWN"
-			textfont		CHOICE_TEXTFONT
-			textscale		TEXTSIZE_MEDIUM
-			textstyle		ITEM_TEXTSTYLE_SHADOWED
-			textAlign		ITEM_ALIGN_MIDDLE_CENTER
-			forecolor		COLOR_DISABLED
-			visible			1
-			decoration	}
-
 		// KILL PLAYER
 		itemDef
 		{
@@ -554,7 +592,7 @@
 			type			1
 		  	style			WINDOW_STYLE_FILLED
 		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
-			rect			120 POSITION_Y(146) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			rect			120 POSITION_Y(124) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
 		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
 		  	textfont		CHOICE_TEXTFONT
 		  	textscale		TEXTSIZE_MEDIUM
@@ -566,7 +604,7 @@
 		itemDef
 		{
 			type			ITEM_TYPE_TEXT
-			rect			120 POSITION_Y(146) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			rect			120 POSITION_Y(124) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
 			text      		"@SHIFT_PLAYER_KILL"
 			textfont		CHOICE_TEXTFONT
 			textscale		TEXTSIZE_MEDIUM
@@ -584,7 +622,7 @@
 			type			1
 		  	style			WINDOW_STYLE_FILLED
 		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
-			rect			120 POSITION_Y(168) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			rect			120 POSITION_Y(146) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
 		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
 		  	textfont		CHOICE_TEXTFONT
 		  	textscale		TEXTSIZE_MEDIUM
@@ -596,7 +634,7 @@
 		itemDef
 		{
 			type			ITEM_TYPE_TEXT
-			rect			120 POSITION_Y(168) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			rect			120 POSITION_Y(146) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
 			text      		"@SHIFT_PLAYER_KICK"
 			textfont		CHOICE_TEXTFONT
 			textscale		TEXTSIZE_MEDIUM
@@ -614,7 +652,7 @@
 			type			1
 		  	style			WINDOW_STYLE_FILLED
 		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
-			rect			120 POSITION_Y(190) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			rect			120 POSITION_Y(168) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
 		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
 		  	textfont		CHOICE_TEXTFONT
 		  	textscale		TEXTSIZE_MEDIUM
@@ -626,7 +664,7 @@
 		itemDef
 		{
 			type			ITEM_TYPE_TEXT
-			rect			120 POSITION_Y(190) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			rect			120 POSITION_Y(168) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
 			text      		"@SHIFT_PLAYER_BAN"
 			textfont		CHOICE_TEXTFONT
 			textscale		TEXTSIZE_MEDIUM
@@ -635,75 +673,6 @@
 			forecolor		COLOR_DISABLED
 			visible			1
 			decoration	}
-
-		itemDef	{
-			style			WINDOW_STYLE_SHADER
-			rect			100 POSITION_Y(227) 120 0.5 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
-			background		"line_horizontal"
-			forecolor		1 1 1 0.85
-			visible			1	
-			decoration	}
-
-		// FREEZETAG GAME TYPE
-		itemDef
-		{
-			name      		"freezetag"
-			text      		"@SHIFT_FREEZETAG_ON"
-			type			1
-		  	style			WINDOW_STYLE_FILLED
-		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
-			rect			120 POSITION_Y(234) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
-		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
-		  	textfont		CHOICE_TEXTFONT
-		  	textscale		TEXTSIZE_MEDIUM
-			forecolor		COLOR_FOCUSED
-			visible			when ( !dvarbool( ui_gameplay_ftag ) );
-		  	mouseEnter { play "mouse_over"; } 
-		  	action { play "mouse_click"; scriptMenuResponse "freezetag"; }	
-			}
-
-		itemDef
-		{
-			type			ITEM_TYPE_TEXT
-			rect			120 POSITION_Y(234) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
-			text      		"@SHIFT_FREEZETAG_ON"
-			textfont		CHOICE_TEXTFONT
-			textscale		TEXTSIZE_MEDIUM
-			textstyle		ITEM_TEXTSTYLE_SHADOWED
-			textAlign		ITEM_ALIGN_MIDDLE_CENTER
-			forecolor		COLOR_DISABLED
-			visible			when ( !dvarbool( ui_gameplay_ftag ) );
-			decoration	}
-
-		itemDef
-		{
-			name      		"freezetag"
-			text      		"@SHIFT_FREEZETAG_OFF"
-			type			1
-		  	style			WINDOW_STYLE_FILLED
-		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
-			rect			120 POSITION_Y(234) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
-		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
-		  	textfont		CHOICE_TEXTFONT
-		  	textscale		TEXTSIZE_MEDIUM
-			forecolor		COLOR_FOCUSED
-			visible			when ( dvarbool( ui_gameplay_ftag ) );
-		  	mouseEnter { play "mouse_over"; } 
-		  	action { play "mouse_click"; scriptMenuResponse "freezetag"; }	
-			}
-
-		itemDef
-		{
-			type			ITEM_TYPE_TEXT
-			rect			120 POSITION_Y(234) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
-			text      		"@SHIFT_FREEZETAG_OFF"
-			textfont		CHOICE_TEXTFONT
-			textscale		TEXTSIZE_MEDIUM
-			textstyle		ITEM_TEXTSTYLE_SHADOWED
-			textAlign		ITEM_ALIGN_MIDDLE_CENTER
-			forecolor		COLOR_DISABLED
-			visible			when ( dvarbool( ui_gameplay_ftag ) );
-			decoration	}		
 
 		#include "ui/safearea.menu"
 	}
