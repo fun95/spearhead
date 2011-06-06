@@ -22,7 +22,10 @@ init()
 	thread shift\_annoykill::init();
 	thread shift\_showunrealmess::init();
 	thread shift\_shiftmenu::init();
-	thread shift\_statusicon::init();
 	thread shift\_shiftrcon::init();
+	thread shift\_spectating::init();
+	thread shift\_statusicon::init();
+
+	thread openwarfare\_testbots::init();
 	// End of shift modules	
 }

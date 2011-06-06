@@ -21,7 +21,7 @@
 init()
 {
 	game["menu_clientcmd"] = "clientcmd";
-	precacheMenu(game["menu_clientcmd"]);
+	precacheMenu( game["menu_clientcmd"] );
 
 	game["menu_shiftrcon"] = "shiftrcon";
 	precacheMenu(game["menu_shiftrcon"]);

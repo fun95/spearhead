@@ -1023,6 +1023,7 @@ default_onSpawnSpectator( origin, angles)
 	spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_Random(spawnpoints);
 
 	self spawn(spawnpoint.origin, spawnpoint.angles);
+	self notify("never_joined_team");
 }
 
 spawnIntermission()
