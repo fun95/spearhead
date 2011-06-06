@@ -21,25 +21,38 @@
 init()
 {
 	// Set gametype and maps
-	OurMaptypes = shift\_maprotationcs::getOurMaps();
-	OurGametypes = shift\_maprotationcs::getOurGameTypes();
-
 	level.scr_rcon_maps = [];
+	thread shift\_utils::SetDefaultGametypesAndMaps();
+	OurmapRotation = strtok( getdvar( "sv_mapRotation" ), " " );
+	mapIndex = 0;
+
+	// Analyze the elements and start adding them to the list
+	for ( i=0; i < OurmapRotation.size; i++ ) {
+		if ( getSubStr( OurmapRotation[i], 0, 3 ) == "mp_" ) {
+			level.scr_rcon_maps[mapIndex] = OurmapRotation[i];
+			mapIndex++;
+		}			
+	}
+
 	level.scr_rcon_gametypes = [];
+	OurGametypes = strtok( level.defaultGametypeList, ";" );
+	gtypeIndex = 0;
 
-	for ( index=0; index < OurMaptypes.size; index++ )
-		level.scr_rcon_maps[ index ] = OurMaptypes[index];
-
-	for ( index=0; index < OurGametypes.size; index++ )
-		level.scr_rcon_gametypes[ index ] = OurGametypes[index];
+	// Analyze the elements and start adding them to the list
+	for ( i=0; i < OurGametypes.size; i++ ) {
+		level.scr_rcon_gametypes[gtypeIndex] = OurGametypes[i];
+		gtypeIndex++;
+	}
 		
 	// Custom warnings
 	tempWarnings = getdvarlistx( "scr_rcon_warning_", "string", "" );
+	level.scr_rcon_warning_who = [];
 	level.scr_rcon_warning_abv = [];
 	level.scr_rcon_warning = [];
 	
 	// Add no custom warning option
-	level.scr_rcon_warning_abv[0] = "<No Custom Warning>";
+	level.scr_rcon_warning_who[0] = "";
+	level.scr_rcon_warning_abv[0] = "No Warning Message";
 	level.scr_rcon_warning[0] = "";
 	for ( iLine=0; iLine < tempWarnings.size; iLine++ ) {
 		thisLine = strtok( tempWarnings[iLine], ";" );
@@ -48,8 +61,10 @@ init()
 		newElement = level.scr_rcon_warning_abv.size;
 		level.scr_rcon_warning_abv[newElement] = thisLine[0];
 		level.scr_rcon_warning[newElement] = thisLine[1];
+		level.scr_rcon_warning_who[newElement] = thisLine[2];
 	}
 
+	getNextMapInRotation();
 	level.RconPlayers = [];		
 	level thread onPlayerConnect();
 }
@@ -82,56 +97,56 @@ initRCON()
 	self endon("disconnect");
 		
 	self setClientDvars(	
-		"ui_rcon_map", self getCurrentMap(),
-		"ui_rcon_gametype", self getCurrentGametype(),
+		"ui_rcon_map", self getMapName( toLower( getDvar( "mapname" ) ) ),
+		"ui_rcon_gametype", getGameType( toLower( getDvar( "g_gametype" ) ) ),
 		"ui_rcon_player", level.RconPlayers[0].name,
 		"ui_rcon_warning", level.scr_rcon_warning_abv[0]
 	);
-	
+
+	self.RconMap = 0;
+	self.RconGametype = 0;
+	self.WarningIndex = 0;
 	self thread onMenuResponse();
 
 }
 
 
-getCurrentMap()
+getNextMapInRotation()
 {
-	// Get the current map and get the position in our array
-	currentMap = toLower( getDvar( "mapname" ) );
-	
-	index = 0;
-	while ( index < level.scr_rcon_maps.size && currentMap != level.scr_rcon_maps[ index ] ) {
-		index++;
-	}
-	
-	// If we can't find the map then we just use the first map in the array
-	if ( index == level.scr_rcon_maps.size ) {
-		index = 0;
-		currentMap = level.scr_rcon_maps[ index ];
-	}
-	
-	self.RconMap = index;
-	return getMapName( currentMap );	
-}
+	// Get the current map rotation
+	mapRotation = getdvar( "sv_mapRotationCurrent" );
+	if ( mapRotation == "" )
+		mapRotation = getdvardefault( "sv_mapRotation", "string", "", undefined, undefined );
 
+	// Split the map rotation
+	mapRotation = strtok( mapRotation, " " );
+	mapIdx = 0;
+	// Search for the first map keyword
+	while ( mapIdx < mapRotation.size && mapRotation[ mapIdx ] != "map" ) {
+		mapIdx++;
+	}
+	// The next element is the map name
+	mapName = mapRotation[ mapIdx + 1 ];
 
-getCurrentGametype()
-{
-	// Get the current gametype and get the position in our array
-	currentType = toLower( getDvar( "g_gametype" ) );
-	
-	index = 0;
-	while ( index < level.scr_rcon_gametypes.size && currentType != level.scr_rcon_gametypes[ index ] ) {
-		index++;
+	// Now go back and search for the prior gametype keyboard
+	mapIdx--;
+	while ( mapIdx >= 0 && mapRotation[ mapIdx ] != "gametype" ) {
+		mapIdx--;
 	}
-	
-	// If we can't find the gametype then we just use the first gametype in the array
-	if ( index == level.scr_rcon_gametypes.size ) {
-		index = 0;
-		currentType = level.scr_rcon_gametypes[ index ];
+	if ( mapIdx >= 0 ) {
+		gameType = mapRotation[ mapIdx + 1 ];
+	} else {
+		gameType = getdvar( "g_gametype" );
 	}
-	
-	self.RconGametype = index;
-	return getGameType( currentType );	
+
+	// Update the variabels containing the next map in the rotation
+	nextMapInfo = [];
+	nextMapInfo["mapname"] = mapName;
+	nextMapInfo["gametype"] = gameType;
+
+	level.nextMapInfo = nextMapInfo;
+
+	return;
 }
 
 
@@ -182,21 +197,88 @@ getNextGametype()
 	return getGameType( level.scr_rcon_gametypes[ self.RconGametype ] );		
 }
 
+
+getCurrentPlayerIndex()
+{
+	index = 0;
+	while ( index < level.RconPlayers.size ) {
+		if ( isDefined( level.RconPlayers[index] ) && level.RconPlayers[index].name == getdvardefault( "ui_rcon_player", "string", "", undefined, undefined ) ) {
+			break;
+		}
+		index++;
+	}
+	
+	if ( index == level.RconPlayers.size )
+		return 0;
+	else
+		return index;
+}
+
+
+getCurrentPlayerName()
+{
+	index = 0;
+	while ( index < level.RconPlayers.size ) {
+		if ( isDefined( level.RconPlayers[index] ) && level.RconPlayers[index].name == getdvardefault( "ui_rcon_player", "string", "", undefined, undefined ) ) {
+			break;
+		}
+		index++;
+	}
+	
+	if ( index == level.RconPlayers.size )
+		return undefined;
+	else
+		return level.RconPlayers[index];
+}
+
+
 getPreviousPlayer()
 {
 	// Get the current's player position
-	index = self getCurrentPlayer();
+	index = self getCurrentPlayerIndex();
 	index--;
-	return level.RconPlayers[index].name;	
+
+	while ( index >= 0  ) {
+		if ( isDefined( level.RconPlayers[index] ) )
+			break;
+		index--;
+	}
+	if ( index < 0 )
+		index = level.RconPlayers.size - 1;
+	while ( index >= 0  ) {
+		if ( isDefined( level.RconPlayers[index] ) )
+			break;
+		index--;
+	}
+	if ( index < 0 )
+		return "";
+	else
+		return level.RconPlayers[index].name;	
 }
 
 
 getNextPlayer()
 {
 	// Get the current's player position
-	index = self getCurrentPlayer();
+	index = self getCurrentPlayerIndex();
 	index++;
-	return level.RconPlayers[index].name;	
+
+	while ( index < level.RconPlayers.size ) {
+		if ( isDefined( level.RconPlayers[index] ) )
+			break;
+		index++;
+	}
+	if ( index == level.RconPlayers.size )
+		index = 0;
+	while ( index < level.RconPlayers.size ) {
+		if ( isDefined( level.RconPlayers[index] ) )
+			break;
+		index++;
+	}
+	if ( index == level.RconPlayers.size )
+		return "";
+	else
+		return level.RconPlayers[index].name;	
 }
 
 
@@ -224,17 +306,45 @@ getNextWarning()
 }
 
 
-getCurrentPlayer()
+FreezePlayer()
 {
-	index = 0;
-	while ( index < level.RconPlayers.size ) {
-		if ( isDefined( level.RconPlayers[index] ) && level.RconPlayers[index] == getdvardefault( "ui_rcon_player", "string", "", undefined, undefined ) ) {
-			break;
-		}
-		index++;
-	}
-	
-	return level.RconPlayers[index];
+	self endon("disconnect");
+	self endon("death");
+
+	self freezeControls( true );
+	if(isDefined(self.blackscreen))
+		self.blackscreen destroy();
+
+	self.blackscreen = newClientHudElem( self );
+	self.blackscreen.alpha = 0;
+	self.blackscreen.x = 0;
+	self.blackscreen.y = 0;
+	self.blackscreen.alignX = "left";
+	self.blackscreen.alignY = "top";
+	self.blackscreen.horzAlign = "fullscreen";
+	self.blackscreen.vertAlign = "fullscreen";
+	self.blackscreen.sort = -5;
+	self.blackscreen.archived = true;
+	self.blackscreen setShader( "black", 640, 480 );
+	self.blackscreen.alpha = 1;
+}
+
+
+UnFreezePlayer()
+{
+	self endon("disconnect");
+
+	if(isDefined(self.blackscreen))
+		self.blackscreen destroy();
+	self freezeControls( false );
+}
+
+
+PlayWarningSound()
+{
+	for ( i = 0; i < level.players.size; i++ )
+		level.players[i] playLocalSound( "pop" );
+	return;
 }
 
 
@@ -284,7 +394,7 @@ onMenuResponse()
 						// Make sure the map rotation is not too long
 						if ( nextRotation.size + newMap.size <= 1020 ) {
 							setDvar( "sv_mapRotationCurrent",  newMap + " " + nextRotation );
-							shift\_maprotationcs::getNextMapInRotation();
+							getNextMapInRotation();
 						}
 					} 
 					break;		
@@ -327,10 +437,33 @@ onMenuResponse()
 				case "nextwarning":
 					self setClientDvar( "ui_rcon_warning", self getNextWarning() );
 					break;
+
+				case "showwarning":
+					// Check if this player is still connected
+					player = self getCurrentPlayerName();
+					if ( isDefined( player ) ) {
+						if ( level.scr_rcon_warning[ self.WarningIndex ] != "" ) {
+							if ( level.scr_rcon_warning_who[ self.WarningIndex ] == "all" ) {
+								mycommand = "rcon say " + level.scr_rcon_warning[ self.WarningIndex ];
+								wait (0.2);
+								self thread PlayWarningSound();
+								wait (0.2);
+								self thread ExecClientCommand( mycommand );
+							} else if ( level.scr_rcon_warning_who[ self.WarningIndex ] == "player" ) {
+								player FreezePlayer();
+								player playLocalSound( "buzz" );
+								mycommand = ", " + level.scr_rcon_warning[ self.WarningIndex ];
+								player iprintlnbold( player.name, mycommand);
+								wait (7.0);
+								Player UnFreezePlayer();
+							}
+						}
+					}
+					break;
 					
 				case "killplayer":
 					// Check if this player is still connected and alive
-					player = self getCurrentPlayer( false );
+					player = self getCurrentPlayerName();
 					if ( isDefined( player ) ) {
 						if ( isDefined( player.pers ) && isDefined( player.pers["team"] ) && player.pers["team"] != "spectator" && isAlive( player ) ) {
 							// Check if we should display a custom message
@@ -346,7 +479,7 @@ onMenuResponse()
 
 				case "kickplayer":
 					// Check if this player is still connected
-					player = self getCurrentPlayer( false );
+					player = self getCurrentPlayerName();
 					if ( isDefined( player ) ) {
 						// Check if we should display a custom message or just kick the player directly
 						if ( level.scr_rcon_warning[ self.WarningIndex ] != "" ) {
@@ -360,7 +493,7 @@ onMenuResponse()
 					
 				case "banplayer":
 					// Check if this player is still connected
-					player = self getCurrentPlayer( false );
+					player = self getCurrentPlayerName();
 					if ( isDefined( player ) ) {
 						// Check if we should display a custom message or just kick the player directly
 						if ( level.scr_rcon_warning[ self.WarningIndex ] != "" ) {

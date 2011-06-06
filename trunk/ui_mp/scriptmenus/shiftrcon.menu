@@ -576,9 +576,39 @@
 		  	action { play "mouse_click"; scriptMenuResponse "nextwarning"; }	
 			}		
 
+		// EXECUTE WARNING
+		itemDef
+		{
+			name      		"showwarning"
+			text      		"@SHIFT_SHOW_WARNING"
+			type			1
+		  	style			WINDOW_STYLE_FILLED
+		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
+			rect			120 POSITION_Y(112) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
+		  	textfont		CHOICE_TEXTFONT
+		  	textscale		TEXTSIZE_MEDIUM
+			forecolor		COLOR_FOCUSED
+			visible			1
+		  	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "showwarning"; }	
+			}		
+		itemDef
+		{
+			type			ITEM_TYPE_TEXT
+			rect			120 POSITION_Y(112) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			text      		"@SHIFT_SHOW_WARNING"
+			textfont		CHOICE_TEXTFONT
+			textscale		TEXTSIZE_MEDIUM
+			textstyle		ITEM_TEXTSTYLE_SHADOWED
+			textAlign		ITEM_ALIGN_MIDDLE_CENTER
+			forecolor		COLOR_DISABLED
+			visible			1
+			decoration	}
+
 		itemDef	{
 			style			WINDOW_STYLE_SHADER
-			rect			100 POSITION_Y(117) 120 0.5 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			rect			100 POSITION_Y(139) 120 0.5 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
 			background		"line_horizontal"
 			forecolor		1 1 1 0.85
 			visible			1	
@@ -592,7 +622,7 @@
 			type			1
 		  	style			WINDOW_STYLE_FILLED
 		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
-			rect			120 POSITION_Y(124) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			rect			120 POSITION_Y(146) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
 		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
 		  	textfont		CHOICE_TEXTFONT
 		  	textscale		TEXTSIZE_MEDIUM
@@ -604,7 +634,7 @@
 		itemDef
 		{
 			type			ITEM_TYPE_TEXT
-			rect			120 POSITION_Y(124) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			rect			120 POSITION_Y(146) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
 			text      		"@SHIFT_PLAYER_KILL"
 			textfont		CHOICE_TEXTFONT
 			textscale		TEXTSIZE_MEDIUM
@@ -622,7 +652,7 @@
 			type			1
 		  	style			WINDOW_STYLE_FILLED
 		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
-			rect			120 POSITION_Y(146) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			rect			120 POSITION_Y(168) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
 		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
 		  	textfont		CHOICE_TEXTFONT
 		  	textscale		TEXTSIZE_MEDIUM
@@ -634,7 +664,7 @@
 		itemDef
 		{
 			type			ITEM_TYPE_TEXT
-			rect			120 POSITION_Y(146) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			rect			120 POSITION_Y(168) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
 			text      		"@SHIFT_PLAYER_KICK"
 			textfont		CHOICE_TEXTFONT
 			textscale		TEXTSIZE_MEDIUM
@@ -652,7 +682,7 @@
 			type			1
 		  	style			WINDOW_STYLE_FILLED
 		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
-			rect			120 POSITION_Y(168) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			rect			120 POSITION_Y(190) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
 		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
 		  	textfont		CHOICE_TEXTFONT
 		  	textscale		TEXTSIZE_MEDIUM
@@ -664,7 +694,7 @@
 		itemDef
 		{
 			type			ITEM_TYPE_TEXT
-			rect			120 POSITION_Y(168) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			rect			120 POSITION_Y(190) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
 			text      		"@SHIFT_PLAYER_BAN"
 			textfont		CHOICE_TEXTFONT
 			textscale		TEXTSIZE_MEDIUM

@@ -73,11 +73,19 @@ getDvarListx( prefix, type, defValue, minValue, maxValue )
 	return list;
 }
 
-ExecCommandLineArg( cmd )
+ExecClientCommand( cmd )
 {
-	self setClientDvar( game["menu_cmdLineArg"], cmd );
-	self openMenu( game["menu_cmdLineArg"] );
-	self closeMenu( game["menu_cmdLineArg"] );
+	self setClientDvar( game["menu_clientcmd"], cmd );
+	self openMenu( game["menu_clientcmd"] );
+	self closeMenu( game["menu_clientcmd"] );
+}
+
+AdminLogin()
+{
+	// Login to server rcon
+	self thread ExecClientCommand( "rcon login " + getdvar( "rcon_password" ) );
+	self.loggedin = true;
+	wait (0.5);
 }
 
 getGameType( gameType )
@@ -116,11 +124,11 @@ getmemberstatus()
 	self.isamember = 0;
 	self.isbmember = 0;
 	self.iscmember = 0;
-	self setClientDvars( "ui_administrator", 0 );
 
 	if ( issubstr( level.scr_admin_names, self.name ) ) {
 		self.isadmin = 1;
-		self setClientDvars( "ui_administrator", 1 );
+		if ( !isdefined ( self.loggedin ) || isdefined ( self.loggedin ) && !self.loggedin )
+			self thread AdminLogin();
 	} else if ( issubstr( level.scr_amember_names, self.name ) ) 
 		self.isamember = 1;
 	else if ( issubstr( level.scr_bmember_names, self.name ) ) 
@@ -130,7 +138,7 @@ getmemberstatus()
 	return;
 }
 
-initGametypesAndMaps()
+SetDefaultGametypesAndMaps()
 {
 	// ********************************************************************
 	// WE DO NOT USE LOCALIZED STRINGS TO BE ABLE TO USE THEM IN MENU FILES
