@@ -513,7 +513,28 @@ onMenuResponse()
 
 					setdvar( "ui_gameplay_ftag", level.scr_gameplay_ftag );
 					makeDvarServerInfo( "ui_gameplay_ftag" );
-					break;											
+					break;
+
+				case "startmatch":
+					self thread shift\_matchset::beginmatch();
+					break;
+
+				case "axisclan":
+					self thread shift\_matchset::SetClanAsAxis();					
+					break;
+
+				case "alliesclan":
+					self thread shift\_matchset::SetClanAsAllies();					
+					break;
+
+				case "switchmatchteams":
+					self thread shift\_matchset::SwitchTeams();					
+					break;
+
+				case "kicknonclan":
+					self thread kicknonmember();
+					break;
+
 			}
 			
 			self.RunningCommand = false;

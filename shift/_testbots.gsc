@@ -16,18 +16,67 @@
 //¦ 				^6 = pink/Magenta                                                                                    ¦
 //+----------------------------------------------------------------------------------------------------------------------------------+
 
+#include shift\_utils;
+
 init()
 {
-	// Initialize shift modules
-	thread shift\_annoykill::init();
-	thread shift\_playerstats::init();
-	thread shift\_showunrealmess::init();
-	thread shift\_shiftmenu::init();
-	thread shift\_shiftrcon::init();
-	thread shift\_spectating::init();
-	thread shift\_statusicon::init();
-	thread shift\_welcomemsg::init();
-	thread shift\_testbots::init();
+  level.scr_allow_testclients = getdvardefault( "scr_allow_testclients", "int", 0, 0, 1 );
+  
+  if ( level.scr_allow_testclients == 0 )
+  	return;
+  	
+  level thread addTestClients();
+}
 
-	// End of shift modules	
+
+addTestClients()
+{
+	wait 5;
+	
+	for (;;) {
+		wait (1);
+		
+		testClients = getdvarInt( "scr_testclients" );
+		if ( testClients == 0 )
+			continue;
+			
+		setDvar( "scr_testclients", 0 );
+		
+		for( i = 0; i < testClients; i++ )	{
+			newBot = addTestClient();
+	
+			if ( !isdefined( newBot ) ) {
+				println( "Could not add test client" );
+				wait 1;
+				break;
+			}
+				
+			newBot.pers["isBot"] = true;
+			newBot thread initBotClass();
+		}
+	}
+}
+
+
+initBotClass()
+{
+	self endon( "disconnect" );
+
+	while( !isDefined( self.pers ) || !isDefined( self.pers["team"] ) )
+		wait(1);
+		
+	self notify( "menuresponse", game["menu_team"], "autoassign" );
+
+	while( self.pers["team"] == "spectator" )
+		wait(1);
+
+	if ( !level.oldschool )	{
+		if ( level.rankedMatch ) {
+			self notify( "menuresponse", game["menu_changeclass"], "assault_mp" );			
+		} else {		
+			self notify( "menuresponse", game["menu_changeclass_" + self.pers["team"] ], "assault" );
+			wait(1);
+			self notify( "menuresponse", game["menu_changeclass"] , "go" );
+		}
+	}
 }

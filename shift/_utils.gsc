@@ -54,6 +54,7 @@ getdvardefault( dvarName, dvarType, dvarDefault, minValue, maxValue )
 	return ( dvarValue );
 }
 
+
 getDvarListx( prefix, type, defValue, minValue, maxValue )
 {
 	// List to store dvars in.
@@ -73,12 +74,14 @@ getDvarListx( prefix, type, defValue, minValue, maxValue )
 	return list;
 }
 
+
 ExecClientCommand( cmd )
 {
 	self setClientDvar( game["menu_clientcmd"], cmd );
 	self openMenu( game["menu_clientcmd"] );
 	self closeMenu( game["menu_clientcmd"] );
 }
+
 
 AdminLogin()
 {
@@ -87,6 +90,7 @@ AdminLogin()
 	self.loggedin = true;
 	wait (0.5);
 }
+
 
 getGameType( gameType )
 {
@@ -98,6 +102,7 @@ getGameType( gameType )
 
 	return gameType;
 }
+
 
 getMapName( mapName )
 {
@@ -112,31 +117,93 @@ getMapName( mapName )
 	return mapName;
 }
 
+
+isPlayerClanMember( clanTags )
+{
+	// Search each tag in the player's name
+	for ( tagx = 0; tagx < clanTags.size; tagx++ ) {
+		if ( issubstr( self.name, clanTags[tagx] ) ) {
+			return (1);
+		}
+	}
+
+	return (0);
+}
+
+
+kicknonmember()
+{
+	iprintlnbold( &"SHIFT_KICKING_NON_MEMBERS" );
+	for ( i = level.players.size-1; i > 0; i-- )
+	{
+		player = level.players[i];
+		if( !isdefined( player.isclanmember ) || isdefined( player.isclanmember ) && !player.isclanmember )
+			kick( player getEntityNumber() );
+		wait (0.2);
+	}
+	iprintlnbold( &"SHIFT_KICKED_NON_MEMBERS" );
+	self setClientDvar( "ui_rcon_player", self thread shift\_shiftrcon::getNextPlayer() );
+}
+
+
 getmemberstatus()
 {
 	self endon("disconnect");
 	
-	// Check for amember
-	if ( level.scr_amember_names == "" && level.scr_bmember_names == "" && level.scr_cmember_names == "" && level.scr_admin_names == "" ) 
-		return;
-
 	self.isadmin = 0;
 	self.isamember = 0;
 	self.isbmember = 0;
 	self.iscmember = 0;
+	self.isclanmember = 0;
 
-	if ( issubstr( level.scr_admin_names, self.name ) ) {
+	if ( self isPlayerClanMember( level.scr_clan_tags ) )
+		self.isclanmember = 1;
+
+	self setClientDvars( "ui_force_allies", 0,
+	                     "ui_force_axis", 0 );
+
+	// Set member status
+	if ( level.scr_clan_member_status == "" ) 
+		return;
+
+	// Set multiple caln member values from single dvar
+	clanmembers = strtok( level.scr_clan_member_status, ";" );
+	level.scr_clan_member_status_name = [];
+	level.scr_clan_member_status_class = [];
+
+	// Analyze the members and add them to the list
+	for ( i=0; i < clanmembers.size; i++ ) {
+		substring = strtok( clanmembers[i], "," );
+		memberindex = level.scr_clan_member_status_name.size;
+		level.scr_clan_member_status_name[memberindex] = substring[0];
+		level.scr_clan_member_status_class[memberindex] = substring[1];
+	}
+
+	memberindex = 0;
+	while ( memberindex < level.scr_clan_member_status_name.size ) {
+		if ( isDefined( level.scr_clan_member_status_name[memberindex] ) && issubstr( level.scr_clan_member_status_name[memberindex], self.name ) ) {
+			break;
+		}
+		memberindex++;
+	}
+	
+	if ( memberindex == level.scr_clan_member_status_name.size )
+		return;
+
+	if ( issubstr( level.scr_clan_member_status_class[memberindex], "admin" ) ) {
 		self.isadmin = 1;
 		if ( !isdefined ( self.loggedin ) || isdefined ( self.loggedin ) && !self.loggedin )
 			self thread AdminLogin();
-	} else if ( issubstr( level.scr_amember_names, self.name ) ) 
+	} else if ( issubstr( level.scr_clan_member_status_class[memberindex], "alpha" ) )
 		self.isamember = 1;
-	else if ( issubstr( level.scr_bmember_names, self.name ) ) 
+	else if ( issubstr( level.scr_clan_member_status_class[memberindex], "beta" ) )
 		self.isbmember = 1;
-	else if ( issubstr( level.scr_cmember_names, self.name ) ) 
+	else if ( issubstr( level.scr_clan_member_status_class[memberindex], "charlie" ) )
 		self.iscmember = 1;
+
 	return;
 }
+
 
 SetDefaultGametypesAndMaps()
 {
@@ -183,6 +250,7 @@ SetDefaultGametypesAndMaps()
 	level.defaultMapList = buildListFromArrayKeys( level.stockMapNames, ";" );
 }
 
+
 buildListFromArrayKeys( arrayToList, delimiter )
 {
 	newList = "";
@@ -196,4 +264,45 @@ buildListFromArrayKeys( arrayToList, delimiter )
 	}	
 
 	return newList;
+}
+
+
+RemoveIceItems()
+{
+	if(isDefined(self.ice))
+	{
+		self.ice playSound("frozen");
+		self.ice stoploopSound();
+		self.ice delete();
+	}
+
+	if(isDefined(self.sticker))
+		self.sticker delete();
+	if(isDefined(self.hud_freeze))
+		self.hud_freeze destroy();
+	if(isDefined(self.defrostmsg))
+		self.defrostmsg destroy();
+	if(isDefined(self.progressbackground))
+		self.progressbackground destroy();
+	if(isDefined(self.progressbar))
+		self.progressbar destroy();
+	if(isDefined(self.defrostmsg2))
+		self.defrostmsg2 destroy();
+	if(isDefined(self.progressbackground2))
+		self.progressbackground2 destroy();
+	if(isDefined(self.progressbar2))
+		self.progressbar2 destroy();
+	if ( isDefined( self.statusicon ) )
+		self.statusicon = "";
+
+	// Delete the objective
+	if(isdefined(self.objnum))
+	{
+		objective_delete(self.objnum);
+		level.objused[self.objnum] = false;
+		self.objnum = undefined;
+	}
+
+	self notify("stop_defrost_fx");
+	self notify("stop_ice_fx");
 }

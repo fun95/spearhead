@@ -24,9 +24,10 @@ init()
 	// Get the main module's dvar
 	level.scr_showscore_spectator = getdvardefault( "scr_showscore_spectator", "int", 0, 0, 1 );
 	level.scr_allow_free_spectate = getdvardefault( "scr_allow_free_spectate", "int", 0, 0, 2 );
+	level.scr_disable_match_join = getdvardefault( "scr_disable_match_join", "int", 0, 0, 1 );
 
 	// If spectator score or Admin spec are not enabled then there's nothing else to do here
-	if ( level.scr_showscore_spectator == 0 && level.scr_allow_free_spectate == 0)
+	if ( level.scr_showscore_spectator == 0 && level.scr_allow_free_spectate == 0 && level.scr_disable_match_join == 0 )
 		return;
 
 	level thread onPlayerConnect();
@@ -38,7 +39,6 @@ onPlayerConnect()
 	{
 		level waittill("connecting", player);
 
-		player thread getmemberstatus();
 		player thread onJoinedTeam();
 		player thread onJoinedSpectators();
 		player thread onPlayerSpawned();
@@ -72,10 +72,21 @@ onJoinedSpectators()
 {
 	self endon("disconnect");
 
+	wait 5;
+
+	for(;;)
+	{
+		if( isdefined( self.isadmin ) )
+			break;
+		wait 1;
+	}
+
 	for(;;)
 	{
 		self waittill("never_joined_team");
 		self RemoveSpectateScore();
+		if ( level.scr_disable_match_join )
+			self setSpectateMatch();
 		if ( level.scr_showscore_spectator )
 			self setSpectateScore();
 		if ( level.scr_allow_free_spectate == 2 )
@@ -128,6 +139,17 @@ setSpectateScore()
 	self.rightScore.archived = false;
 }
 
+setSpectateMatch()
+{
+	self.matchstatus = createFontString( "objective", 1.4 );
+	self.matchstatus setPoint( "CENTER", "TOP", 0, 90 );
+	self.matchstatus.glowColor = game["colors"]["allies"];
+	self.matchstatus.glowAlpha = 1;
+	self.matchstatus setText( game["scrim"]["status"] );
+	self.matchstatus.hideWhenInMenu = true;
+	self.matchstatus.archived = false;
+}
+
 RemoveSpectateScore()
 {
 	if ( isDefined( self.leftIcon ) )
@@ -138,4 +160,6 @@ RemoveSpectateScore()
 		self.leftScore destroyElem();
 	if ( isDefined( self.rightScore ) )
 		self.rightScore destroyElem();
+	if ( isDefined( self.matchstatus ) )
+		self.matchstatus destroyElem();
 }

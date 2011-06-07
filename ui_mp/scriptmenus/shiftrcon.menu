@@ -704,6 +704,164 @@
 			visible			1
 			decoration	}
 
+		itemDef	{
+			style			WINDOW_STYLE_SHADER
+			rect			100 POSITION_Y(217) 120 0.5 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			background		"line_horizontal"
+			forecolor		1 1 1 0.85
+			visible			1	
+			decoration	}
+
+		// MATCH START
+		itemDef
+		{
+			name      		"startmatch"
+			text      		"@SHIFT_BEGIN_MATCH"
+			type			1
+		  	style			WINDOW_STYLE_FILLED
+		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
+			rect			120 POSITION_Y(224) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
+		  	textfont		CHOICE_TEXTFONT
+		  	textscale		TEXTSIZE_MEDIUM
+			forecolor		COLOR_FOCUSED
+			visible			1
+		  	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "startmatch"; }	
+			}		
+		itemDef
+		{
+			type			ITEM_TYPE_TEXT
+			rect			120 POSITION_Y(224) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			text      		"@SHIFT_BEGIN_MATCH"
+			textfont		CHOICE_TEXTFONT
+			textscale		TEXTSIZE_MEDIUM
+			textstyle		ITEM_TEXTSTYLE_SHADOWED
+			textAlign		ITEM_ALIGN_MIDDLE_CENTER
+			forecolor		COLOR_DISABLED
+			visible			1
+			decoration	}
+
+		// SET CLAN ALLIES
+		itemDef
+		{
+			name      		"alliesclan"
+			text      		"@SHIFT_CLAN_ALLIES"
+			type			1
+		  	style			WINDOW_STYLE_FILLED
+		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
+			rect			120 POSITION_Y(246) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
+		  	textfont		CHOICE_TEXTFONT
+		  	textscale		TEXTSIZE_MEDIUM
+			forecolor		COLOR_FOCUSED
+			visible			1
+		  	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "alliesclan"; }	
+			}		
+		itemDef
+		{
+			type			ITEM_TYPE_TEXT
+			rect			120 POSITION_Y(246) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			text      		"@SHIFT_CLAN_ALLIES"
+			textfont		CHOICE_TEXTFONT
+			textscale		TEXTSIZE_MEDIUM
+			textstyle		ITEM_TEXTSTYLE_SHADOWED
+			textAlign		ITEM_ALIGN_MIDDLE_CENTER
+			forecolor		COLOR_DISABLED
+			visible			1
+			decoration	}
+
+		// SET CLAN AXIS
+		itemDef
+		{
+			name      		"axisclan"
+			text      		"@SHIFT_CLAN_AXIS"
+			type			1
+		  	style			WINDOW_STYLE_FILLED
+		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
+			rect			120 POSITION_Y(268) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
+		  	textfont		CHOICE_TEXTFONT
+		  	textscale		TEXTSIZE_MEDIUM
+			forecolor		COLOR_FOCUSED
+			visible			1
+		  	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "axisclan"; }	
+			}		
+		itemDef
+		{
+			type			ITEM_TYPE_TEXT
+			rect			120 POSITION_Y(268) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			text      		"@SHIFT_CLAN_AXIS"
+			textfont		CHOICE_TEXTFONT
+			textscale		TEXTSIZE_MEDIUM
+			textstyle		ITEM_TEXTSTYLE_SHADOWED
+			textAlign		ITEM_ALIGN_MIDDLE_CENTER
+			forecolor		COLOR_DISABLED
+			visible			1
+			decoration	}
+
+		// SWITCH TEAMS
+		itemDef
+		{
+			name      		"switchmatchteams"
+			text      		"@SHIFT_MATCH_SWITCH"
+			type			1
+		  	style			WINDOW_STYLE_FILLED
+		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
+			rect			120 POSITION_Y(290) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
+		  	textfont		CHOICE_TEXTFONT
+		  	textscale		TEXTSIZE_MEDIUM
+			forecolor		COLOR_FOCUSED
+			visible			1
+		  	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "switchmatchteams"; }	
+			}		
+		itemDef
+		{
+			type			ITEM_TYPE_TEXT
+			rect			120 POSITION_Y(290) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			text      		"@SHIFT_MATCH_SWITCH"
+			textfont		CHOICE_TEXTFONT
+			textscale		TEXTSIZE_MEDIUM
+			textstyle		ITEM_TEXTSTYLE_SHADOWED
+			textAlign		ITEM_ALIGN_MIDDLE_CENTER
+			forecolor		COLOR_DISABLED
+			visible			1
+			decoration	}
+
+		// KICK NON CLAN MEMBERS
+		itemDef
+		{
+			name      		"kicknonclan"
+			text      		"@SHIFT_KICK_NONCLAN"
+			type			1
+		  	style			WINDOW_STYLE_FILLED
+		  	textstyle		ITEM_TEXTSTYLE_SHADOWED
+			rect			120 POSITION_Y(312) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+		  	textAlign		ITEM_ALIGN_MIDDLE_CENTER
+		  	textfont		CHOICE_TEXTFONT
+		  	textscale		TEXTSIZE_MEDIUM
+			forecolor		COLOR_FOCUSED
+			visible			1
+		  	mouseEnter { play "mouse_over"; } 
+		  	action { play "mouse_click"; scriptMenuResponse "kicknonclan"; }	
+			}		
+		itemDef
+		{
+			type			ITEM_TYPE_TEXT
+			rect			120 POSITION_Y(312) 80 15 HORIZONTAL_ALIGN_CENTER VERTICAL_ALIGN_TOP
+			text      		"@SHIFT_KICK_NONCLAN"
+			textfont		CHOICE_TEXTFONT
+			textscale		TEXTSIZE_MEDIUM
+			textstyle		ITEM_TEXTSTYLE_SHADOWED
+			textAlign		ITEM_ALIGN_MIDDLE_CENTER
+			forecolor		COLOR_DISABLED
+			visible			1
+			decoration	}
+
 		#include "ui/safearea.menu"
 	}
 }
