@@ -20,9 +20,7 @@
 
 init()
 {
-	level.scr_show_extra_stats = getdvardefault( "scr_show_extra_stats", "int", 0, 0, 1 );
-
-	if ( level.scr_show_extra_stats == 0 )
+	if ( !isdefined( level.scr_shift_hud["stats"] ) || !level.scr_shift_hud["stats"] )
 		return;
 
 	level thread onPlayerConnect();

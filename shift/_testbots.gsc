@@ -20,10 +20,11 @@
 
 init()
 {
-  level.scr_allow_testclients = getdvardefault( "scr_allow_testclients", "int", 0, 0, 1 );
+	//Added by [SHIFT]
+	level.scr_allow_testclients = getDvarInt( "scr_allow_testclients" );
   
-  if ( level.scr_allow_testclients == 0 )
-  	return;
+	if ( !level.scr_allow_testclients )
+  		return;
   	
   level thread addTestClients();
 }
@@ -37,7 +38,7 @@ addTestClients()
 		wait (1);
 		
 		testClients = getdvarInt( "scr_testclients" );
-		if ( testClients == 0 )
+		if ( !testClients )
 			continue;
 			
 		setDvar( "scr_testclients", 0 );

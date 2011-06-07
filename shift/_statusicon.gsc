@@ -23,7 +23,7 @@
 init()
 {
 	// If the statusicons is not enabled then there's nothing else to do here
-	if ( level.scr_clan_member_status == "" )
+	if ( !isdefined( level.scr_clan_member_status ) || level.scr_clan_member_status == "" ) 
 		return;
 
 	precacheStatusIcon( "hud_status_amem" );  	//A Member
@@ -144,7 +144,7 @@ SetStatusIcon()
 {
 	self endon("disconnect");
 
-	if ( isdefined(level.scr_gameplay_ftag) && level.scr_gameplay_ftag && isdefined(self.frozen) && self.frozen )
+	if ( isdefined( level.scr_shift_gameplay["ftag"] ) && level.scr_shift_gameplay["ftag"] && isdefined(self.frozen) && self.frozen )
 		return;
 
 	if ( self.isadmin ) 

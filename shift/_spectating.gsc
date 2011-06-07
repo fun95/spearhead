@@ -21,13 +21,8 @@
 
 init()
 {
-	// Get the main module's dvar
-	level.scr_showscore_spectator = getdvardefault( "scr_showscore_spectator", "int", 0, 0, 1 );
-	level.scr_allow_free_spectate = getdvardefault( "scr_allow_free_spectate", "int", 0, 0, 2 );
-	level.scr_disable_match_join = getdvardefault( "scr_disable_match_join", "int", 0, 0, 1 );
-
 	// If spectator score or Admin spec are not enabled then there's nothing else to do here
-	if ( level.scr_showscore_spectator == 0 && level.scr_allow_free_spectate == 0 && level.scr_disable_match_join == 0 )
+	if ( ( !isdefined( level.scr_shift_spectator["score"] ) || !level.scr_shift_spectator["score"] ) && ( !isdefined( level.scr_shift_spectator["freespec"] ) || !level.scr_shift_spectator["freespec"] ) && ( !isdefined( level.scr_shift_gameplay["join"] ) || !level.scr_shift_gameplay["join"] ) )
 		return;
 
 	level thread onPlayerConnect();
@@ -85,13 +80,13 @@ onJoinedSpectators()
 	{
 		self waittill("never_joined_team");
 		self RemoveSpectateScore();
-		if ( level.scr_disable_match_join )
+		if ( isdefined( level.scr_shift_gameplay["join"] ) && level.scr_shift_gameplay["join"] )
 			self setSpectateMatch();
-		if ( level.scr_showscore_spectator )
+		if ( isdefined( level.scr_shift_spectator["score"] ) && level.scr_shift_spectator["score"] )
 			self setSpectateScore();
-		if ( level.scr_allow_free_spectate == 2 )
+		if ( isdefined( level.scr_shift_spectator["freespec"] ) && level.scr_shift_spectator["freespec"] == 2 )
 			self setSpectateFree();
-		else if ( level.scr_allow_free_spectate == 1 && isdefined( self.isadmin ) && self.isadmin )
+		else if ( isdefined( level.scr_shift_spectator["freespec"] ) && level.scr_shift_spectator["freespec"] == 1 && isdefined( self.isadmin ) && self.isadmin )
 			self setSpectateFree();
 	}
 }

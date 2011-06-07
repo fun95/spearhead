@@ -243,7 +243,6 @@ beginmatch()
 	level.gameEnded = true;
 	level.inGracePeriod = false;
 	level notify ( "game_ended" );
-	level.timeremaining = getdvardefault( "scr_scrim_clock", "float", 10, 1, 300 );
 
 	visionSetNaked( "mpOutro", 0 );
 	setGameEndTime( 1 ); // stop/hide the timers
@@ -285,8 +284,8 @@ beginmatch()
 createHUDelements()
 {
 	// Wait for countdown
-	level thread maps\mp\gametypes\_globallogic::timeLimitClock_Intermission( level.timeremaining );
-	gameStarts = gettime() + 1000 * level.timeremaining;
+	level thread maps\mp\gametypes\_globallogic::timeLimitClock_Intermission( level.scr_shift_gameplay["clock"] );
+	gameStarts = gettime() + 1000 * level.scr_shift_gameplay["clock"];
 
 	// Create the nice stop watch!
 	stopWatch = NewHudElem();
@@ -300,7 +299,7 @@ createHUDelements()
 	stopWatch.alpha = 1.0;
 	stopWatch.x = 0;
 	stopWatch.y = 20;
-	stopWatch SetClock( level.timeremaining + 1, 60, "hudStopwatch", 96, 96 );
+	stopWatch SetClock( level.scr_shift_gameplay["clock"] + 1, 60, "hudStopwatch", 96, 96 );
 
 	//Create The Text For Match Starts In
 	MatchTimerInText = createServerFontString( "objective", 2.4 );
@@ -314,7 +313,7 @@ createHUDelements()
 	MatchTimerInTime = createServerFontString( "objective", 2.4 );
 	MatchTimerInTime setParent( MatchTimerInText );
 	MatchTimerInTime setPoint( "CENTER", "LEFT", 170, 0 );
-	MatchTimerInTime setTimer( level.timeremaining );
+	MatchTimerInTime setTimer( level.scr_shift_gameplay["clock"] );
 	MatchTimerInTime.color = ( 1, 1, 0 );
 	MatchTimerInTime.archived = false;
 	MatchTimerInTime.hideWhenInMenu = true;

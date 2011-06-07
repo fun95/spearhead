@@ -20,20 +20,13 @@
 
 init()
 {
-	// Get the main module's dvar
-	level.scr_ftag_annoy_warn = getdvardefault("scr_ftag_annoy_warn","int",1,0,1);
-	level.scr_ftag_annoy_safezone = getdvardefault("scr_ftag_annoy_safezone","int",4000,1,999999);
-	level.ftag_annoy_knife = getdvardefault("scr_ftag_annoy_knife","int",2,0,999999);
-	level.ftag_annoy_dist = getdvardefault("scr_ftag_annoy_dist","int",200,1,999999);
-	level.ftag_annoy_shots = getdvardefault("scr_ftag_annoy_shots","int",15,0,999999);
-
-	if ( !isdefined(level.scr_gameplay_ftag) || !level.scr_gameplay_ftag )
+	if ( !isdefined( level.scr_shift_gameplay["ftag"] ) || !level.scr_shift_gameplay["ftag"] )
 		return;
 
-	if ( !isdefined(level.scr_ftag_annoy_warn) || !level.scr_ftag_annoy_warn )
+	if ( !isdefined( level.scr_ftag_annoy["warn"] ) || !level.scr_ftag_annoy["warn"] )
 		return;
 
-	if ( level.ftag_annoy_knife == 0 && level.ftag_annoy_shots == 0 )
+	if ( ( !isdefined( level.scr_ftag_annoy["knife"] ) || !level.scr_ftag_annoy["knife"] ) && ( !isdefined( level.scr_ftag_annoy["shots"] ) || !level.scr_ftag_annoy["shots"] ) )
 		return;
 
 	precacheString( &"SHIFT_FTAG_ALREADY_FROZEN_ANNOY" );
@@ -90,9 +83,9 @@ onPlayerDamaged()
 			eAttacker.numberofshots = 0;
 
 		if ( self.team != eAttacker.team && isdefined(self.frozen) && self.frozen && isdefined(self.killtime) ) {
-			if ( gettime() - self.killtime >= level.scr_ftag_annoy_safezone ) {
-				if ( sMeansOfDeath == "MOD_MELEE" && level.ftag_annoy_knife > 0 ) {
-					if ( gettime() - eAttacker.knifekilltime <= level.scr_ftag_annoy_safezone )
+			if ( gettime() - self.killtime >= level.scr_ftag_annoy["time"] ) {
+				if ( sMeansOfDeath == "MOD_MELEE" && level.scr_ftag_annoy["knife"] > 0 ) {
+					if ( gettime() - eAttacker.knifekilltime <= level.scr_ftag_annoy["time"] )
 						eAttacker.numberofknife ++;
 					else if ( eAttacker.knifekilltime == 0 )
 						eAttacker.numberofknife ++;
@@ -100,12 +93,12 @@ onPlayerDamaged()
 						eAttacker.numberofknife = 0;
 
 					eAttacker.knifekilltime = gettime();
-					if ( eAttacker.numberofknife >= level.ftag_annoy_knife )
+					if ( eAttacker.numberofknife >= level.scr_ftag_annoy["knife"] )
 						self thread onPlayerEnemyAnnoy(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime);
-				} else if ( level.ftag_annoy_shots > 0 ) {
-					if(distance(eAttacker.origin, self.origin) <= level.ftag_annoy_dist ) {
+				} else if ( level.scr_ftag_annoy["shots"] > 0 ) {
+					if(distance(eAttacker.origin, self.origin) <= level.scr_ftag_annoy["dist"] ) {
 						eAttacker.numberofshots ++;
-						if ( eAttacker.numberofshots >= level.ftag_annoy_shots )
+						if ( eAttacker.numberofshots >= level.scr_ftag_annoy["shots"] )
 							self thread onPlayerEnemyAnnoy(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime);
 					} else {
 						eAttacker.numberofshots = 0;
@@ -113,8 +106,8 @@ onPlayerDamaged()
 				}
 			}				
 		} else if ( self.team == eAttacker.team ) {
-			if ( sMeansOfDeath == "MOD_MELEE" && level.ftag_annoy_knife > 0 ) {
-				if ( gettime() - eAttacker.knifekilltime <= level.scr_ftag_annoy_safezone )
+			if ( sMeansOfDeath == "MOD_MELEE" && level.scr_ftag_annoy["knife"] > 0 ) {
+				if ( gettime() - eAttacker.knifekilltime <= level.scr_ftag_annoy["time"] )
 					eAttacker.numberofknife ++;
 				else if ( eAttacker.knifekilltime == 0 )
 					eAttacker.numberofknife ++;
@@ -122,12 +115,12 @@ onPlayerDamaged()
 					eAttacker.numberofknife = 0;
 
 				eAttacker.knifekilltime = gettime();
-				if ( eAttacker.numberofknife >= level.ftag_annoy_knife )
+				if ( eAttacker.numberofknife >= level.scr_ftag_annoy["knife"] )
 					self thread onPlayerTeamAnnoy(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime);
-			} else if ( level.ftag_annoy_shots > 0 ) {
-				if(distance(eAttacker.origin, self.origin) <= level.ftag_annoy_dist ) {
+			} else if ( level.scr_ftag_annoy["shots"] > 0 ) {
+				if(distance(eAttacker.origin, self.origin) <= level.scr_ftag_annoy["dist"] ) {
 					eAttacker.numberofshots ++;
-						if ( eAttacker.numberofshots >= level.ftag_annoy_shots )
+						if ( eAttacker.numberofshots >= level.scr_ftag_annoy["shots"] )
 							self thread onPlayerTeamAnnoy(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime);
 				} else {
 					eAttacker.numberofshots = 0;

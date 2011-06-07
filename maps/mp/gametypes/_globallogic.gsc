@@ -324,7 +324,7 @@ default_onOneLeftEvent( team )
 			if ( !isDefined( player.pers["team"] ) || player.pers["team"] != team )
 				continue;
 
-			if ( level.scr_show_unreal_messages )
+			if ( isdefined( level.scr_shift_gameplay["unreal"] ) && level.scr_shift_gameplay["unreal"] )
 				player maps\mp\gametypes\_globallogic::leaderDialogOnPlayer( "last_alive" );
 		}
 	}
@@ -2114,7 +2114,7 @@ menuAutoAssign()
 	
 	self closeMenus();
 
-	if ( isdefined ( game["scrim"]["islive"] ) && game["scrim"]["islive"] && level.scr_disable_match_join ) {
+	if ( isdefined ( game["scrim"]["islive"] ) && game["scrim"]["islive"] && isdefined( level.scr_shift_gameplay["join"] ) && level.scr_shift_gameplay["join"] ) {
 		tempindex = 0;
 		ismatchplayer = false;
 		if ( isdefined( game["scrim"]["names"] ) && issubstr( game["scrim"]["names"], self.name ) )
@@ -2289,7 +2289,7 @@ menuAllies()
 {
 	self closeMenus();
 
-	if ( isdefined ( game["scrim"]["islive"] ) && game["scrim"]["islive"] && level.scr_disable_match_join ) {
+	if ( isdefined ( game["scrim"]["islive"] ) && game["scrim"]["islive"] && isdefined( level.scr_shift_gameplay["join"] ) && level.scr_shift_gameplay["join"] ) {
 		tempindex = 0;
 		ismatchplayer = false;
 		if ( isdefined( game["scrim"]["names"] ) && issubstr( game["scrim"]["names"], self.name ) )
@@ -2348,7 +2348,7 @@ menuAxis()
 {
 	self closeMenus();
 
-	if ( isdefined ( game["scrim"]["islive"] ) && game["scrim"]["islive"] && level.scr_disable_match_join ) {
+	if ( isdefined ( game["scrim"]["islive"] ) && game["scrim"]["islive"] && isdefined( level.scr_shift_gameplay["join"] ) && level.scr_shift_gameplay["join"] ) {
 		tempindex = 0;
 		ismatchplayer = false;
 		if ( isdefined( game["scrim"]["names"] ) && issubstr( game["scrim"]["names"], self.name ) )
@@ -3611,7 +3611,7 @@ removeSpawnMessageShortly( delay )
 
 Callback_StartGameType()
 {
-	if ( isdefined ( level.scr_gameplay_ftag ) && level.scr_gameplay_ftag )
+	if ( isdefined ( level.scr_shift_gameplay["ftag"] ) && level.scr_shift_gameplay["ftag"] )
 		level thread shift\_ftagplay::init();
 
 	level.prematchPeriod = 0;
@@ -4564,7 +4564,7 @@ Callback_PlayerDamage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, s
 		return;
 	
 	self notify( "player_struck", eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, psOffsetTime );
-	if ( isdefined ( level.ftagactive ) && level.ftagactive && isdefined( self.frozen ) && self.frozen ) 
+	if ( isdefined ( level.scr_shift_gameplay["ftag"] ) && level.scr_shift_gameplay["ftag"] && isdefined( self.frozen ) && self.frozen ) 
 		return;
 
 	prof_begin( "Callback_PlayerDamage flags/tweaks" );
