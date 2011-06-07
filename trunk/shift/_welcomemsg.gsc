@@ -16,18 +16,58 @@
 //¦ 				^6 = pink/Magenta                                                                                    ¦
 //+----------------------------------------------------------------------------------------------------------------------------------+
 
+#include shift\_utils;
+
 init()
 {
-	// Initialize shift modules
-	thread shift\_annoykill::init();
-	thread shift\_playerstats::init();
-	thread shift\_showunrealmess::init();
-	thread shift\_shiftmenu::init();
-	thread shift\_shiftrcon::init();
-	thread shift\_spectating::init();
-	thread shift\_statusicon::init();
-	thread shift\_welcomemsg::init();
-	thread shift\_testbots::init();
+	// Get the main module's dvar
+	level.svr_welcome_msg_delay = getdvardefault( "svr_welcome_msg_delay", "int", 1, 1, 60 );
+	level.svr_welcome_msg = getdvardefault( "svr_welcome_msg", "string", undefined, undefined, undefined);
+	level.scr_welcome_at_start = getdvardefault( "scr_welcome_at_start", "int", 0, 0, 2 );
 
-	// End of shift modules	
+	if ( level.scr_welcome_at_start == 0 )
+		return;
+
+	level thread onPlayerConnect();
+}
+
+onPlayerConnect()
+{
+	for(;;)
+	{
+		level waittill("connected", player);
+		player thread onPlayerSpawned();
+	}
+}
+
+onPlayerSpawned()
+{
+	self endon("disconnect");
+
+	for(;;)
+	{
+		self waittill("spawned_player");
+
+		if ( game["state"] != "postgame" )
+			self thread displaywelcomeMsg();
+	}
+}
+
+displaywelcomeMsg()
+{
+	if (level.svr_welcome_msg_delay && !isDefined(self.pers["welcomeMsgDone"]))
+	{
+		wait level.svr_welcome_msg_delay;
+		self thread welcomeMsg();
+		while (!isDefined(self.pers["welcomeMsgDone"]))
+			wait .50;
+	}
+}
+
+welcomeMsg()
+{
+	wait .50;
+	if (level.svr_welcome_msg != "")
+		self iprintlnbold(level.svr_welcome_msg + ", " + self.name);
+	self.pers["welcomeMsgDone"] = true;
 }

@@ -239,4 +239,67 @@ LANG_ENGLISH 	"Turn on freezetag"
 REFERENCE	FREEZETAG_OFF
 LANG_ENGLISH 	"Turn off freezetag"
 
+REFERENCE	BEGIN_MATCH
+LANG_ENGLISH	"Begin Match"
+
+REFERENCE	CLAN_ALLIES
+LANG_ENGLISH	"Set clan as allies"
+
+REFERENCE	CLAN_AXIS
+LANG_ENGLISH	"set clan as axis"
+
+REFERENCE	MATCH_SWITCH
+LANG_ENGLISH	"Switch Teams"
+
+REFERENCE	KICK_NONCLAN
+LANG_ENGLISH	"Kick Non Clan"
+
+REFERENCE	TEAM_SWITCH_ALLIES
+LANG_ENGLISH	"Switching clan members to allies"
+
+REFERENCE	TEAM_SWITCH_AXIS
+LANG_ENGLISH	"Switching clan members to axis"
+
+REFERENCE	TEAM_SWITCH
+LANG_ENGLISH	"Switching Teams"
+
+//+----------------------------------------------------------------------------------------------------------------------------------+
+//¦ Match In Progress Strings                                                                                                        ¦
+//+----------------------------------------------------------------------------------------------------------------------------------+
+
+REFERENCE       PREMATCH
+LANG_ENGLISH    "GAMEPLAY IN ^3NORMAL ^7MODE, PRESS ESC TO JOIN!"
+
+REFERENCE       LIVEMATCH
+LANG_ENGLISH    "GAMEPLAY IN ^3LIVE ^7MODE, ^1DO NOT ^7DISTURB!"
+
+REFERENCE       HAVENOPERMISSION
+LANG_ENGLISH    "YOU ^1DO NOT ^7HAVE PERMISSION TO JOIN THIS MATCH!"
+
+REFERENCE	MATCH_LIVE
+LANG_ENGLISH	"Match is now live!!!"
+
+REFERENCE	KICKING_NON_MEMBERS
+LANG_ENGLISH	"^3Removing Non Clan members from the server!"
+
+REFERENCE	KICKED_NON_MEMBERS
+LANG_ENGLISH	"^3All Non Clan members have been removed from the server!"
+
+//+----------------------------------------------------------------------------------------------------------------------------------+
+//¦ Players Stats HUD                                                                                                                ¦
+//+----------------------------------------------------------------------------------------------------------------------------------+
+
+REFERENCE       HUD_SCORE
+LANG_ENGLISH    "^5SCORE^3 "
+REFERENCE       HUD_HEADSHOTS
+LANG_ENGLISH    "^5HEADSHOTS^3 "
+REFERENCE       HUD_KNIFE
+LANG_ENGLISH    "^5KNIFE KILLS^3 "
+REFERENCE       HUD_BLOOD
+LANG_ENGLISH    "^5FIRSTBLOODS^3 "
+REFERENCE       HUD_NADE
+LANG_ENGLISH    "^5GRENADE KILLS^3 "
+REFERENCE       HUD_KILLSTREAK
+LANG_ENGLISH    "^5KILL STREAK^3 "
+
 ENDMARKER

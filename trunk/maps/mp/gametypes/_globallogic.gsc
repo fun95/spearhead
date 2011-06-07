@@ -324,7 +324,7 @@ default_onOneLeftEvent( team )
 			if ( !isDefined( player.pers["team"] ) || player.pers["team"] != team )
 				continue;
 
-			if ( level.scr_OneLeftSoundEvent )
+			if ( level.scr_show_unreal_messages )
 				player maps\mp\gametypes\_globallogic::leaderDialogOnPlayer( "last_alive" );
 		}
 	}
@@ -571,6 +571,55 @@ matchStartTimer()
 	matchStartText destroyElem();
 	matchStartTimer destroyElem();
 }
+
+
+matchshownowlive()
+{
+	gameStarts = gettime() + 5100;
+	if ( !isdefined( game["matchReadyUpText"] ) ) {
+		game["matchReadyUpText"] = createServerFontString( "objective", 2.0 );
+		game["matchReadyUpText"] setPoint( "CENTER", "CENTER", 0, -45 );
+		game["matchReadyUpText"].sort = 1001;
+		game["matchReadyUpText"].color = ( 1, 1, 0 );
+		game["matchReadyUpText"].foreground = false;
+		game["matchReadyUpText"].hidewheninmenu = true;
+	}
+
+	game["matchReadyUpText"] setText( game["strings"]["match__is_live"] );
+
+	while ( gettime() < gameStarts ) {
+		wait (0.5);
+		game["matchReadyUpText"].alpha = 1;
+		wait (0.5);
+		game["matchReadyUpText"].alpha = 0;
+	}
+
+	if ( isDefined( game["matchReadyUpText"] ) )
+		game["matchReadyUpText"] destroy();
+
+	// Let players know we are live
+	game["scrim"]["status"] = &"SHIFT_LIVEMATCH";
+	game["scrim"]["islive"] = true;
+
+	players = level.players;
+	tempindex = 0;
+	for ( index = 0; index < players.size; index++ )
+	{
+		player = players[index];
+
+		if ( isdefined (player.matchstatus) )
+			player.matchstatus setText( game["scrim"]["status"] );
+
+		if ( player.team == "allies" || player.team == "axis" ) {
+			if ( isdefined( game["scrim"]["names"] ) )
+				game["scrim"]["names"] += player.name + ";";
+			else
+				game["scrim"]["names"] = player.name + ";";
+			tempindex++;
+		}
+	}
+}
+
 
 matchStartTimerSkip()
 {
@@ -1408,7 +1457,7 @@ endGame( winner, endReasonText )
 		else
 			endReasonText = game["strings"]["time_limit_reached"];
 	}
-	
+
 	thread maps\mp\gametypes\_missions::roundEnd( winner );
 	
 	// catching gametype, since DM forceEnd sends winner as player entity, instead of string
@@ -2065,6 +2114,17 @@ menuAutoAssign()
 	
 	self closeMenus();
 
+	if ( isdefined ( game["scrim"]["islive"] ) && game["scrim"]["islive"] && level.scr_disable_match_join ) {
+		tempindex = 0;
+		ismatchplayer = false;
+		if ( isdefined( game["scrim"]["names"] ) && issubstr( game["scrim"]["names"], self.name ) )
+			ismatchplayer = true;
+		if ( !ismatchplayer ) {
+			self iprintlnbold(&"SHIFT_HAVENOPERMISSION");
+			return;
+		}
+	}
+
 	if ( level.teamBased )
 	{
 		if ( getDvarInt( "party_autoteams" ) == 1 )
@@ -2228,6 +2288,17 @@ showMainMenuForTeam()
 menuAllies()
 {
 	self closeMenus();
+
+	if ( isdefined ( game["scrim"]["islive"] ) && game["scrim"]["islive"] && level.scr_disable_match_join ) {
+		tempindex = 0;
+		ismatchplayer = false;
+		if ( isdefined( game["scrim"]["names"] ) && issubstr( game["scrim"]["names"], self.name ) )
+			ismatchplayer = true;
+		if ( !ismatchplayer ) {
+			self iprintlnbold(&"SHIFT_HAVENOPERMISSION");
+			return;
+		}
+	}
 	
 	if(self.pers["team"] != "allies")
 	{
@@ -2276,6 +2347,17 @@ menuAllies()
 menuAxis()
 {
 	self closeMenus();
+
+	if ( isdefined ( game["scrim"]["islive"] ) && game["scrim"]["islive"] && level.scr_disable_match_join ) {
+		tempindex = 0;
+		ismatchplayer = false;
+		if ( isdefined( game["scrim"]["names"] ) && issubstr( game["scrim"]["names"], self.name ) )
+			ismatchplayer = true;
+		if ( !ismatchplayer ) {
+			self iprintlnbold(&"SHIFT_HAVENOPERMISSION");
+			return;
+		}
+	}
 	
 	if(self.pers["team"] != "axis")
 	{
@@ -3100,6 +3182,9 @@ prematchPeriod()
 	{
 		matchStartTimerSkip();
 	}
+
+	if ( isdefined ( game["scrim"]["announcelive"] ) && game["scrim"]["announcelive"] )
+		level thread matchshownowlive();
 	
 	level.inPrematchPeriod = false;
 	
@@ -3785,7 +3870,13 @@ Callback_StartGameType()
 		
 		game["teamScores"]["allies"] = 0;
 		game["teamScores"]["axis"] = 0;
-		
+
+		game["scrim"]["status"] = &"SHIFT_PREMATCH";
+		game["scrim"]["islive"] = false;
+		game["scrim"]["announcelive"] = false;
+		game["scrim"]["names"] = undefined;
+		game["strings"]["match__is_live"] = &"SHIFT_MATCH_LIVE";
+
 		// first round, so set up prematch
 		level.prematchPeriod = maps\mp\gametypes\_tweakables::getTweakableValue( "game", "playerwaittime" );
 		level.prematchPeriodEnd = maps\mp\gametypes\_tweakables::getTweakableValue( "game", "matchstarttime" );
@@ -5915,5 +6006,3 @@ getMostKilled()
 	
 	return mostKilled;
 }
-
-

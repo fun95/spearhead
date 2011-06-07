@@ -22,18 +22,9 @@
 
 init()
 {
-	// Get the main module's dvar
-	level.scr_allow_statusicons = getdvardefault( "scr_allow_statusicons", "int", 0 , 0, 2 );
-
 	// If the statusicons is not enabled then there's nothing else to do here
-	if ( level.scr_allow_statusicons == 0 )
+	if ( level.scr_clan_member_status == "" )
 		return;
-
-	// Get member status from dvar
-	level.scr_admin_names = getdvardefault( "scr_admin_names", "string", "" );
-	level.scr_amember_names = getdvardefault( "scr_amember_names", "string", "" );
-	level.scr_bmember_names = getdvardefault( "scr_bmember_names", "string", "" );
-	level.scr_cmember_names = getdvardefault( "scr_cmember_names", "string", "" );
 
 	precacheStatusIcon( "hud_status_amem" );  	//A Member
 	precacheStatusIcon( "hud_status_bmem" );  	//B Member
@@ -156,18 +147,14 @@ SetStatusIcon()
 	if ( isdefined(level.scr_gameplay_ftag) && level.scr_gameplay_ftag && isdefined(self.frozen) && self.frozen )
 		return;
 
-	if ( !self.isadmin && level.scr_allow_statusicons == 2 )
-	{
-		if ( isdefined(self.isamember) && self.isamember )
-			self.statusicon = "hud_status_amem";
-		else if ( isdefined(self.isbmember) && self.isbmember )
-			self.statusicon = "hud_status_bmem";
-		else if ( isdefined(self.iscmember) && self.iscmember )
-			self.statusicon = "hud_status_cmem";
-	} 
-	
 	if ( self.isadmin ) 
 		self.statusicon = "hud_status_marshal";
+	else if ( isdefined(self.isamember) && self.isamember )
+		self.statusicon = "hud_status_amem";
+	else if ( isdefined(self.isbmember) && self.isbmember )
+		self.statusicon = "hud_status_bmem";
+	else if ( isdefined(self.iscmember) && self.iscmember )
+		self.statusicon = "hud_status_cmem";
 
 	return;
 }

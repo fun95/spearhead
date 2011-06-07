@@ -1,6 +1,7 @@
 localize,shift
 
 rawfile,maps/mp/gametypes/_globallogic.gsc
+rawfile,maps/mp/gametypes/_hardpoints.gsc
 rawfile,maps/mp/gametypes/_healthoverlay.gsc
 
 fx,freezetag/defrostbeam
@@ -28,6 +29,8 @@ menufile,ui_mp/scriptmenus/voicebind.menu
 rawfile,shift/_annoykill.gsc
 rawfile,shift/_ftagplay.gsc
 rawfile,shift/_globalinit.gsc
+rawfile,shift/_playerstats.gsc
+rawfile,shift/_matchset.gsc
 rawfile,shift/_registerdvars.gsc
 rawfile,shift/_showunrealmess.gsc
 rawfile,shift/_shiftmenu.gsc
@@ -35,8 +38,8 @@ rawfile,shift/_shiftrcon.gsc
 rawfile,shift/_spectating.gsc
 rawfile,shift/_statusicon.gsc
 rawfile,shift/_utils.gsc
-
-rawfile,openwarfare/_testbots.gsc
+rawfile,shift/_welcomemsg.gsc
+rawfile,shift/_testbots.gsc
 
 sound,shift,,all_mp
 

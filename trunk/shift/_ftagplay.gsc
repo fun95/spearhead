@@ -126,20 +126,20 @@ onPrecacheFtag()
 			break;
 	}
 
-	level.freezedist = getdvardefault("scr_ftag_freezemaxrange","int",0,0,999999);
-	level.defrostdist = getdvardefault("scr_ftag_defrostmaxrange","int",0,0,999999);
-	level.defrosttime = getdvardefault("scr_ftag_defrosttime","int",15,5,100) / 100;
-	level.defrostmode = getdvardefault("scr_ftag_defrostmode","int",0,0,2);
+	// Set multiple defrost values from single dvar
+	defrostvalues = strtok( level.scr_ftag_defrost_values, ";" );
 
-	level.defrostrespawn = getdvardefault("scr_ftag_defrostrespawn","int",1,0,1);
-	level.autodefrost = getdvardefault("scr_ftag_autodefrost","int",0,0,120);
+	level.defrostmode = int( defrostvalues[0] );
+	level.defrostrespawn = int( defrostvalues[1] );
+	level.defrosttime = int( defrostvalues[2] );
+	level.defrostdistance = int( defrostvalues[3] );
+	level.autodefrost = int( defrostvalues[4] );
+	level.unfreeze_button = defrostvalues[5];
+	level.showdefrostbeam = int( defrostvalues[6] );
+	level.rotate_cube = int( defrostvalues[7] );
 
 	level.ftag_sd_spec = getdvardefault("scr_ftag_sd_spec","int",1,0,1);
 	level.ftag_sd_time = getdvardefault("scr_ftag_sd_time","int",90,0,999999);
-	level.scr_ftag_rotate_ann = getdvardefault("scr_ftag_rotate_ann","int",1,0,1);
-	level.scr_ftag_rotate_angle = getdvardefault("scr_ftag_rotate_angle","int",1,1,180);
-	level.scr_ftag_unfreeze_button = getdvardefault( "scr_ftag_unfreeze_button", "string", "use" );
-	level.scr_ftag_showdefrostbeam = getdvardefault("scr_ftag_showdefrostbeam","int",0,0,1);
 	level.scr_ftag_showteamstatus = getdvardefault("scr_ftag_showteamstatus","int",1,0,1);
 	level.scr_ftag_showcentermessage = getdvardefault("scr_ftag_showcentermessage","int",1,0,1);
 	level.scr_ftag_showstatusmessage = getdvardefault("scr_ftag_showstatusmessage","int",1,0,1);
@@ -439,11 +439,17 @@ freezeme(attacker)
 
 	self.frozen = true;
 
+	// Save the body in case the player disconnects
+	myBody = self.body;
+
 	self waittill("spawned_player");					
 	self thread disablemyweapons();
 
 	self thread RemoveIceItems();
-	self.body delete();
+
+	if ( isDefined( myBody ) )
+		myBody delete();	
+
 	self.health = 1;
 	self.statusicon = "hud_freeze";
 
@@ -709,9 +715,9 @@ defrostme(player, beam)
 		if(isDefined(player.progressbar))
 			player.progressbar setShader("white", width, level.barheight);
 
-		if (level.scr_ftag_rotate_ann == 1)
+		if (level.rotate_cube == 1)
 			self.ice.origin = self.ice.origin - (0,0, ( 60 / self.maxhealth ) );
-		if (level.scr_ftag_rotate_ann == 1 && isDefined(self.cubeisrotating) && self.cubeisrotating == false)
+		if (level.rotate_cube == 1 && isDefined(self.cubeisrotating) && self.cubeisrotating == false)
 			self thread rotatemycube(player);
 		self.health++;
 		player.healthgiven++;
@@ -847,9 +853,9 @@ defrostme2(player, beam2)
 		if(isDefined(player.progressbar2))
 			player.progressbar2 setShader("white", width, level.barheight);
 
-		if (level.scr_ftag_rotate_ann == 1)
+		if (level.rotate_cube == 1)
 			self.ice.origin = self.ice.origin - (0,0, ( 60 / self.maxhealth ) );
-		if (level.scr_ftag_rotate_ann == 1 && isDefined(self.cubeisrotating) && self.cubeisrotating == false)
+		if (level.rotate_cube == 1 && isDefined(self.cubeisrotating) && self.cubeisrotating == false)
 			self thread rotatemycube(player);
 		self.health++;
 		player.healthgiven2++;
@@ -1129,7 +1135,7 @@ rotatemycube(player)
 
 	self.cubeisrotating = true;
 	self.ice.angles = self.ice.angles + ( 0, self.rotang, 0);
-	self.rotang += level.scr_ftag_rotate_angle;
+	self.rotang += 1;
 	if (self.rotang >= 360)
 		self.rotang = 0;
 	wait (0.05);
@@ -1418,42 +1424,3 @@ SetOvertimeSpec()
 	self.statusicon = "hud_freeze";
 }
 
-RemoveIceItems()
-{
-	if(isDefined(self.ice))
-	{
-		self.ice playSound("frozen");
-		self.ice stoploopSound();
-		self.ice delete();
-	}
-
-	if(isDefined(self.sticker))
-		self.sticker delete();
-	if(isDefined(self.hud_freeze))
-		self.hud_freeze destroy();
-	if(isDefined(self.defrostmsg))
-		self.defrostmsg destroy();
-	if(isDefined(self.progressbackground))
-		self.progressbackground destroy();
-	if(isDefined(self.progressbar))
-		self.progressbar destroy();
-	if(isDefined(self.defrostmsg2))
-		self.defrostmsg2 destroy();
-	if(isDefined(self.progressbackground2))
-		self.progressbackground2 destroy();
-	if(isDefined(self.progressbar2))
-		self.progressbar2 destroy();
-	if ( isDefined( self.statusicon ) )
-		self.statusicon = "";
-
-	// Delete the objective
-	if(isdefined(self.objnum))
-	{
-		objective_delete(self.objnum);
-		level.objused[self.objnum] = false;
-		self.objnum = undefined;
-	}
-
-	self notify("stop_defrost_fx");
-	self notify("stop_ice_fx");
-}

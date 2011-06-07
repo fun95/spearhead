@@ -21,17 +21,12 @@
 init()
 {
 	// Freezetag Variables
-
 	tempvalue = getdvardefault( "ui_gameplay_ftag", "int", 2, 0, 2 );
 	if( tempvalue == 2 ) {
 		ui_gameplay_ftag = getdvardefault( "scr_gameplay_ftag", "int", 0, 0, 1 );
 		setdvar( "ui_gameplay_ftag", ui_gameplay_ftag );
 		makeDvarServerInfo( "ui_gameplay_ftag" );
 	}
-	level.scr_gameplay_ftag = getdvardefault( "ui_gameplay_ftag", "int", 0, 0, 1 );
-
-	// Misc Variables
-	level.scr_OneLeftSoundEvent = getdvardefault( "scr_OneLeftSoundEvent", "int", 1, 0, 1 );
 
 	// Show always the minimap in hardcore mode
 	level.scr_hud_hardcore_show_minimap = getdvardefault( "scr_hardcore_show_minimap", "int", 0, 0, 1 );
@@ -41,6 +36,20 @@ init()
 
 	// Variables used in menu files
 	level.scr_hud_show_inventory = getdvardefault( "scr_hud_show_inventory", "int", 0, 0, 2 );
+
+	// Load the clan tags
+	level.scr_clan_tags = getdvardefault( "scr_clan_tags", "string", "" );
+	level.scr_clan_tags = strtok( level.scr_clan_tags, " " );
+
+	// Misc Variables
+	level.scr_gameplay_ftag = getdvardefault( "ui_gameplay_ftag", "int", 0, 0, 1 );
+	level.scr_disable_match_join = getdvardefault( "scr_disable_match_join", "int", 0, 0, 1 );
+	precacheShader( "hudStopwatch" );
+
+	// New Compact Dvar values
+	level.scr_show_unreal_messages = getdvardefault( "scr_show_unreal_messages", "int", 0, 0, 1 );
+	level.scr_clan_member_status = getdvardefault( "scr_clan_member_status", "string", "" );
+	level.scr_ftag_defrost_values = getdvardefault( "scr_ftag_defrost_values", "string", "mode0;1;15;0;0;use;0;1" );
 
 	return;
 }
