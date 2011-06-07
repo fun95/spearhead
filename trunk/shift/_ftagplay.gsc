@@ -24,9 +24,16 @@ init()
 {
 	if ( level.teamBased != true )
 		return;
-	if ( level.gametype == "dom" || level.gametype == "ftag" )
-		return;
 
+	if ( !isdefined( game["switchedsides"] ) )
+		game["switchedsides"] = false;
+
+	level.ftagactive = true;
+	level.inOvertime = false;
+	level.overrideTeamScore = true;
+	level.displayRoundEndText = true;
+
+	level.onRoundSwitch = ::onRoundSwitch;
 	level.onTimeLimit = ::onTimeLimit;
 	level.onPlayerFrozen = ::onPlayerFrozen;
 	level.onStartFtagGame = ::onStartFtagGame;
@@ -35,29 +42,16 @@ init()
 	if ( level.gametype == "koth" || level.gametype == "war" )
 		level.onDeadEvent = ::onDeadEvent;
 
-	level.ftagactive = true;
-	level.overrideTeamScore = true;
-	level.displayRoundEndText = true;
+	// Force some server variables
+	setDvar( "scr_" + level.gametype + "_playerrespawndelay", "-1" );
+	setDvar( "scr_" + level.gametype + "_waverespawndelay", "0" );
+	setDvar( "scr_" + level.gametype + "_numlives", "0" );
 
-	level.scr_game_spawn_type = getdvardefault("scr_game_spawn_type","int",0,0,4);
-	level.hardcoreMode = getDvarInt( "scr_hardcore" );
-	level.oldschool = ( getDvarInt( "scr_oldschool" ) == 1 );
-
-	if ( level.scr_game_spawn_type != 0 )
+	if ( !isdefined( level.scr_shift_gameplay["spawn"] ) || !level.scr_shift_gameplay["spawn"] )
 		level.onSpawnPlayer = ::onSpawnPlayer;
 
-	if ( level.hardcoreMode )
-		level.maxhealth = getdvardefault( "scr_player_maxhealth", "int", 30, 1, 500 );
-	else if ( level.oldschool )
-		level.maxhealth = getdvardefault( "scr_player_maxhealth", "int", 200, 1, 500 );
-	else
-		level.maxhealth = getdvardefault( "scr_player_maxhealth", "int", 100, 1, 500 );
-
-	// Add more detail to the type of game being played
-	if ( isdefined ( level.ftagactive ) && level.ftagactive ) {
-		gametype = "freezetag";
-		game["dialog"]["gametype"] = gametype;
-	}	
+	gametype = "freezetag";
+	game["dialog"]["gametype"] = gametype;	
 }
 
 onPrecacheFtag()
@@ -126,27 +120,6 @@ onPrecacheFtag()
 			break;
 	}
 
-	// Set multiple defrost values from single dvar
-	defrostvalues = strtok( level.scr_ftag_defrost_values, ";" );
-
-	level.defrostmode = int( defrostvalues[0] );
-	level.defrostrespawn = int( defrostvalues[1] );
-	level.defrosttime = int( defrostvalues[2] );
-	level.defrostdistance = int( defrostvalues[3] );
-	level.autodefrost = int( defrostvalues[4] );
-	level.unfreeze_button = defrostvalues[5];
-	level.showdefrostbeam = int( defrostvalues[6] );
-	level.rotate_cube = int( defrostvalues[7] );
-
-	level.ftag_sd_spec = getdvardefault("scr_ftag_sd_spec","int",1,0,1);
-	level.ftag_sd_time = getdvardefault("scr_ftag_sd_time","int",90,0,999999);
-	level.scr_ftag_showteamstatus = getdvardefault("scr_ftag_showteamstatus","int",1,0,1);
-	level.scr_ftag_showcentermessage = getdvardefault("scr_ftag_showcentermessage","int",1,0,1);
-	level.scr_ftag_showstatusmessage = getdvardefault("scr_ftag_showstatusmessage","int",1,0,1);
-
-	level.thismap = toLower( getDvar( "mapname" ) );
-	level.spawn_type_map = getdvardefault("scr_spawn_type_" + level.thismap,"int",0,0,4);
-
 	level.fx_defrostmelt = loadFx("freezetag/defrostmelt");
 	level.barsize = 100;
 	level.barheight = 3;
@@ -158,7 +131,7 @@ onPrecacheFtag()
 
 onStartFtagGame()
 {
-	if ( level.scr_game_spawn_type != 0 ) {
+	if ( !level.scr_shift_gameplay["spawn"] ) {
 		level.spawnMins = ( 0, 0, 0 );
 		level.spawnMaxs = ( 0, 0, 0 );
 
@@ -195,9 +168,9 @@ onStartFtagGame()
 
 	level thread onPrecacheFtag();
 	level thread onPlayerConnect();
-	level thread checkforfrozenplayers();
+	level thread monitorFrozenPlayerScore();
 
-	if ( level.scr_ftag_showteamstatus )
+	if ( level.scr_shift_hud["team"] )
 		level thread inithud();
 }
 
@@ -257,26 +230,28 @@ onSpawnPlayer()
 	self.isFlagCarrier = false;
 	self.isVIP = false;
 
-	spawnteam = self.pers["team"];
-
-	if ( level.spawn_type_map <= 4 || level.spawn_type_map != 0 )
-		level.scr_game_spawn_type = level.spawn_type_map;
+	// Check which spawn points should be used
+	if ( game["switchedsides"] ) {
+		spawnTeam = level.otherTeam[ self.pers["team"] ];
+	} else {
+		spawnTeam =  self.pers["team"];
+	}
 
 	if ( level.useStartSpawns )
 	{
 		// Set Spawn Points From DVar, 0 = Disabled(default), 1 = Team End, 2 = Near Team, 3 = Scattered, 4 = Random
-		if ( level.scr_game_spawn_type == 2 ) {
+		if ( level.scr_shift_gameplay["spawn"] == 2 ) {
 			if (spawnteam == "axis")
 				spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_NearTeam(level.spawn_axis);
 			else
 				spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_NearTeam(level.spawn_allies);
-		} else if ( level.scr_game_spawn_type == 3 ) {
+		} else if ( level.scr_shift_gameplay["spawn"] == 3 ) {
 			numb = randomInt(2);
 			if (numb == 1)
 				spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_Random(level.spawn_axis);
 			else
 				spawnpoint = maps\mp\gametypes\_spawnlogic::getSpawnpoint_Random(level.spawn_allies);
-		} else if ( level.scr_game_spawn_type == 4 ) {
+		} else if ( level.scr_shift_gameplay["spawn"] == 4 ) {
 			num = randomInt(3);
 			if (num == 2) {
 				numb = randomInt(2);
@@ -320,7 +295,7 @@ onSpawnFtagPlayer()
 		if ( isdefined( self.freezeorigin ) && isdefined( self.freezeangles ) )
 		self spawn(self.freezeorigin, self.freezeangles);	
 		self thread freezeme();
-	} else if ( !level.defrostrespawn && isdefined( self.freezeorigin ) && isdefined( self.freezeangles ) ) {
+	} else if ( !level.scr_ftag_defrost["respawn"] && isdefined( self.freezeorigin ) && isdefined( self.freezeangles ) ) {
 		self spawn(self.freezeorigin, self.freezeangles);
 		self.frozen = false;
 		self.health = self.maxhealth;
@@ -345,7 +320,14 @@ onSpawnFtagPlayer()
 		self thread SetOvertimeSpec();
 }
 
-checkforfrozenplayers()
+onRoundSwitch()
+{
+	// Just change the value for the variable controlling which map assets will be assigned to each team
+	level.halftimeType = "halftime";
+	game["switchedsides"] = !game["switchedsides"];
+}
+
+monitorFrozenPlayerScore()
 {
 	level endon("game_ended");
 	while(1)
@@ -419,15 +401,15 @@ onPlayerFrozen( eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHi
 		self.freezeorigin = undefined;
 	}
 
-	if ( level.scr_ftag_showcentermessage ) {
+	if ( level.scr_shift_hud["center"] ) {
 		if( isdefined( attacker ) && isPlayer( attacker ) && attacker != self ) {
 			self iprintlnbold(&"SHIFT_FTAG_HUD_FROZENBY" , attacker.name);
 			attacker iprintlnbold(&"SHIFT_FTAG_HUD_YOUFROZE" , self.name);
-			if ( level.scr_ftag_showstatusmessage )
+			if ( level.scr_shift_hud["left"] )
 				iPrintln(&"SHIFT_FTAG_FROZE" , attacker.name , self.name);
 		} else {
 			self iprintlnbold(&"SHIFT_FTAG_HUD_YOUFROZE_SELF");
-			if ( level.scr_ftag_showstatusmessage )
+			if ( level.scr_shift_hud["left"] )
 				iPrintln(&"SHIFT_FTAG_HUD_FROZE_HIMSELF" , self.name);
 		}
 	}
@@ -497,7 +479,7 @@ freezeme(attacker)
 	self.hud_freeze fadeovertime(2);
 	self.hud_freeze.alpha = 0.6;
 
-	if( numofplayers("allies") < 1 || numofplayers("axis") < 1 || level.autodefrost )
+	if( numofplayers("allies") < 1 || numofplayers("axis") < 1 || level.scr_ftag_defrost["auto"] )
 		self thread defrostaftertime();
 
 	self thread waitfordefrost();
@@ -515,6 +497,8 @@ waitfordefrost()
 	self.ice.origin = self.origin + (0,0,30);
 	self.ice.alpha = 1;
 
+logprint( "distance for defrost = " + level.scr_ftag_defrost["mode"] + "\n" );
+
 	while(1)
 	{
 		players = getentarray("player", "classname");
@@ -524,7 +508,7 @@ waitfordefrost()
 
 			if(self.isdefrosting)
 				continue;
-			if(isdefined(player.isdefrostingsomeone) && player.isdefrostingsomeone && (level.defrostmode == 0 || level.defrostmode == 1))
+			if( isdefined( player.isdefrostingsomeone ) && player.isdefrostingsomeone && level.scr_ftag_defrost["mode"] != 2 )
 				continue;
 			if(player.sessionstate != "playing")
 				continue;
@@ -535,11 +519,11 @@ waitfordefrost()
 			if(isdefined(player.frozen) && player.frozen)
 				continue;
 
-			if( level.defrostmode == 2 )
+			if( level.scr_ftag_defrost["mode"] == 2 )
 			{
-				if( !isdefined(player.isdefrostingsomeone) || isdefined(player.isdefrostingsomeone) && !player.isdefrostingsomeone )
+				if( !isdefined(player.isdefrostingsomeone) || !player.isdefrostingsomeone )
 				{
-					if(distance(self.origin, player.origin) <= 50)
+					if( distance( self.origin, player.origin ) <= level.scr_ftag_defrost["dist"] )
 						inrange = true;
 					else
 						inrange = false;
@@ -559,22 +543,18 @@ waitfordefrost()
 						self thread defrostme2(player, true);
 				}
 			}
-			else if( level.defrostmode == 0 )
+			else if( level.scr_ftag_defrost["mode"] == 0 )
 			{
 				if(player ftagButtonPressed() && player islookingatftag(self))
 					self thread defrostme(player, true);
 			}
 			else
 			{
-				if(level.defrostdist)
-				{
-					if(distance(self.origin, player.origin) <= level.defrostdist)
-						inrange = true;
-					else
-						inrange = false;
-				}
-				else
+				if( distance( self.origin, player.origin ) <= level.scr_ftag_defrost["dist"] )
 					inrange = true;
+				else
+					inrange = false;
+
 				trace = bulletTrace(player.origin + (0,0,10), self.origin + (0,0,10), false, undefined);
 				if(inrange && trace["fraction"] == 1)
 					self thread defrostmeicon(player);
@@ -677,7 +657,7 @@ defrostme(player, beam)
 	player.progressbar setShader("white", 1, level.barheight);
 	player.progressbar scaleOverTime(self.maxhealth, level.barsize, level.barheight);
 
-	if(!beam && level.defrostmode != 2 )
+	if(!beam && level.scr_ftag_defrost["mode"] != 2 )
 	{
 		player playsound("MP_bomb_plant");
 		defroststicker = spawn("script_origin", player.origin);
@@ -695,7 +675,7 @@ defrostme(player, beam)
 
 	while(isPlayer(self) && self.sessionstate == "playing" && (self.health < self.maxhealth) && game["state"] != "postgame")
 	{
-		if( !isPlayer(player) || player.sessionstate != "playing" || player.frozen || ( !player ftagButtonPressed() && level.defrostmode != 2 ) || ( !player ftagButtonPressed() && beam ) )
+		if( !isPlayer(player) || player.sessionstate != "playing" || player.frozen || ( !player ftagButtonPressed() && level.scr_ftag_defrost["mode"] != 2 ) || ( !player ftagButtonPressed() && beam ) )
 			break;
 		if(beam)
 		{
@@ -703,9 +683,9 @@ defrostme(player, beam)
 			if(!player islookingatftag(self))
 				break;
 		}
-		else if ( level.defrostmode == 2 )
+		else if ( level.scr_ftag_defrost["mode"] == 2 )
 		{
-			if(distance(self.origin, player.origin) >= 50)
+			if( distance( self.origin, player.origin ) >= level.scr_ftag_defrost["dist"] )
 				break;
 		}
 
@@ -715,13 +695,13 @@ defrostme(player, beam)
 		if(isDefined(player.progressbar))
 			player.progressbar setShader("white", width, level.barheight);
 
-		if (level.rotate_cube == 1)
+		if ( level.scr_ftag_defrost["cube"] )
 			self.ice.origin = self.ice.origin - (0,0, ( 60 / self.maxhealth ) );
-		if (level.rotate_cube == 1 && isDefined(self.cubeisrotating) && self.cubeisrotating == false)
+		if ( level.scr_ftag_defrost["cube"] && isDefined( self.cubeisrotating ) && self.cubeisrotating == false)
 			self thread rotatemycube(player);
 		self.health++;
 		player.healthgiven++;
-		wait level.defrosttime;
+		wait level.scr_ftag_defrost["time"];
 	}
 
 	self setClientDvar( "cg_drawhealth", 1 );
@@ -739,13 +719,13 @@ defrostme(player, beam)
 
 	if(self.health + 1 >= self.maxhealth)
 		self thread defrosted(player, beam, defroststicker);
-	else if(!player.frozen && !beam && level.defrostmode != 2)
+	else if(!player.frozen && !beam && level.scr_ftag_defrost["mode"] != 2)
 	{
 		player unlink();
 		player enableWeapons();
 		defroststicker delete();
 	}
-	else if(!beam && level.defrostmode != 2)
+	else if(!beam && level.scr_ftag_defrost["mode"] != 2)
 		defroststicker delete();
 	self.isdefrosting = false;
 	self notify("stop_defrost_fx");
@@ -821,7 +801,7 @@ defrostme2(player, beam2)
 	player.progressbar2.sort = 2;
 	player.progressbar2.color = (0.3,1,1);
 	player.progressbar2 setShader("white", 1, level.barheight);
-	player.progressbar2 scaleOverTime(level.defrosttime, level.barsize, level.barheight);
+	player.progressbar2 scaleOverTime( level.scr_ftag_defrost["time"], level.barsize, level.barheight );
 
 	if( !isDefined(self.defrostprogresstime) )
 		self.defrostprogresstime = 0;
@@ -841,9 +821,9 @@ defrostme2(player, beam2)
 			if(!player islookingatftag(self))
 				break;
 		}
-		else if ( level.defrostmode == 2 )
+		else if ( level.scr_ftag_defrost["mode"] == 2 )
 		{
-			if(distance(self.origin, player.origin) >= 50)
+			if( distance( self.origin, player.origin ) >= level.scr_ftag_defrost["dist"] )
 				break;
 		}
 
@@ -853,13 +833,13 @@ defrostme2(player, beam2)
 		if(isDefined(player.progressbar2))
 			player.progressbar2 setShader("white", width, level.barheight);
 
-		if (level.rotate_cube == 1)
+		if ( level.scr_ftag_defrost["cube"] )
 			self.ice.origin = self.ice.origin - (0,0, ( 60 / self.maxhealth ) );
-		if (level.rotate_cube == 1 && isDefined(self.cubeisrotating) && self.cubeisrotating == false)
+		if ( level.scr_ftag_defrost["cube"] && isDefined(self.cubeisrotating) && self.cubeisrotating == false)
 			self thread rotatemycube(player);
 		self.health++;
 		player.healthgiven2++;
-		wait level.defrosttime;
+		wait level.scr_ftag_defrost["time"];
 	}
 
 	self setClientDvar( "cg_drawhealth", 1 );
@@ -891,7 +871,7 @@ defrosted(player, beam, defroststicker)
 
 	if(isDefined(player))
 	{
-		if(!beam && level.defrostmode != 2)
+		if(!beam && level.scr_ftag_defrost["mode"] != 2)
 		{
 			player unlink();
 			player enableWeapons();
@@ -926,7 +906,7 @@ defrosted(player, beam, defroststicker)
 					player maps\mp\gametypes\_globallogic::incPersStat( "assists", 1 );
 					player.assists = player maps\mp\gametypes\_globallogic::getPersStat( "assists" );
 
-					if ( level.scr_ftag_showcentermessage ) {
+					if ( level.scr_shift_hud["center"] ) {
 						player iprintlnbold(&"SHIFT_FTAG_HUD_DEFROSTED", self.name);
 						player iprintlnbold(&"SHIFT_FTAG_HUD_POINTS", value);
 					}
@@ -944,16 +924,16 @@ defrosted(player, beam, defroststicker)
 		if(!isDefined(level.defrostplayers))
 			level.defrostplayers = self.name;
 
-		if ( level.scr_ftag_showcentermessage )
+		if ( level.scr_shift_hud["center"] )
 			self iprintlnbold(&"SHIFT_FTAG_HUD_DEFROSTEDBY", level.defrostplayers);
-		if ( level.scr_ftag_showstatusmessage )
+		if ( level.scr_shift_hud["left"] )
 			iPrintln(&"SHIFT_FTAG_DEFROSTED" , level.defrostplayers , self.name);
 	}
-	else if( level.autodefrost )
+	else if( level.scr_ftag_defrost["auto"] )
 	{
-		if ( level.scr_ftag_showcentermessage )
+		if ( level.scr_shift_hud["center"] )
 			self iprintlnbold(&"SHIFT_FTAG_HUD_AUTO_DEFROSTED");
-		if ( level.scr_ftag_showstatusmessage )
+		if ( level.scr_shift_hud["left"] )
 			iPrintln(&"SHIFT_FTAG_AUTO_DEFROSTED" , self.name);
 	}
 
@@ -980,16 +960,16 @@ defrostaftertime()
 	self endon("defrosted");
 	self endon("death");
 
-	if ( !level.autodefrost )
-		level.autodefrost = 10;
+	if ( !level.scr_ftag_defrost["auto"] )
+		level.scr_ftag_defrost["auto"] = 10;
 
-	wait level.autodefrost;
+	wait level.scr_ftag_defrost["auto"];
 	if(!self.isdefrosting)
 		self thread defrosted(undefined, false, undefined);
 	else
 	{
 		while(self.isdefrosting)
-			wait level.autodefrost;
+			wait level.scr_ftag_defrost["auto"];
 		if(!self.isdefrosting)
 			self thread defrostaftertime();
 	}
@@ -1022,38 +1002,21 @@ playloopfx(fx,origin,waittime,end)
 
 islookingatftag(who)
 {
-	if(level.defrostdist)
-	{
-		if(distance(self.origin, who.origin) <= level.defrostdist)
-			inrange = true;
-		else
-			inrange = false;
-	}
-	else
-		inrange = true;
+	if( self getStance() == "prone" )
+		myeye = self.origin + (0,0,11);
+	else if( self getStance() == "crouch" )
+		myeye = self.origin + (0,0,40);
+	else 
+		myeye = self.origin + (0,0,60);
+	myangles = self getPlayerAngles();
 
-	if(inrange)
+	origin = myeye + maps\mp\_utility::vector_Scale(anglestoforward(myangles),9999999);
+	trace = bulletTrace(myeye, origin, true, self);
+
+	if( trace["fraction"] != 1 )
 	{
-		if(self getStance() == "prone")
-			myeye = self.origin + (0,0,11);
-		else if(self getStance() == "crouch")
-			myeye = self.origin + (0,0,40);
-		else 
-			myeye = self.origin + (0,0,60);
-		myangles = self getPlayerAngles();
-		if(level.defrostdist)
-			end = level.defrostdist;
-		else
-			end = 9999999;
-		origin = myeye + maps\mp\_utility::vector_Scale(anglestoforward(myangles),end);
-		trace = bulletTrace(myeye, origin, true, self);
-		if(trace["fraction"] != 1)
-		{
-			if(isdefined(trace["entity"]) && trace["entity"] == who)
-				return true;
-			else
-				return false;
-		}
+		if( isdefined( trace["entity"] ) && trace["entity"] == who )
+			return true;
 		else
 			return false;
 	}
@@ -1068,9 +1031,9 @@ dobeam(player)
 
 	speed = 500;
 	self.beam = true;
-	defrosterfx = spawn("script_origin", player.origin + (0,0,40));
+	defrosterfx = spawn( "script_origin", player.origin + (0,0,40) );
 
-	if ( level.scr_ftag_showdefrostbeam )
+	if ( level.scr_ftag_defrost["beam"] )
 		defrosterfx thread playdefrostbeam(game[level.gameType]["defrost_beam_" + self.pers["team"] ],0.1,"stop_defrost_fx");
 
 	defrosterfx moveto(self.origin + (0,0,40),calcspeed(speed, player.origin, self.origin));
@@ -1101,7 +1064,7 @@ ftagButtonPressed()
 {
 	ispressed = false;
 
-	switch ( level.scr_ftag_unfreeze_button )
+	switch ( level.scr_ftag_defrost["button"] )
 	{
 		case "attack":
 			ispressed = self attackButtonPressed();
@@ -1116,7 +1079,7 @@ ftagButtonPressed()
 			ispressed = self useButtonPressed();
 			break;
 		default:
-			ispressed = self buttonPressed(level.scr_ftag_unfreeze_button);
+			ispressed = self buttonPressed( level.scr_ftag_defrost["button"] );
 			break;
 	}
 
@@ -1149,7 +1112,7 @@ iconchecker(me)
 	self endon("disconnect");
 
 	trace = bulletTrace(me.origin + (0,0,10), self.origin + (0,0,10), false, undefined);
-	while(isPlayer(self) && distance(self.origin, me.origin) <= level.defrostdist && self.sessionstate == "playing" && !self.frozen && trace["fraction"] == 1)
+	while(isPlayer(self) && distance(self.origin, me.origin) <= level.scr_ftag_defrost["dist"] && self.sessionstate == "playing" && !self.frozen && trace["fraction"] == 1)
 	{
 		trace = bulletTrace(me.origin + (0,0,10), self.origin + (0,0,10), false, undefined);
 		wait 0.05;
@@ -1353,8 +1316,8 @@ onOvertime()
 		player thread SetOvertimeSpec();
 	}
 
-	thread timeLimitClock_Overtime( level.ftag_sd_time );
-	wait (level.ftag_sd_time - 1);
+	thread timeLimitClock_Overtime( level.scr_shift_spectator["ottime"] );
+	wait ( level.scr_shift_spectator["ottime"] - 1 );
 	self notify("stop_ticking");
 
 	if(numofplayersnotfrozen("axis") == numofplayersnotfrozen("allies"))
@@ -1394,7 +1357,7 @@ timeLimitClock_Overtime( waitTime )
 
 SetOvertimeSpec()
 {
-	if( level.ftag_sd_spec != 1 || !isAlive(self) || !self.frozen || self.team == "spectator" )
+	if( !level.scr_shift_spectator["otspec"] || !isAlive(self) || !self.frozen || self.team == "spectator" )
 		return;
 
 	self suicide();

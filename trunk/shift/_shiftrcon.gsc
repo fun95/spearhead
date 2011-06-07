@@ -116,7 +116,9 @@ getNextMapInRotation()
 	// Get the current map rotation
 	mapRotation = getdvar( "sv_mapRotationCurrent" );
 	if ( mapRotation == "" )
-		mapRotation = getdvardefault( "sv_mapRotation", "string", "", undefined, undefined );
+		mapRotation = getdvar( "sv_mapRotation" );
+	if ( mapRotation == "" )
+		return;
 
 	// Split the map rotation
 	mapRotation = strtok( mapRotation, " " );
@@ -202,7 +204,7 @@ getCurrentPlayerIndex()
 {
 	index = 0;
 	while ( index < level.RconPlayers.size ) {
-		if ( isDefined( level.RconPlayers[index] ) && level.RconPlayers[index].name == getdvardefault( "ui_rcon_player", "string", "", undefined, undefined ) ) {
+		if ( isDefined( level.RconPlayers[index] ) && level.RconPlayers[index].name == getdvar( "ui_rcon_player" ) ) {
 			break;
 		}
 		index++;
@@ -219,7 +221,7 @@ getCurrentPlayerName()
 {
 	index = 0;
 	while ( index < level.RconPlayers.size ) {
-		if ( isDefined( level.RconPlayers[index] ) && level.RconPlayers[index].name == getdvardefault( "ui_rcon_player", "string", "", undefined, undefined ) ) {
+		if ( isDefined( level.RconPlayers[index] ) && level.RconPlayers[index].name == getdvar( "ui_rcon_player" ) ) {
 			break;
 		}
 		index++;
@@ -357,7 +359,7 @@ onMenuResponse()
 		self waittill( "menuresponse", menuName, menuOption );
 		
 		// Make sure we handle only responses coming from the Advanced ACP menu
-		if ( menuName == "shiftrcon" && ( !isdefined ( self.RunningCommand ) || isdefined ( self.RunningCommand ) && !self.RunningCommand ) ) {
+		if ( menuName == "shiftrcon" && ( !isdefined ( self.RunningCommand ) || !self.RunningCommand ) ) {
 			self.RunningCommand = true;
 			
 			switch ( menuOption ) {
@@ -506,12 +508,12 @@ onMenuResponse()
 					break;	
 
 				case "freezetag":
-					if ( isdefined ( level.scr_gameplay_ftag ) && level.scr_gameplay_ftag )
-						level.scr_gameplay_ftag = 0;
+					if ( isdefined ( level.scr_shift_gameplay["ftag"] ) && level.scr_shift_gameplay["ftag"] )
+						level.scr_shift_gameplay["ftag"] = 0;
 					else
-						level.scr_gameplay_ftag = 1;
+						level.scr_shift_gameplay["ftag"] = 1;
 
-					setdvar( "ui_gameplay_ftag", level.scr_gameplay_ftag );
+					setdvar( "ui_gameplay_ftag", level.scr_shift_gameplay["ftag"] );
 					makeDvarServerInfo( "ui_gameplay_ftag" );
 					break;
 

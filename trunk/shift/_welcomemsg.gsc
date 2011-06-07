@@ -20,12 +20,10 @@
 
 init()
 {
-	// Get the main module's dvar
-	level.svr_welcome_msg_delay = getdvardefault( "svr_welcome_msg_delay", "int", 1, 1, 60 );
-	level.svr_welcome_msg = getdvardefault( "svr_welcome_msg", "string", undefined, undefined, undefined);
-	level.scr_welcome_at_start = getdvardefault( "scr_welcome_at_start", "int", 0, 0, 2 );
+	if ( !isdefined( level.scr_shift_hud["welcome"] ) || !level.scr_shift_hud["welcome"] )
+		return;
 
-	if ( level.scr_welcome_at_start == 0 )
+	if ( !isdefined( level.scr_shift_hud["delay"] ) || !level.scr_shift_hud["delay"] )
 		return;
 
 	level thread onPlayerConnect();
@@ -55,9 +53,9 @@ onPlayerSpawned()
 
 displaywelcomeMsg()
 {
-	if (level.svr_welcome_msg_delay && !isDefined(self.pers["welcomeMsgDone"]))
+	if ( !isDefined(self.pers["welcomeMsgDone"]) )
 	{
-		wait level.svr_welcome_msg_delay;
+		wait level.scr_shift_hud["delay"];
 		self thread welcomeMsg();
 		while (!isDefined(self.pers["welcomeMsgDone"]))
 			wait .50;
@@ -67,7 +65,6 @@ displaywelcomeMsg()
 welcomeMsg()
 {
 	wait .50;
-	if (level.svr_welcome_msg != "")
-		self iprintlnbold(level.svr_welcome_msg + ", " + self.name);
+	self iprintlnbold( level.scr_shift_hud["welcome"] + ", " + self.name );
 	self.pers["welcomeMsgDone"] = true;
 }

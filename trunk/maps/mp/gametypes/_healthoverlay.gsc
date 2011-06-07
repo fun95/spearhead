@@ -115,7 +115,7 @@ playerHealthRegen()
 		if (player.health <= 0)
 			return;
 
-		if ( isdefined(level.scr_gameplay_ftag) && level.scr_gameplay_ftag )
+		if ( isdefined( level.scr_shift_gameplay["ftag"] ) && level.scr_shift_gameplay["ftag"] )
 			return;
 
 		wasVeryHurt = veryHurt;
@@ -191,7 +191,7 @@ playerBreathingSound(healthcap)
 		if (player.health <= 0)
 			return;
 
-		if ( isdefined(level.scr_gameplay_ftag) && level.scr_gameplay_ftag )
+		if ( isdefined( level.scr_shift_gameplay["ftag"] ) && level.scr_shift_gameplay["ftag"] )
 			return;
 			
 		// Player still has a lot of health so no breathing sound

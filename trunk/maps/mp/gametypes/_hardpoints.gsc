@@ -23,7 +23,8 @@
 
 init()
 {
-	level.scr_game_hardpoints = getdvardefault( "scr_game_hardpoints", "int", 1, 0, 1 );
+	//Added by [SHIFT]
+	level.scr_game_hardpoints = getDvarInt( "scr_game_hardpoints" );
 
 	precacheItem( "radar_mp" );
 	precacheItem( "airstrike_mp" );

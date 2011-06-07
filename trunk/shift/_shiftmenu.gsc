@@ -52,7 +52,7 @@ onMenuResponse()
 		if(menu == game["menu_voicebind"])
 			self openMenu( game["menu_voicebind"] );
 
-		if( !isdefined( self.isadmin || isdefined( self.isadmin && !self.isadmin ) ) )
+		if( !isdefined( self.isadmin ) || !self.isadmin )
 			continue;
 
 		if(  menu == game["menu_shiftrcon"] )

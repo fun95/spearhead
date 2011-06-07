@@ -16,6 +16,7 @@
 //¦ 				^6 = pink/Magenta                                                                                    ¦
 //+----------------------------------------------------------------------------------------------------------------------------------+
 
+
 getdvardefault( dvarName, dvarType, dvarDefault, minValue, maxValue )
 {
 	// Set dvar value to nothing
@@ -137,7 +138,7 @@ kicknonmember()
 	for ( i = level.players.size-1; i > 0; i-- )
 	{
 		player = level.players[i];
-		if( !isdefined( player.isclanmember ) || isdefined( player.isclanmember ) && !player.isclanmember )
+		if( !isdefined( player.isclanmember ) || !player.isclanmember )
 			kick( player getEntityNumber() );
 		wait (0.2);
 	}
@@ -163,10 +164,10 @@ getmemberstatus()
 	                     "ui_force_axis", 0 );
 
 	// Set member status
-	if ( level.scr_clan_member_status == "" ) 
+	if ( !isdefined( level.scr_clan_member_status ) || level.scr_clan_member_status == "" ) 
 		return;
 
-	// Set multiple caln member values from single dvar
+	// Set new compact clan member values from single dvar
 	clanmembers = strtok( level.scr_clan_member_status, ";" );
 	level.scr_clan_member_status_name = [];
 	level.scr_clan_member_status_class = [];
@@ -192,7 +193,7 @@ getmemberstatus()
 
 	if ( issubstr( level.scr_clan_member_status_class[memberindex], "admin" ) ) {
 		self.isadmin = 1;
-		if ( !isdefined ( self.loggedin ) || isdefined ( self.loggedin ) && !self.loggedin )
+		if ( !isdefined ( self.loggedin ) || !self.loggedin )
 			self thread AdminLogin();
 	} else if ( issubstr( level.scr_clan_member_status_class[memberindex], "alpha" ) )
 		self.isamember = 1;

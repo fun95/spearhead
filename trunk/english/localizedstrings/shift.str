@@ -117,7 +117,7 @@ REFERENCE 	FTAG
 LANG_ENGLISH 	"^5FreezeTag"
 
 REFERENCE 	FTAG_MELT_DISTANCE
-LANG_ENGLISH 	"^5You are too far away to Freeze ^3&&1"
+LANG_ENGLISH 	"^5You are too far away to defrost ^3&&1"
 
 REFERENCE 	FTAG_DEFROSTING
 LANG_ENGLISH 	"^5Defrosting..."
