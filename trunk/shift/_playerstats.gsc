@@ -77,6 +77,7 @@ statsonuse()
 	level.ex_hudstatsuse_ypos = 130;
 
 	if(!isDefined(self.pers["score"])) self.pers["score"] = 0; 
+	if(!isDefined(self.pers["defrost"])) self.pers["defrost"] = 0; 
 	if(!isDefined(self.cur_kill_streak)) self.cur_kill_streak = 0; 
 	if(!isDefined(self.pers["firstblood"])) self.pers["firstblood"] = 0; 
 	if(!isDefined(self.pers["headshots"])) self.pers["headshots"] = 0;
@@ -104,11 +105,26 @@ statsonuse()
 			self.hud_statsscore.label = &"SHIFT_HUD_SCORE";
 			self.hud_statsscore setvalue(self.pers["score"]);
 
+			if(!isdefined(self.hud_statsdefrost))
+			{
+				self.hud_statsdefrost = newClientHudElem(self);
+				self.hud_statsdefrost.x = level.ex_hudstatsuse_xpos;
+				self.hud_statsdefrost.y = level.ex_hudstatsuse_ypos + 16;
+				self.hud_statsdefrost.alignx = "right";
+				self.hud_statsdefrost.aligny = "middle";
+				self.hud_statsdefrost.horzAlign = "fullscreen";
+				self.hud_statsdefrost.vertAlign = "fullscreen";
+				self.hud_statsdefrost.alpha =0.8;
+				self.hud_statsdefrost.fontScale = 1.4;
+			}
+			self.hud_statsdefrost.label = &"SHIFT_HUD_DEFROST";
+			self.hud_statsdefrost setvalue(self.pers["defrost"]);
+
 			if(!isdefined(self.hud_statskstreak))
 			{
 				self.hud_statskstreak = newClientHudElem(self);
 				self.hud_statskstreak.x = level.ex_hudstatsuse_xpos;
-				self.hud_statskstreak.y = level.ex_hudstatsuse_ypos + 16;
+				self.hud_statskstreak.y = level.ex_hudstatsuse_ypos + 32;
 				self.hud_statskstreak.alignx = "right";
 				self.hud_statskstreak.aligny = "middle";
 				self.hud_statskstreak.horzAlign = "fullscreen";
@@ -123,7 +139,7 @@ statsonuse()
 			{
 				self.hud_statsblood = newClientHudElem(self);
 				self.hud_statsblood.x = level.ex_hudstatsuse_xpos;
-				self.hud_statsblood.y = level.ex_hudstatsuse_ypos + 32;
+				self.hud_statsblood.y = level.ex_hudstatsuse_ypos + 48;
 				self.hud_statsblood.alignx = "right";
 				self.hud_statsblood.aligny = "middle";
 				self.hud_statsblood.horzAlign = "fullscreen";
@@ -139,7 +155,7 @@ statsonuse()
 			{
 				self.hud_statshead = newClientHudElem(self);
 				self.hud_statshead.x = level.ex_hudstatsuse_xpos;
-				self.hud_statshead.y = level.ex_hudstatsuse_ypos + 48;
+				self.hud_statshead.y = level.ex_hudstatsuse_ypos + 64;
 				self.hud_statshead.alignx = "right";
 				self.hud_statshead.aligny = "middle";
 				self.hud_statshead.horzAlign = "fullscreen";
@@ -155,7 +171,7 @@ statsonuse()
 			{
 				self.hud_statsknife = newClientHudElem(self);
 				self.hud_statsknife.x = level.ex_hudstatsuse_xpos;
-				self.hud_statsknife.y = level.ex_hudstatsuse_ypos + 64;
+				self.hud_statsknife.y = level.ex_hudstatsuse_ypos + 80;
 				self.hud_statsknife.alignx = "right";
 				self.hud_statsknife.aligny = "middle";
 				self.hud_statsknife.horzAlign = "fullscreen";
@@ -171,7 +187,7 @@ statsonuse()
 			{
 				self.hud_statsnade = newClientHudElem(self);
 				self.hud_statsnade.x = level.ex_hudstatsuse_xpos;
-				self.hud_statsnade.y = level.ex_hudstatsuse_ypos + 80;
+				self.hud_statsnade.y = level.ex_hudstatsuse_ypos + 96;
 				self.hud_statsnade.alignx = "right";
 				self.hud_statsnade.aligny = "middle";
 				self.hud_statsnade.horzAlign = "fullscreen";
@@ -186,6 +202,7 @@ statsonuse()
 		else
 		{
 			if(isDefined(self.hud_statsscore)) self.hud_statsscore destroy(); 
+			if(isDefined(self.hud_statsdefrost)) self.hud_statsdefrost destroy(); 
 			if(isDefined(self.hud_statskstreak)) self.hud_statskstreak destroy(); 
 			if(isDefined(self.hud_statsblood)) self.hud_statsblood destroy(); 
 			if(isDefined(self.hud_statshead)) self.hud_statshead destroy();
