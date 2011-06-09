@@ -30,18 +30,19 @@ init()
 
 
 	// Set new compact defrost values from single dvar
-	level.scr_ftag_defrost_values = getdvardefault( "scr_ftag_defrost_values", "string", "0;1;15;50;0;0;1;use" );
+	level.scr_ftag_defrost_values = getdvardefault( "scr_ftag_defrost_values", "string", "50;0;1;15;50;0;0;1;use" );
 	defaultvalues = strtok( level.scr_ftag_defrost_values, ";" );
 
 	level.scr_ftag_defrost = [];
-	level.scr_ftag_defrost["mode"] = int( defaultvalues[0] );
-	level.scr_ftag_defrost["respawn"] = int( defaultvalues[1] );
-	level.scr_ftag_defrost["time"] = int( defaultvalues[2] ) / 100;
-	level.scr_ftag_defrost["dist"] = int( defaultvalues[3] );
-	level.scr_ftag_defrost["auto"] = int( defaultvalues[4] );
-	level.scr_ftag_defrost["beam"] = int( defaultvalues[5] );
-	level.scr_ftag_defrost["cube"] = int( defaultvalues[6] );
-	level.scr_ftag_defrost["button"] = defaultvalues[7];
+	level.scr_ftag_defrost["score"] = int( defaultvalues[0] );
+	level.scr_ftag_defrost["mode"] = int( defaultvalues[1] );
+	level.scr_ftag_defrost["respawn"] = int( defaultvalues[2] );
+	level.scr_ftag_defrost["time"] = int( defaultvalues[3] ) / 100;
+	level.scr_ftag_defrost["dist"] = int( defaultvalues[4] );
+	level.scr_ftag_defrost["auto"] = int( defaultvalues[5] );
+	level.scr_ftag_defrost["beam"] = int( defaultvalues[6] );
+	level.scr_ftag_defrost["cube"] = int( defaultvalues[7] );
+	level.scr_ftag_defrost["button"] = defaultvalues[8];
 
 
 	// Set new compact gameplay values from single dvar
@@ -94,7 +95,7 @@ init()
 	level.scr_ftag_annoy["knife"] = int( defaultvalues[4] );
 
 
-	// Set new compact spectator_options from single dvar
+	// Set new compact spectator options from single dvar
 	level.scr_spectator_options = getdvardefault( "scr_spectator_options", "string", "0;0;90;0" );
 	defaultvalues = strtok( level.scr_spectator_options, ";" );
 
@@ -105,8 +106,40 @@ init()
 	level.scr_shift_spectator["score"] = int( defaultvalues[3] );
 
 
+	// Set new compact Rcon warning message options from single dvar
+	level.scr_rcon_warning_player = getdvardefault( "scr_rcon_warning_player", "string", "" );
+	defaultvalues = strtok( level.scr_rcon_warning_player, ";" );
+
+	level.scr_rcon_warning_who = [];
+	level.scr_rcon_warning_abv = [];
+	level.scr_rcon_warning = [];
+	
+	// Add no custom warning option
+	level.scr_rcon_warning_who[0] = "";
+	level.scr_rcon_warning_abv[0] = "No Warning Message";
+	level.scr_rcon_warning[0] = "";
+
+	// Add all other custom warnings
+	for ( i=0; i < defaultvalues.size; i++ ) {
+		newElement = level.scr_rcon_warning_abv.size;
+		level.scr_rcon_warning_who[newElement] = "player";
+		level.scr_rcon_warning_abv[newElement] = defaultvalues[i];
+		i++;
+		level.scr_rcon_warning[newElement] = defaultvalues[i];
+	}
+
+	level.scr_rcon_warning_all = getdvardefault( "scr_rcon_warning_all", "string", "" );
+	defaultvalues = strtok( level.scr_rcon_warning_all, ";" );
+
+	// Add all other custom warnings
+	for ( i=0; i < defaultvalues.size; i++ ) {
+		newElement = level.scr_rcon_warning_abv.size;
+		level.scr_rcon_warning_who[newElement] = "all";
+		level.scr_rcon_warning_abv[newElement] = defaultvalues[i];
+		i++;
+		level.scr_rcon_warning[newElement] = defaultvalues[i];
+	}
+
 	precacheShader( "hudStopwatch" );
-
-
 	return;
 }

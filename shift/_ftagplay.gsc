@@ -28,16 +28,19 @@ init()
 	if ( !isdefined( game["switchedsides"] ) )
 		game["switchedsides"] = false;
 
-	level.ftagactive = true;
-	level.inOvertime = false;
-	level.overrideTeamScore = true;
-	level.displayRoundEndText = true;
-
-	level.onRoundSwitch = ::onRoundSwitch;
 	level.onTimeLimit = ::onTimeLimit;
 	level.onPlayerFrozen = ::onPlayerFrozen;
+	level.onRoundSwitch = ::onRoundSwitch;
 	level.onStartFtagGame = ::onStartFtagGame;
 	level.onSpawnFtagPlayer = ::onSpawnFtagPlayer;
+
+	if ( level.gametype == "koth" || level.gametype == "war" )
+		level.onDeadEvent = ::onDeadEvent;
+
+	level.ftagactive = true;
+	level.overrideTeamScore = true;
+	level.displayRoundEndText = true;
+	level.inOvertime = false;
 
 	if ( level.gametype == "koth" || level.gametype == "war" )
 		level.onDeadEvent = ::onDeadEvent;
@@ -47,7 +50,8 @@ init()
 	setDvar( "scr_" + level.gametype + "_waverespawndelay", "0" );
 	setDvar( "scr_" + level.gametype + "_numlives", "0" );
 
-	if ( !isdefined( level.scr_shift_gameplay["spawn"] ) || !level.scr_shift_gameplay["spawn"] )
+	// Setup callback for custom spawns
+	if ( isdefined( level.scr_shift_gameplay["spawn"] ) && level.scr_shift_gameplay["spawn"] )
 		level.onSpawnPlayer = ::onSpawnPlayer;
 
 	gametype = "freezetag";
@@ -83,6 +87,7 @@ onPrecacheFtag()
 	precacheString( &"SHIFT_FTAG_FROZE" );
 	precacheString( &"SHIFT_FTAG_DEFROSTING" );
 	precacheString( &"SHIFT_FTAG_DEFROSTED" );
+	precacheString( &"FTAG_DEFROSTED_UNKNOWN" );
 	precacheString( &"SHIFT_FTAG_AUTO_DEFROSTED" );
 	precacheString( &"SHIFT_FTAG_HUD_POINTS" );
 	precacheString( &"SHIFT_FTAG_HUD_DEFROSTED" );
@@ -131,7 +136,7 @@ onPrecacheFtag()
 
 onStartFtagGame()
 {
-	if ( !level.scr_shift_gameplay["spawn"] ) {
+	if ( level.scr_shift_gameplay["spawn"] ) {
 		level.spawnMins = ( 0, 0, 0 );
 		level.spawnMaxs = ( 0, 0, 0 );
 
@@ -162,6 +167,10 @@ onStartFtagGame()
 		setMapCenter( level.mapCenter );
 	}
 
+	// Register the new defrost score
+	maps\mp\gametypes\_rank::registerScoreInfo( "defrost", level.scr_ftag_defrost["score"] );
+
+	level.defrostpoint = maps\mp\gametypes\_rank::getScoreInfoValue( "defrost" );
 	level.inOvertime = false;
 
 	level.displayRoundEndText = true;
@@ -230,12 +239,9 @@ onSpawnPlayer()
 	self.isFlagCarrier = false;
 	self.isVIP = false;
 
-	// Check which spawn points should be used
-	if ( game["switchedsides"] ) {
-		spawnTeam = level.otherTeam[ self.pers["team"] ];
-	} else {
-		spawnTeam =  self.pers["team"];
-	}
+	spawnteam = self.pers["team"];
+	if ( game["switchedsides"] )
+		spawnteam = getOtherTeam( spawnteam );
 
 	if ( level.useStartSpawns )
 	{
@@ -322,7 +328,6 @@ onSpawnFtagPlayer()
 
 onRoundSwitch()
 {
-	// Just change the value for the variable controlling which map assets will be assigned to each team
 	level.halftimeType = "halftime";
 	game["switchedsides"] = !game["switchedsides"];
 }
@@ -479,183 +484,217 @@ freezeme(attacker)
 	self.hud_freeze fadeovertime(2);
 	self.hud_freeze.alpha = 0.6;
 
-	if( numofplayers("allies") < 1 || numofplayers("axis") < 1 || level.scr_ftag_defrost["auto"] )
-		self thread defrostaftertime();
-
-	self thread waitfordefrost();
-}
-
-waitfordefrost()
-{
-	level endon("game_ended");
-	self endon("disconnect");
-	self endon("joined_spectators");
-	self endon("defrosted");
-	self endon("death");
-
 	wait(1.0);
 	self.ice.origin = self.origin + (0,0,30);
 	self.ice.alpha = 1;
 
-logprint( "distance for defrost = " + level.scr_ftag_defrost["mode"] + "\n" );
+	if( numofplayers("allies") < 1 || numofplayers("axis") < 1 || level.scr_ftag_defrost["auto"] )
+		self thread defrostaftertime();
+
+	// Monitor unfreeze attempts by aiming if not mode1
+	if( level.scr_ftag_defrost["mode"] != 1 )
+		self thread waitfordefrostbyaim();
+
+	// Monitor unfreeze attempts by standing if not mode0
+	if( level.scr_ftag_defrost["mode"] != 0 )
+		self thread waitfordefrostbytouch();
+}
+
+
+waitfordefrostbytouch()
+{
+	self endon("disconnect");
+	self endon("death");
+	self endon("defrosted");
+	inrange = false;
 
 	while(1)
 	{
+		while ( self.isdefrosting )
+			wait (0.05);
+
 		players = getentarray("player", "classname");
 		for(i=0;i<players.size;i++)
 		{
 			player = players[i];
 
-			if(self.isdefrosting)
-				continue;
-			if( isdefined( player.isdefrostingsomeone ) && player.isdefrostingsomeone && level.scr_ftag_defrost["mode"] != 2 )
-				continue;
-			if(player.sessionstate != "playing")
-				continue;
-			if(player.team != self.team)
-				continue;
-			if(player == self)
-				continue;
-			if(isdefined(player.frozen) && player.frozen)
+			// Check if the player can defrost
+			if ( !isDefined( player ) || !isDefined( player.pers ) || !isPlayer( player ) || player.sessionstate != "playing" )
 				continue;
 
-			if( level.scr_ftag_defrost["mode"] == 2 )
-			{
-				if( !isdefined(player.isdefrostingsomeone) || !player.isdefrostingsomeone )
-				{
-					if( distance( self.origin, player.origin ) <= level.scr_ftag_defrost["dist"] )
-						inrange = true;
-					else
-						inrange = false;
-				} else {
-					inrange = false;
-				}
+			// Make sure player is on our team and not self or frozen
+			if ( player.team != self.team  || player == self || isdefined( player.frozen ) && player.frozen )
+				continue;
 
-				if( inrange ) {
-					if (isdefined(player.isdefrostingsomeone) && !player.isdefrostingsomeone)
-						self thread defrostme(player);
-					else
-						self thread defrostme2(player);
-				} else if(player ftagButtonPressed() && player islookingatftag(self)) {
-					if (isdefined(player.isdefrostingsomeone) && !player.isdefrostingsomeone)
-						self thread defrostme(player, true);
-					else
-						self thread defrostme2(player, true);
-				}
-			}
-			else if( level.scr_ftag_defrost["mode"] == 0 )
-			{
-				if(player ftagButtonPressed() && player islookingatftag(self))
-					self thread defrostme(player, true);
-			}
+			if( distance( self.origin, player.origin ) <= level.scr_ftag_defrost["dist"] )
+				inrange = true;
 			else
-			{
-				if( distance( self.origin, player.origin ) <= level.scr_ftag_defrost["dist"] )
-					inrange = true;
-				else
-					inrange = false;
+				inrange = false;
 
-				trace = bulletTrace(player.origin + (0,0,10), self.origin + (0,0,10), false, undefined);
-				if(inrange && trace["fraction"] == 1)
-					self thread defrostmeicon(player);
-			}
+			if( !inrange )
+				continue;
+
+			// Make sure this player is not already defrosting someone
+			if ( isdefined(player.isdefrostingsomeone) && player.isdefrostingsomeone && level.scr_ftag_defrost["mode"] == 2 )
+				self thread defrostme2( player, false );
+			else if ( !isdefined( player.isdefrostingsomeone ) || !player.isdefrostingsomeone )
+				self thread defrostme( player, false );
 		}
 		wait 0.05;
 	}
 }
 
-defrostmeicon(player)
+waitfordefrostbyaim()
 {
-	if(!isDefined(player.defrosticon))
+	self endon("disconnect");
+	self endon("death");
+	self endon("defrosted");
+
+	while(1)
 	{
-		player.defrosticon = newClientHudElem(player);
-		player.defrosticon.alignX = "center";
-		player.defrosticon.alignY = "middle";
-		player.defrosticon.x = 320;
-		player.defrosticon.y = 340;
-		player.defrosticon.sort = 1;
-		player.defrosticon setShader("hud_freeze", 64, 64);
+		while ( self.isdefrosting )
+			wait (0.05);
+
+		players = getentarray("player", "classname");
+		for(i=0;i<players.size;i++)
+		{
+			player = players[i];
+
+			// Check if the player can defrost
+			if ( !isDefined( player ) || !isDefined( player.pers ) || !isPlayer( player ) || player.sessionstate != "playing" )
+				continue;
+
+			// Make sure player is on our team and not self or frozen
+			if ( player.team != self.team  || player == self || isdefined( player.frozen ) && player.frozen )
+				continue;
+
+			if( !player ftagButtonPressed() || !player islookingatftag(self) )
+				continue;
+
+			// Make sure this player is not already defrosting someone
+			if ( isdefined(player.isdefrostingsomeone) && player.isdefrostingsomeone && level.scr_ftag_defrost["mode"] == 2 )
+				self thread defrostme2( player, true );
+			else if ( !isdefined( player.isdefrostingsomeone ) || !player.isdefrostingsomeone )
+				self thread defrostme( player, true );
+		}
+		wait 0.05;
 	}
-	player thread iconchecker(self);
-
-	if(player.frozen || !player ftagButtonPressed() || !player isonground())
-		return;
-
-	self thread defrostme(player);
 }
 
-defrostme(player, beam)
+
+createprogressdisplays( player, defrostindex )
+{
+	if( !isDefined( self.defrostingmsg ) ) {
+		self.defrostingmsg = newClientHudElem(self);
+		self.defrostingmsg.alignX = "left";
+		self.defrostingmsg.alignY = "middle";
+		self.defrostingmsg.horzAlign = "fullscreen";
+		self.defrostingmsg.vertAlign = "fullscreen";
+		self.defrostingmsg.x = 30;
+		self.defrostingmsg.y = 410;
+		self.defrostingmsg.alpha = 1;
+		self.defrostingmsg.sort = 1;
+		self.defrostingmsg.fontscale = 1.4;
+		self.defrostingmsg setText(&"SHIFT_FTAG_DEFROSTING");
+	}
+	if( !defrostindex ) {
+		if( !isDefined( player.defrostmsg0 ) ) {
+			player.defrostmsg0 = newClientHudElem(player);
+			player.defrostmsg0.alignX = "left";
+			player.defrostmsg0.alignY = "middle";
+			player.defrostmsg0.horzAlign = "fullscreen";
+			player.defrostmsg0.vertAlign = "fullscreen";
+			player.defrostmsg0.x = 30;
+			player.defrostmsg0.y = 410;
+			player.defrostmsg0.alpha = 1;
+			player.defrostmsg0.sort = 1;
+			player.defrostmsg0.fontscale = 1.4;
+			player.defrostmsg0 setText(&"SHIFT_FTAG_DEFROSTING");
+		}
+
+		if( !isDefined( player.progressbackground0 ) ) {
+			player.progressbackground0 = newClientHudElem(player);
+			player.progressbackground0.alignX = "left";
+			player.progressbackground0.alignY = "middle";
+			player.progressbackground0.horzAlign = "fullscreen";
+			player.progressbackground0.vertAlign = "fullscreen";
+			player.progressbackground0.x = 30;
+			player.progressbackground0.y = 425;
+			player.progressbackground0.alpha = 0.5;
+			player.progressbackground0.sort = 1;
+			player.progressbackground0 setShader("black", (level.barsize + 2), (level.barheight + 2) );
+		}
+
+		if( !isDefined( player.progressbar0 ) ) {
+			player.progressbar0 = newClientHudElem(player);
+			player.progressbar0.alignX = "left";
+			player.progressbar0.alignY = "middle";
+			player.progressbar0.horzAlign = "fullscreen";
+			player.progressbar0.vertAlign = "fullscreen";
+			player.progressbar0.x = 31;
+			player.progressbar0.y = 425;
+			player.progressbar0.sort = 2;
+			player.progressbar0.color = (0.3,1,1);
+			player.progressbar0 setShader("white", 1, level.barheight);
+			player.progressbar0 scaleOverTime(self.maxhealth, level.barsize, level.barheight);
+		}
+	} else {
+		if( !isDefined( player.defrostmsg1 ) ) {
+			player.defrostmsg1 = newClientHudElem(player);
+			player.defrostmsg1.alignX = "left";
+			player.defrostmsg1.alignY = "middle";
+			player.defrostmsg1.horzAlign = "fullscreen";
+			player.defrostmsg1.vertAlign = "fullscreen";
+			player.defrostmsg1.x = 30;
+			player.defrostmsg1.y = 435;
+			player.defrostmsg1.alpha = 1;
+			player.defrostmsg1.sort = 1;
+			player.defrostmsg1.fontscale = 1.4;
+			player.defrostmsg1 setText(&"SHIFT_FTAG_DEFROSTING");
+		}
+	
+		if( !isDefined( player.progressbackground1 ) ) {
+			player.progressbackground1 = newClientHudElem(player);
+			player.progressbackground1.alignX = "left";
+			player.progressbackground1.alignY = "middle";
+			player.progressbackground1.horzAlign = "fullscreen";
+			player.progressbackground1.vertAlign = "fullscreen";
+			player.progressbackground1.x = 30;
+			player.progressbackground1.y = 450;
+			player.progressbackground1.alpha = 0.5;
+			player.progressbackground1.sort = 1;
+			player.progressbackground1 setShader("black", (level.barsize + 2), (level.barheight + 2) );
+		}
+
+		if( !isDefined( player.progressbar1 ) ) {
+			player.progressbar1 = newClientHudElem(player);
+			player.progressbar1.alignX = "left";
+			player.progressbar1.alignY = "middle";
+			player.progressbar1.horzAlign = "fullscreen";
+			player.progressbar1.vertAlign = "fullscreen";
+			player.progressbar1.x = 31;
+			player.progressbar1.y = 450;
+			player.progressbar1.sort = 2;
+			player.progressbar1.color = (0.3,1,1);
+			player.progressbar1 setShader("white", 1, level.barheight);
+			player.progressbar1 scaleOverTime(self.maxhealth, level.barsize, level.barheight);
+		}
+	}
+
+	return;
+}
+
+
+defrostme( player, beam )
 {
 	if ( level.inOvertime )
 		return;
-
-	if(!isDefined(beam))
-		beam = false;
 
 	defroststicker = undefined;
 	self.isdefrosting = true;
 	player.isdefrostingsomeone = true;
 
-	if(isDefined(self.defrostmsg))
-		self.defrostmsg destroy();
-
-	self setClientDvar( "cg_drawhealth", 1 );
-
-	self.defrostmsg = newClientHudElem(self);
-	self.defrostmsg.alignX = "left";
-	self.defrostmsg.alignY = "middle";
-	self.defrostmsg.horzAlign = "fullscreen";
-	self.defrostmsg.vertAlign = "fullscreen";
-	self.defrostmsg.x = 30;
-	self.defrostmsg.y = 410;
-	self.defrostmsg.alpha = 1;
-	self.defrostmsg.sort = 1;
-	self.defrostmsg.fontscale = 1.4;
-	self.defrostmsg setText(&"SHIFT_FTAG_DEFROSTING");
-
-	if(isDefined(player.defrostmsg))
-		player.defrostmsg destroy();
-
-	player.defrostmsg = newClientHudElem(player);
-	player.defrostmsg.alignX = "left";
-	player.defrostmsg.alignY = "middle";
-	player.defrostmsg.horzAlign = "fullscreen";
-	player.defrostmsg.vertAlign = "fullscreen";
-	player.defrostmsg.x = 30;
-	player.defrostmsg.y = 410;
-	player.defrostmsg.alpha = 1;
-	player.defrostmsg.sort = 1;
-	player.defrostmsg.fontscale = 1.4;
-	player.defrostmsg setText(&"SHIFT_FTAG_DEFROSTING");
-
-	if(isDefined(player.progressbackground))
-		player.progressbackground destroy();
-
-	player.progressbackground = newClientHudElem(player);
-	player.progressbackground.alignX = "left";
-	player.progressbackground.alignY = "middle";
-	player.progressbackground.horzAlign = "fullscreen";
-	player.progressbackground.vertAlign = "fullscreen";
-	player.progressbackground.x = 30;
-	player.progressbackground.y = 425;
-	player.progressbackground.alpha = 0.5;
-	player.progressbackground.sort = 1;
-	player.progressbackground setShader("black", (level.barsize + 2), (level.barheight + 2) );
-
-	if(isDefined(player.progressbar))
-		player.progressbar destroy();
-
-	player.progressbar = newClientHudElem(player);
-	player.progressbar.alignX = "left";
-	player.progressbar.alignY = "middle";
-	player.progressbar.horzAlign = "fullscreen";
-	player.progressbar.vertAlign = "fullscreen";
-	player.progressbar.x = 31;
-	player.progressbar.y = 425;
-	player.progressbar.sort = 2;
-	player.progressbar.color = (0.3,1,1);
-	player.progressbar setShader("white", 1, level.barheight);
-	player.progressbar scaleOverTime(self.maxhealth, level.barsize, level.barheight);
+	self thread createprogressdisplays( player, 0 );
 
 	if(!beam && level.scr_ftag_defrost["mode"] != 2 )
 	{
@@ -673,27 +712,24 @@ defrostme(player, beam)
 
 	self thread playloopfx(level.fx_defrostmelt,self.origin,0.5,"stop_defrost_fx");
 
-	while(isPlayer(self) && self.sessionstate == "playing" && (self.health < self.maxhealth) && game["state"] != "postgame")
+
+	while( isPlayer(self) && self.sessionstate == "playing" && (self.health < self.maxhealth) && game["state"] != "postgame" && isdefined( self.frozen ) && self.frozen )
 	{
-		if( !isPlayer(player) || player.sessionstate != "playing" || player.frozen || ( !player ftagButtonPressed() && level.scr_ftag_defrost["mode"] != 2 ) || ( !player ftagButtonPressed() && beam ) )
+		if( !isPlayer(player) || player.sessionstate != "playing" || isdefined( player.frozen ) && player.frozen )
 			break;
-		if(beam)
-		{
+		if( beam && ( !player ftagButtonPressed() || !player islookingatftag(self) ) )
+			break;
+		if( !beam && distance( self.origin, player.origin ) >= level.scr_ftag_defrost["dist"] )
+			break;
+
+		if( beam )
 			self thread dobeam(player);
-			if(!player islookingatftag(self))
-				break;
-		}
-		else if ( level.scr_ftag_defrost["mode"] == 2 )
-		{
-			if( distance( self.origin, player.origin ) >= level.scr_ftag_defrost["dist"] )
-				break;
-		}
 
 		width = self.health / self.maxhealth;
 		width = int(level.barsize * width);
 
-		if(isDefined(player.progressbar))
-			player.progressbar setShader("white", width, level.barheight);
+		if( isDefined( player.progressbar0 ) )
+			player.progressbar0 setShader("white", width, level.barheight);
 
 		if ( level.scr_ftag_defrost["cube"] )
 			self.ice.origin = self.ice.origin - (0,0, ( 60 / self.maxhealth ) );
@@ -704,104 +740,41 @@ defrostme(player, beam)
 		wait level.scr_ftag_defrost["time"];
 	}
 
-	self setClientDvar( "cg_drawhealth", 1 );
+	if( isDefined( self.defrostingmsg ) )
+		self.defrostingmsg destroy();
+	if( isDefined( player.defrostmsg0 ) )
+		player.defrostmsg0 destroy();
+	if( isDefined( player.progressbackground0 ) )
+		player.progressbackground0 destroy();
+	if( isDefined( player.progressbar0 ) )
+		player.progressbar0 destroy();
 
-	if(isDefined(self.defrostmsg))
-		self.defrostmsg destroy();
-
-	if(isDefined(player.defrostmsg))
-		player.defrostmsg destroy();
-	if(isDefined(player.progressbackground))
-		player.progressbackground destroy();
-	if(isDefined(player.progressbar))
-		player.progressbar destroy();
 	player.isdefrostingsomeone = false;
 
-	if(self.health + 1 >= self.maxhealth)
+	if( self.health + 1 >= self.maxhealth ) {
 		self thread defrosted(player, beam, defroststicker);
-	else if(!player.frozen && !beam && level.scr_ftag_defrost["mode"] != 2)
-	{
+	} else if( !player.frozen && !beam && level.scr_ftag_defrost["mode"] != 2 ) {
 		player unlink();
 		player enableWeapons();
 		defroststicker delete();
-	}
-	else if(!beam && level.scr_ftag_defrost["mode"] != 2)
+	} else if( !beam && level.scr_ftag_defrost["mode"] != 2 ) {
 		defroststicker delete();
+	}
+
 	self.isdefrosting = false;
 	self notify("stop_defrost_fx");
 }
 
-defrostme2(player, beam2)
+
+defrostme2( player, beam )
 {
 	if ( level.inOvertime )
 		return;
 
-	if(!isDefined(beam2))
-		beam2 = false;
-
 	self.isdefrosting = true;
 	player.isdefrostingsomeone = true;
 
-	if(isDefined(self.defrostmsg))
-		self.defrostmsg destroy();
-
-	self setClientdvars( "cg_drawhealth", 1, "cg_drawhealthlogo", "hud_freeze" );
-
-	self.defrostmsg = newClientHudElem(self);
-	self.defrostmsg.alignX = "left";
-	self.defrostmsg.alignY = "middle";
-	self.defrostmsg.horzAlign = "fullscreen";
-	self.defrostmsg.vertAlign = "fullscreen";
-	self.defrostmsg.x = 30;
-	self.defrostmsg.y = 410;
-	self.defrostmsg.alpha = 1;
-	self.defrostmsg.sort = 1;
-	self.defrostmsg.fontscale = 1.4;
-	self.defrostmsg setText(&"SHIFT_FTAG_DEFROSTING");
-
-	if(isDefined(player.defrostmsg2))
-		player.defrostmsg2 destroy();
-
-	player.defrostmsg2 = newClientHudElem(player);
-	player.defrostmsg2.alignX = "left";
-	player.defrostmsg2.alignY = "middle";
-	player.defrostmsg2.horzAlign = "fullscreen";
-	player.defrostmsg2.vertAlign = "fullscreen";
-	player.defrostmsg2.x = 150;
-	player.defrostmsg2.y = 410;
-	player.defrostmsg2.alpha = 1;
-	player.defrostmsg2.sort = 1;
-	player.defrostmsg2.fontscale = 1.4;
-	player.defrostmsg2 setText(&"SHIFT_FTAG_DEFROSTING");
-
-	if(isDefined(player.progressbackground2))
-		player.progressbackground2 destroy();
-
-	player.progressbackground2 = newClientHudElem(player);
-	player.progressbackground2.alignX = "left";
-	player.progressbackground2.alignY = "middle";
-	player.progressbackground2.horzAlign = "fullscreen";
-	player.progressbackground2.vertAlign = "fullscreen";
-	player.progressbackground2.x = 150;
-	player.progressbackground2.y = 425;
-	player.progressbackground2.alpha = 0.5;
-	player.progressbackground2.sort = 1;
-	player.progressbackground2 setShader("black", (level.barsize + 2), (level.barheight + 2) );
-
-	if(isDefined(player.progressbar2))
-		player.progressbar2 destroy();
-
-	player.progressbar2 = newClientHudElem(player);
-	player.progressbar2.alignX = "left";
-	player.progressbar2.alignY = "middle";
-	player.progressbar2.horzAlign = "fullscreen";
-	player.progressbar2.vertAlign = "fullscreen";
-	player.progressbar2.x = 151;
-	player.progressbar2.y = 425;
-	player.progressbar2.sort = 2;
-	player.progressbar2.color = (0.3,1,1);
-	player.progressbar2 setShader("white", 1, level.barheight);
-	player.progressbar2 scaleOverTime( level.scr_ftag_defrost["time"], level.barsize, level.barheight );
+	self thread createprogressdisplays( player, 1 );
 
 	if( !isDefined(self.defrostprogresstime) )
 		self.defrostprogresstime = 0;
@@ -809,54 +782,48 @@ defrostme2(player, beam2)
 	self.cubeisrotating = false;
 	self.rotang = 0;
 
-	self thread playloopfx(level.fx_defrostmelt,self.origin,0.5,"stop_defrost_fx");		// REMOVED IN CURRENT MOD
+	self thread playloopfx(level.fx_defrostmelt,self.origin,0.5,"stop_defrost_fx");
 
-	while(isPlayer(self) && self.sessionstate == "playing" && (self.health < self.maxhealth) && game["state"] != "postgame")
+	while( isPlayer(self) && self.sessionstate == "playing" && (self.health < self.maxhealth) && game["state"] != "postgame" && isdefined( self.frozen ) && self.frozen )
 	{
-		if( !isPlayer(player) || player.sessionstate != "playing" || player.frozen || ( !player ftagButtonPressed() && beam2 ) )
+		if( !isPlayer(player) || player.sessionstate != "playing" || isdefined( player.frozen ) && player.frozen )
 			break;
-		if(beam2)
-		{
+		if( beam && ( !player ftagButtonPressed() || !player islookingatftag(self) ) )
+			break;
+		if( !beam && distance( self.origin, player.origin ) >= level.scr_ftag_defrost["dist"] )
+			break;
+
+		if( beam )
 			self thread dobeam(player);
-			if(!player islookingatftag(self))
-				break;
-		}
-		else if ( level.scr_ftag_defrost["mode"] == 2 )
-		{
-			if( distance( self.origin, player.origin ) >= level.scr_ftag_defrost["dist"] )
-				break;
-		}
 
 		width = self.health / self.maxhealth;
 		width = int(level.barsize * width);
 
-		if(isDefined(player.progressbar2))
-			player.progressbar2 setShader("white", width, level.barheight);
+		if( isDefined( player.progressbar1 ) )
+			player.progressbar1 setShader("white", width, level.barheight);
 
 		if ( level.scr_ftag_defrost["cube"] )
 			self.ice.origin = self.ice.origin - (0,0, ( 60 / self.maxhealth ) );
-		if ( level.scr_ftag_defrost["cube"] && isDefined(self.cubeisrotating) && self.cubeisrotating == false)
+		if ( level.scr_ftag_defrost["cube"] && isDefined( self.cubeisrotating ) && self.cubeisrotating == false)
 			self thread rotatemycube(player);
 		self.health++;
 		player.healthgiven2++;
 		wait level.scr_ftag_defrost["time"];
 	}
 
-	self setClientDvar( "cg_drawhealth", 1 );
+	if( isDefined( self.defrostingmsg ) )
+		self.defrostingmsg destroy();
+	if( isDefined( player.defrostmsg1 ) )
+		player.defrostmsg1 destroy();
+	if( isDefined( player.progressbackground1 ) )
+		player.progressbackground1 destroy();
+	if( isDefined( player.progressbar1 ) )
+		player.progressbar1 destroy();
 
-	if(isDefined(self.defrostmsg))
-		self.defrostmsg destroy();
-
-	if(isDefined(player.defrostmsg2))
-		player.defrostmsg2 destroy();
-	if(isDefined(player.progressbackground2))
-		player.progressbackground2 destroy();
-	if(isDefined(player.progressbar2))
-		player.progressbar2 destroy();
 	player.isdefrostingsomeone = false;
 
-	if(self.health + 1 >= self.maxhealth)
-		self thread defrosted(player, beam2);
+	if( self.health + 1 >= self.maxhealth )
+		self thread defrosted( player, false, false );
 
 	self.isdefrosting = false;
 	self notify("stop_defrost_fx");
@@ -866,8 +833,8 @@ defrosted(player, beam, defroststicker)
 {
 	self setClientDvar( "cg_drawhealth", 1 );
 
-	if(isDefined(self.defrostmsg))
-		self.defrostmsg destroy();
+	if( isDefined(self.defrostingmsg ) )
+		self.defrostingmsg destroy();
 
 	if(isDefined(player))
 	{
@@ -887,24 +854,26 @@ defrosted(player, beam, defroststicker)
 		for ( index = 0; index < level.players.size; index++ )
 		{
 			player = level.players[index];
+
+			//Code to find players who defrosted me
 			if ( player.team == self.team ) {
 				value = 0;
 				if ( isdefined( player.healthgiven ) && player.healthgiven > 0 )
-					value = int( ( ( player.healthgiven + 1 ) / self.maxhealth ) * 50 );
+					value = int( ( ( player.healthgiven + 1 ) / self.maxhealth ) * level.defrostpoint );
 				else if ( isdefined( player.healthgiven2 ) && player.healthgiven2 > 0 )
-					value = int( ( ( player.healthgiven2 + 1 ) / self.maxhealth ) * 50 );
+					value = int( ( ( player.healthgiven2 + 1 ) / self.maxhealth ) * level.defrostpoint );
 
 				if ( value >= 1 ) {
-					if ( value >= 50 )
-						value = 50;
+					if ( value >= level.defrostpoint )
+						value = level.defrostpoint;
 
-					player thread maps\mp\gametypes\_rank::giveRankXP( "assist", value );
+					player maps\mp\gametypes\_rank::giveRankXP( "assist", value );
 					player.score += value;
 					player.pers["score"] += value;
 
-					player maps\mp\gametypes\_rank::giveRankXP( "assist" );
 					player maps\mp\gametypes\_globallogic::incPersStat( "assists", 1 );
 					player.assists = player maps\mp\gametypes\_globallogic::getPersStat( "assists" );
+					player.pers["defrost"] = player.assists;
 
 					if ( level.scr_shift_hud["center"] ) {
 						player iprintlnbold(&"SHIFT_FTAG_HUD_DEFROSTED", self.name);
@@ -922,7 +891,7 @@ defrosted(player, beam, defroststicker)
 		}
 
 		if(!isDefined(level.defrostplayers))
-			level.defrostplayers = self.name;
+			level.defrostplayers = &"SHIFT_FTAG_DEFROSTED_UNKNOWN";
 
 		if ( level.scr_shift_hud["center"] )
 			self iprintlnbold(&"SHIFT_FTAG_HUD_DEFROSTEDBY", level.defrostplayers);
@@ -952,6 +921,7 @@ defrosted(player, beam, defroststicker)
 	self thread maps\mp\gametypes\_globallogic::spawnPlayer();
 }
 
+
 defrostaftertime()
 {
 	level endon("game_ended");
@@ -975,6 +945,7 @@ defrostaftertime()
 	}
 }
 
+
 disablemyweapons()
 {
 	self endon("disconnect");
@@ -985,6 +956,7 @@ disablemyweapons()
 		wait 0.1;
 	}
 }
+
 
 playloopfx(fx,origin,waittime,end)
 {
@@ -999,6 +971,7 @@ playloopfx(fx,origin,waittime,end)
 		wait waittime;
 	}
 }
+
 
 islookingatftag(who)
 {
@@ -1024,6 +997,7 @@ islookingatftag(who)
 		return false;
 }
 
+
 dobeam(player)
 {
 	if(self.beam)
@@ -1043,6 +1017,7 @@ dobeam(player)
 	defrosterfx delete();
 }
 
+
 playdefrostbeam(fx,waittime,end)
 {
 	self endon(end);
@@ -1053,12 +1028,14 @@ playdefrostbeam(fx,waittime,end)
 	}
 }
 
+
 beamwaiter()
 {
 	self endon("disconnect");
 	wait 1;
 	self.beam = false;
 }
+
 
 ftagButtonPressed()
 {
@@ -1086,6 +1063,7 @@ ftagButtonPressed()
 	return ispressed;
 }
 
+
 rotatemycube(player)
 {
 	self endon("disconnect");
@@ -1105,22 +1083,6 @@ rotatemycube(player)
 	self.cubeisrotating = false;
 }
 
-iconchecker(me)
-{
-	self notify("stopiconchecker");
-	self endon("stopiconchecker");
-	self endon("disconnect");
-
-	trace = bulletTrace(me.origin + (0,0,10), self.origin + (0,0,10), false, undefined);
-	while(isPlayer(self) && distance(self.origin, me.origin) <= level.scr_ftag_defrost["dist"] && self.sessionstate == "playing" && !self.frozen && trace["fraction"] == 1)
-	{
-		trace = bulletTrace(me.origin + (0,0,10), self.origin + (0,0,10), false, undefined);
-		wait 0.05;
-	}
-
-	if(isDefined(self.defrosticon))
-		self.defrosticon destroy();
-}
 
 numofplayers(team)
 {
@@ -1134,6 +1096,7 @@ numofplayers(team)
 	return numonteam;
 }
 
+
 numofplayersfrozen(team)
 {
 	playersfrozen = 0;
@@ -1146,6 +1109,7 @@ numofplayersfrozen(team)
 	return playersfrozen;
 }
 
+
 numofplayersnotfrozen(team)
 {
 	playersnotfrozen = 0;
@@ -1157,6 +1121,7 @@ numofplayersnotfrozen(team)
 	}
 	return playersnotfrozen;
 }
+
 
 GetNextObjNum()
 {
@@ -1171,6 +1136,7 @@ GetNextObjNum()
 	return -1;
 }
 
+
 calcspeed(speed, origin1, moveto)
 {
 	dist = distance(origin1, moveto);
@@ -1178,10 +1144,6 @@ calcspeed(speed, origin1, moveto)
 	return time;
 }
 
-isHeadShot( sWeapon, sHitLoc, sMeansOfDeath )
-{
-	return (sHitLoc == "head" || sHitLoc == "helmet") && sMeansOfDeath != "MOD_MELEE" && sMeansOfDeath != "MOD_IMPACT" && !isMG( sWeapon );
-}
 
 inithud()
 {
@@ -1292,6 +1254,7 @@ inithud()
 	}
 }
 
+
 onTimeLimit()
 {
 	if ( level.inOvertime )
@@ -1299,6 +1262,7 @@ onTimeLimit()
 
 	thread onOvertime();
 }
+
 
 onOvertime()
 {
@@ -1328,6 +1292,7 @@ onOvertime()
 		[[level.onDeadEvent]]( "allies" );
 }
 
+
 timeLimitClock_Overtime( waitTime )
 {
 	level endon ( "game_ended" );
@@ -1354,6 +1319,7 @@ timeLimitClock_Overtime( waitTime )
 	}
 	return;
 }
+
 
 SetOvertimeSpec()
 {

@@ -43,26 +43,6 @@ init()
 		level.scr_rcon_gametypes[gtypeIndex] = OurGametypes[i];
 		gtypeIndex++;
 	}
-		
-	// Custom warnings
-	tempWarnings = getdvarlistx( "scr_rcon_warning_", "string", "" );
-	level.scr_rcon_warning_who = [];
-	level.scr_rcon_warning_abv = [];
-	level.scr_rcon_warning = [];
-	
-	// Add no custom warning option
-	level.scr_rcon_warning_who[0] = "";
-	level.scr_rcon_warning_abv[0] = "No Warning Message";
-	level.scr_rcon_warning[0] = "";
-	for ( iLine=0; iLine < tempWarnings.size; iLine++ ) {
-		thisLine = strtok( tempWarnings[iLine], ";" );
-		
-		// Add the new custom warning
-		newElement = level.scr_rcon_warning_abv.size;
-		level.scr_rcon_warning_abv[newElement] = thisLine[0];
-		level.scr_rcon_warning[newElement] = thisLine[1];
-		level.scr_rcon_warning_who[newElement] = thisLine[2];
-	}
 
 	getNextMapInRotation();
 	level.RconPlayers = [];		

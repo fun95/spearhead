@@ -50,7 +50,6 @@ getdvardefault( dvarName, dvarType, dvarDefault, minValue, maxValue )
 		dvarValue = maxValue;
 
 	// Debug, print values
-	// logPrint(dvarName + " was set to " + dvarValue + "\n");
 
 	return ( dvarValue );
 }
@@ -281,20 +280,23 @@ RemoveIceItems()
 		self.sticker delete();
 	if(isDefined(self.hud_freeze))
 		self.hud_freeze destroy();
-	if(isDefined(self.defrostmsg))
-		self.defrostmsg destroy();
-	if(isDefined(self.progressbackground))
-		self.progressbackground destroy();
-	if(isDefined(self.progressbar))
-		self.progressbar destroy();
-	if(isDefined(self.defrostmsg2))
-		self.defrostmsg2 destroy();
-	if(isDefined(self.progressbackground2))
-		self.progressbackground2 destroy();
-	if(isDefined(self.progressbar2))
-		self.progressbar2 destroy();
 	if ( isDefined( self.statusicon ) )
 		self.statusicon = "";
+
+	if( isDefined( self.defrostingmsg ) )
+		self.defrostingmsg destroy();
+	if( isDefined( self.defrostmsg0 ) )
+		self.defrostmsg0 destroy();
+	if( isDefined( self.progressbackground0 ) )
+		self.progressbackground0 destroy();
+	if( isDefined( self.progressbar0 ) )
+		self.progressbar0 destroy();
+	if( isDefined( self.defrostmsg1 ) )
+		self.defrostmsg1 destroy();
+	if( isDefined( self.progressbackground1 ) )
+		self.progressbackground1 destroy();
+	if( isDefined( self.progressbar1 ) )
+		self.progressbar1 destroy();
 
 	// Delete the objective
 	if(isdefined(self.objnum))
