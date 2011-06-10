@@ -110,7 +110,39 @@
 			forecolor		1 1 1 1
 			background		"overlay_low_health"
 			ownerdraw		CG_PLAYER_LOW_HEALTH_OVERLAY
-			visible			1
+			visible			when( dvarInt( ui_healthoverlay ) == 1 );
+			decoration
+		}
+
+		// HEALTH BAR
+		itemDef
+		{
+			name "healthbarback"
+			rect 16 451 124 6 //rect 6 471 124 6
+			forecolor 0.7 0.7 0.7 0.3
+			background "white"
+			ownerdraw CG_PLAYER_BAR_HEALTH_BACK
+			visible when( !flashbanged() && !ui_active() && NOT_SPECTATING && team( name ) != "TEAM_SPECTATOR" );
+			decoration
+		}
+		itemDef
+		{
+			name "healthbar"
+			rect 17 452 122 4 //rect 7 472 122 4
+			forecolor 0.7 0.4 0.0 0.3
+			background "white"
+			ownerdraw CG_PLAYER_BAR_HEALTH
+			visible when( !flashbanged() && !ui_active() && NOT_SPECTATING && team( name ) != "TEAM_SPECTATOR" );
+			decoration
+		}
+		itemDef
+		{
+			name "hud_freeze"
+			rect 142 447 12 12 //rect 132 467 12 12
+			forecolor 1.0 1.0 1.0 0.3
+			background "hud_freeze"
+			ownerdraw CG_PLAYER_BAR_HEALTH_BACK
+			visible when( !flashbanged() && !ui_active() && NOT_SPECTATING && team( name ) != "TEAM_SPECTATOR" );
 			decoration
 		}
 	}

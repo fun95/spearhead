@@ -29,6 +29,19 @@ init()
 	level.scr_clan_member_status = getdvar( "scr_clan_member_status" );
 
 
+	// Set new compact HARDCORE values from single dvar
+	level.scr_hardcore_options = getdvardefault( "scr_hardcore_options", "string", "0;0;0" );
+	defaultvalues = strtok( level.scr_hardcore_options, ";" );
+
+	level.scr_hud_hardcore_show_minimap = int( defaultvalues[0] );
+	level.scr_hud_hardcore_show_compass = int( defaultvalues[1] );
+	level.scr_hud_show_inventory = int( defaultvalues[2] );
+
+//logprint( "Minimap = " + level.scr_hud_hardcore_show_minimap + "\n" );
+//logprint( "compass = " + level.scr_hud_hardcore_show_compass + "\n" );
+//logprint( "inventory = " + level.scr_hud_show_inventory + "\n" );
+
+
 	// Set new compact defrost values from single dvar
 	level.scr_ftag_defrost_values = getdvardefault( "scr_ftag_defrost_values", "string", "50;0;1;15;50;0;0;1;use" );
 	defaultvalues = strtok( level.scr_ftag_defrost_values, ";" );
@@ -67,20 +80,16 @@ init()
 
 
 	// Set new compact HUD message values from single dvar
-	level.scr_hud_display_options = getdvardefault( "scr_hud_display_options", "string", "0;0;0;0;0;0;0;0;0" );
+	level.scr_hud_display_options = getdvardefault( "scr_hud_display_options", "string", "0;0;0;0;0;0" );
 	defaultvalues = strtok( level.scr_hud_display_options, ";" );
 
-	level.scr_hud_hardcore_show_minimap = int( defaultvalues[0] );
-	level.scr_hud_hardcore_show_compass = int( defaultvalues[1] );
-	level.scr_hud_show_inventory = int( defaultvalues[2] );
-
 	level.scr_shift_hud = [];
-	level.scr_shift_hud["center"] = int( defaultvalues[3] );
-	level.scr_shift_hud["left"] = int( defaultvalues[4] );
-	level.scr_shift_hud["team"] = int( defaultvalues[5] );
-	level.scr_shift_hud["stats"] = int( defaultvalues[6] );
-	level.scr_shift_hud["delay"] = int( defaultvalues[7] );
-	level.scr_shift_hud["welcome"] = int( defaultvalues[8] );
+	level.scr_shift_hud["center"] = int( defaultvalues[0] );
+	level.scr_shift_hud["left"] = int( defaultvalues[1] );
+	level.scr_shift_hud["team"] = int( defaultvalues[2] );
+	level.scr_shift_hud["stats"] = int( defaultvalues[3] );
+	level.scr_shift_hud["delay"] = int( defaultvalues[4] );
+	level.scr_shift_hud["welcome"] = int( defaultvalues[5] );
 
 
 	// Set new compact annoy feature values from single dvar
@@ -141,5 +150,6 @@ init()
 	}
 
 	precacheShader( "hudStopwatch" );
+	precacheShader("overlay_low_health");
 	return;
 }
