@@ -188,6 +188,7 @@ onPlayerConnect()
 	for(;;)
 	{
 		level waittill("connected", player);
+
 		player thread onPlayerDisconnect();
 		player thread onPlayerSpectate();
 		player thread onPlayerSpawned();
@@ -314,6 +315,9 @@ onSpawnFtagPlayer()
 		self.freezeorigin = undefined;
 	}
 
+	self setClientdvars( "cg_drawhealth", 0 );
+	self setClientDvar( "ui_healthoverlay", 0 );
+
 	self.isdefrosting = false;
 	self.isdefrostingsomeone = false;
 	self.healthgiven = 0;
@@ -439,6 +443,9 @@ freezeme(attacker)
 
 	self.health = 1;
 	self.statusicon = "hud_freeze";
+
+	self setClientdvars( "cg_drawhealth", 1 );
+	self setClientDvar( "ui_healthoverlay", 1 );
 
 	// Check if we are in overtime and need to disable spawn
 	if ( level.inOvertime )
@@ -590,8 +597,8 @@ createprogressdisplays( player, defrostindex )
 		self.defrostingmsg.alignY = "middle";
 		self.defrostingmsg.horzAlign = "fullscreen";
 		self.defrostingmsg.vertAlign = "fullscreen";
-		self.defrostingmsg.x = 30;
-		self.defrostingmsg.y = 410;
+		self.defrostingmsg.x = 16;
+		self.defrostingmsg.y = 435;
 		self.defrostingmsg.alpha = 1;
 		self.defrostingmsg.sort = 1;
 		self.defrostingmsg.fontscale = 1.4;
@@ -831,7 +838,8 @@ defrostme2( player, beam )
 
 defrosted(player, beam, defroststicker)
 {
-	self setClientDvar( "cg_drawhealth", 1 );
+	self setClientdvars( "cg_drawhealth", 0 );
+	self setClientDvar( "ui_healthoverlay", 0 );
 
 	if( isDefined(self.defrostingmsg ) )
 		self.defrostingmsg destroy();
