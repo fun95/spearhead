@@ -87,7 +87,7 @@ onPrecacheFtag()
 	precacheString( &"SHIFT_FTAG_FROZE" );
 	precacheString( &"SHIFT_FTAG_DEFROSTING" );
 	precacheString( &"SHIFT_FTAG_DEFROSTED" );
-	precacheString( &"FTAG_DEFROSTED_UNKNOWN" );
+	precacheString( &"SHIFT_FTAG_DEFROSTED_UNKNOWN" );
 	precacheString( &"SHIFT_FTAG_AUTO_DEFROSTED" );
 	precacheString( &"SHIFT_FTAG_HUD_POINTS" );
 	precacheString( &"SHIFT_FTAG_HUD_DEFROSTED" );
@@ -318,8 +318,9 @@ onSpawnFtagPlayer()
 	self setClientdvars( "cg_drawhealth", 0 );
 	self setClientDvar( "ui_healthoverlay", 0 );
 
-	self.isdefrosting = false;
-	self.isdefrostingsomeone = false;
+	self.isbeingdefrosted = false;
+	self.isdefrosting1 = undefined;
+	self.isdefrosting2 = undefined;
 	self.healthgiven = 0;
 	self.healthgiven2 = 0;
 	self.beam = false;
@@ -517,8 +518,8 @@ waitfordefrostbytouch()
 
 	while(1)
 	{
-		while ( self.isdefrosting )
-			wait (0.05);
+		//while ( self.isbeingdefrosted )
+		//	wait (0.05);
 
 		players = getentarray("player", "classname");
 		for(i=0;i<players.size;i++)
@@ -530,21 +531,19 @@ waitfordefrostbytouch()
 				continue;
 
 			// Make sure player is on our team and not self or frozen
-			if ( player.team != self.team  || player == self || isdefined( player.frozen ) && player.frozen )
+			if ( player.team != self.team  || player == self || isdefined( player.frozen ) && player.frozen || distance( self.origin, player.origin ) > level.scr_ftag_defrost["dist"] )
 				continue;
 
-			if( distance( self.origin, player.origin ) <= level.scr_ftag_defrost["dist"] )
-				inrange = true;
-			else
-				inrange = false;
+			if( isdefined( player.isdefrosting1 ) && isdefined( player.isdefrosting2 ) )
+				continue;
 
-			if( !inrange )
+			if( isdefined( player.isdefrosting1 ) && player.isdefrosting1 == self || isdefined( player.isdefrosting2 ) && player.isdefrosting2== self )
 				continue;
 
 			// Make sure this player is not already defrosting someone
-			if ( isdefined(player.isdefrostingsomeone) && player.isdefrostingsomeone && level.scr_ftag_defrost["mode"] == 2 )
+			if ( isdefined( player.isdefrosting1 ) && level.scr_ftag_defrost["mode"] == 2 )
 				self thread defrostme2( player, false );
-			else if ( !isdefined( player.isdefrostingsomeone ) || !player.isdefrostingsomeone )
+			else
 				self thread defrostme( player, false );
 		}
 		wait 0.05;
@@ -559,8 +558,8 @@ waitfordefrostbyaim()
 
 	while(1)
 	{
-		while ( self.isdefrosting )
-			wait (0.05);
+		//while ( self.isbeingdefrosted )
+		//	wait (0.05);
 
 		players = getentarray("player", "classname");
 		for(i=0;i<players.size;i++)
@@ -578,10 +577,16 @@ waitfordefrostbyaim()
 			if( !player ftagButtonPressed() || !player islookingatftag(self) )
 				continue;
 
+			if( isdefined( player.isdefrosting1 ) && isdefined( player.isdefrosting2 ) )
+				continue;
+
+			if( isdefined( player.isdefrosting1 ) && player.isdefrosting1 == self || isdefined( player.isdefrosting2 ) && player.isdefrosting2== self )
+				continue;
+
 			// Make sure this player is not already defrosting someone
-			if ( isdefined(player.isdefrostingsomeone) && player.isdefrostingsomeone && level.scr_ftag_defrost["mode"] == 2 )
+			if ( isdefined( player.isdefrosting1 ) && level.scr_ftag_defrost["mode"] == 2 )
 				self thread defrostme2( player, true );
-			else if ( !isdefined( player.isdefrostingsomeone ) || !player.isdefrostingsomeone )
+			else
 				self thread defrostme( player, true );
 		}
 		wait 0.05;
@@ -698,8 +703,8 @@ defrostme( player, beam )
 		return;
 
 	defroststicker = undefined;
-	self.isdefrosting = true;
-	player.isdefrostingsomeone = true;
+	self.isbeingdefrosted = true;
+	player.isdefrosting1 = self;
 
 	self thread createprogressdisplays( player, 0 );
 
@@ -719,13 +724,14 @@ defrostme( player, beam )
 
 	self thread playloopfx(level.fx_defrostmelt,self.origin,0.5,"stop_defrost_fx");
 
-
 	while( isPlayer(self) && self.sessionstate == "playing" && (self.health < self.maxhealth) && game["state"] != "postgame" && isdefined( self.frozen ) && self.frozen )
 	{
 		if( !isPlayer(player) || player.sessionstate != "playing" || isdefined( player.frozen ) && player.frozen )
 			break;
+
 		if( beam && ( !player ftagButtonPressed() || !player islookingatftag(self) ) )
 			break;
+
 		if( !beam && distance( self.origin, player.origin ) >= level.scr_ftag_defrost["dist"] )
 			break;
 
@@ -742,6 +748,7 @@ defrostme( player, beam )
 			self.ice.origin = self.ice.origin - (0,0, ( 60 / self.maxhealth ) );
 		if ( level.scr_ftag_defrost["cube"] && isDefined( self.cubeisrotating ) && self.cubeisrotating == false)
 			self thread rotatemycube(player);
+
 		self.health++;
 		player.healthgiven++;
 		wait level.scr_ftag_defrost["time"];
@@ -756,8 +763,6 @@ defrostme( player, beam )
 	if( isDefined( player.progressbar0 ) )
 		player.progressbar0 destroy();
 
-	player.isdefrostingsomeone = false;
-
 	if( self.health + 1 >= self.maxhealth ) {
 		self thread defrosted(player, beam, defroststicker);
 	} else if( !player.frozen && !beam && level.scr_ftag_defrost["mode"] != 2 ) {
@@ -768,7 +773,8 @@ defrostme( player, beam )
 		defroststicker delete();
 	}
 
-	self.isdefrosting = false;
+	self.isbeingdefrosted = false;
+	player.isdefrosting1 = undefined;
 	self notify("stop_defrost_fx");
 }
 
@@ -778,8 +784,8 @@ defrostme2( player, beam )
 	if ( level.inOvertime )
 		return;
 
-	self.isdefrosting = true;
-	player.isdefrostingsomeone = true;
+	self.isbeingdefrosted = true;
+	player.isdefrosting2 = self;
 
 	self thread createprogressdisplays( player, 1 );
 
@@ -827,12 +833,11 @@ defrostme2( player, beam )
 	if( isDefined( player.progressbar1 ) )
 		player.progressbar1 destroy();
 
-	player.isdefrostingsomeone = false;
-
 	if( self.health + 1 >= self.maxhealth )
 		self thread defrosted( player, false, false );
 
-	self.isdefrosting = false;
+	self.isbeingdefrosted = false;
+	player.isdefrosting2 = undefined;
 	self notify("stop_defrost_fx");
 }
 
@@ -942,13 +947,13 @@ defrostaftertime()
 		level.scr_ftag_defrost["auto"] = 10;
 
 	wait level.scr_ftag_defrost["auto"];
-	if(!self.isdefrosting)
+	if(!self.isbeingdefrosted)
 		self thread defrosted(undefined, false, undefined);
 	else
 	{
-		while(self.isdefrosting)
+		while(self.isbeingdefrosted)
 			wait level.scr_ftag_defrost["auto"];
-		if(!self.isdefrosting)
+		if(!self.isbeingdefrosted)
 			self thread defrostaftertime();
 	}
 }
