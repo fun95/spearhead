@@ -16,6 +16,7 @@
 //¦ 				^6 = pink/Magenta                                                                                    ¦
 //+----------------------------------------------------------------------------------------------------------------------------------+
 
+#include maps\mp\gametypes\_hud_util;
 
 getdvardefault( dvarName, dvarType, dvarDefault, minValue, maxValue )
 {
@@ -283,8 +284,11 @@ RemoveIceItems()
 	if ( isDefined( self.statusicon ) )
 		self.statusicon = "";
 
-	if( isDefined( self.defrostingmsg ) )
-		self.defrostingmsg destroy();
+	if ( isdefined( self.defrostingmsg ) )
+		for ( index = 0; index < self.defrostingmsg.size; index++ )
+			if ( isdefined( self.defrostingmsg[index] ) )
+				self.defrostingmsg[index] destroy();
+
 	if( isDefined( self.defrostmsg0 ) )
 		self.defrostmsg0 destroy();
 	if( isDefined( self.progressbackground0 ) )

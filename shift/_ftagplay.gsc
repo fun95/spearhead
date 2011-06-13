@@ -25,7 +25,7 @@ init()
 	if ( level.teamBased != true )
 		return;
 
-	if ( !isdefined( game["switchedsides"] ) )
+	if ( !isDefined( game["switchedsides"] ) )
 		game["switchedsides"] = false;
 
 	level.onTimeLimit = ::onTimeLimit;
@@ -51,7 +51,7 @@ init()
 	setDvar( "scr_" + level.gametype + "_numlives", "0" );
 
 	// Setup callback for custom spawns
-	if ( isdefined( level.scr_shift_gameplay["spawn"] ) && level.scr_shift_gameplay["spawn"] )
+	if ( isDefined( level.scr_shift_gameplay["spawn"] ) && level.scr_shift_gameplay["spawn"] )
 		level.onSpawnPlayer = ::onSpawnPlayer;
 
 	gametype = "freezetag";
@@ -203,7 +203,7 @@ onPlayerSpawned()
 	{
 		self waittill("spawned_player");
 
-		if ( isdefined(self.frozen) && self.frozen && self.pers["team"] != "spectator" )
+		if ( isDefined(self.frozen) && self.frozen && self.pers["team"] != "spectator" )
 			self.statusicon = "hud_freeze";
 	}
 }
@@ -299,10 +299,10 @@ onSpawnFtagPlayer()
 	self endon("disconnect");
 
 	if( isDefined( self.frozen ) && self.frozen ) {
-		if ( isdefined( self.freezeorigin ) && isdefined( self.freezeangles ) )
+		if ( isDefined( self.freezeorigin ) && isDefined( self.freezeangles ) )
 		self spawn(self.freezeorigin, self.freezeangles);	
 		self thread freezeme();
-	} else if ( !level.scr_ftag_defrost["respawn"] && isdefined( self.freezeorigin ) && isdefined( self.freezeangles ) ) {
+	} else if ( !level.scr_ftag_defrost["respawn"] && isDefined( self.freezeorigin ) && isDefined( self.freezeangles ) ) {
 		self spawn(self.freezeorigin, self.freezeangles);
 		self.frozen = false;
 		self.health = self.maxhealth;
@@ -318,11 +318,10 @@ onSpawnFtagPlayer()
 	self setClientdvars( "cg_drawhealth", 0 );
 	self setClientDvar( "ui_healthoverlay", 0 );
 
+	self.defrostmsgx = 30;
+	self.defrostmsgy = 410;
 	self.isbeingdefrosted = false;
-	self.isdefrosting1 = undefined;
-	self.isdefrosting2 = undefined;
-	self.healthgiven = 0;
-	self.healthgiven2 = 0;
+	self.healthgiven = [];
 	self.beam = false;
 
 	wait(0.05);
@@ -397,7 +396,7 @@ onDeadEvent( team )
 
 onPlayerFrozen( eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, psOffsetTime, deathAnimDuration )
 {
-	if ( isdefined( self.frozen ) && self.frozen )
+	if ( isDefined( self.frozen ) && self.frozen )
 		return;
 
 	self.frozen = true;
@@ -412,7 +411,7 @@ onPlayerFrozen( eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHi
 	}
 
 	if ( level.scr_shift_hud["center"] ) {
-		if( isdefined( attacker ) && isPlayer( attacker ) && attacker != self ) {
+		if( isDefined( attacker ) && isPlayer( attacker ) && attacker != self ) {
 			self iprintlnbold(&"SHIFT_FTAG_HUD_FROZENBY" , attacker.name);
 			attacker iprintlnbold(&"SHIFT_FTAG_HUD_YOUFROZE" , self.name);
 			if ( level.scr_shift_hud["left"] )
@@ -531,20 +530,14 @@ waitfordefrostbytouch()
 				continue;
 
 			// Make sure player is on our team and not self or frozen
-			if ( player.team != self.team  || player == self || isdefined( player.frozen ) && player.frozen || distance( self.origin, player.origin ) > level.scr_ftag_defrost["dist"] )
+			if ( player.team != self.team  || player == self || isDefined( player.frozen ) && player.frozen || distance( self.origin, player.origin ) > level.scr_ftag_defrost["dist"] )
 				continue;
 
-			if( isdefined( player.isdefrosting1 ) && isdefined( player.isdefrosting2 ) )
+			// Make sure this player is not already defrosting me
+			if ( isDefined( player.defrostmsg ) && isDefined( player.defrostmsg[self getEntityNumber()] ) )
 				continue;
 
-			if( isdefined( player.isdefrosting1 ) && player.isdefrosting1 == self || isdefined( player.isdefrosting2 ) && player.isdefrosting2== self )
-				continue;
-
-			// Make sure this player is not already defrosting someone
-			if ( isdefined( player.isdefrosting1 ) && level.scr_ftag_defrost["mode"] == 2 )
-				self thread defrostme2( player, false );
-			else
-				self thread defrostme( player, false );
+			self thread defrostme( player, false );
 		}
 		wait 0.05;
 	}
@@ -571,23 +564,17 @@ waitfordefrostbyaim()
 				continue;
 
 			// Make sure player is on our team and not self or frozen
-			if ( player.team != self.team  || player == self || isdefined( player.frozen ) && player.frozen )
+			if ( player.team != self.team  || player == self || isDefined( player.frozen ) && player.frozen )
 				continue;
 
 			if( !player ftagButtonPressed() || !player islookingatftag(self) )
 				continue;
 
-			if( isdefined( player.isdefrosting1 ) && isdefined( player.isdefrosting2 ) )
+			// Make sure this player is not already defrosting me
+			if ( isDefined( player.defrostmsg ) && isDefined( player.defrostmsg[self getEntityNumber()] ) )
 				continue;
 
-			if( isdefined( player.isdefrosting1 ) && player.isdefrosting1 == self || isdefined( player.isdefrosting2 ) && player.isdefrosting2== self )
-				continue;
-
-			// Make sure this player is not already defrosting someone
-			if ( isdefined( player.isdefrosting1 ) && level.scr_ftag_defrost["mode"] == 2 )
-				self thread defrostme2( player, true );
-			else
-				self thread defrostme( player, true );
+			self thread defrostme( player, true );
 		}
 		wait 0.05;
 	}
@@ -596,103 +583,86 @@ waitfordefrostbyaim()
 
 createprogressdisplays( player, defrostindex )
 {
-	if( !isDefined( self.defrostingmsg ) ) {
-		self.defrostingmsg = newClientHudElem(self);
-		self.defrostingmsg.alignX = "left";
-		self.defrostingmsg.alignY = "middle";
-		self.defrostingmsg.horzAlign = "fullscreen";
-		self.defrostingmsg.vertAlign = "fullscreen";
-		self.defrostingmsg.x = 16;
-		self.defrostingmsg.y = 435;
-		self.defrostingmsg.alpha = 1;
-		self.defrostingmsg.sort = 1;
-		self.defrostingmsg.fontscale = 1.4;
-		self.defrostingmsg setText(&"SHIFT_FTAG_DEFROSTING");
-	}
-	if( !defrostindex ) {
-		if( !isDefined( player.defrostmsg0 ) ) {
-			player.defrostmsg0 = newClientHudElem(player);
-			player.defrostmsg0.alignX = "left";
-			player.defrostmsg0.alignY = "middle";
-			player.defrostmsg0.horzAlign = "fullscreen";
-			player.defrostmsg0.vertAlign = "fullscreen";
-			player.defrostmsg0.x = 30;
-			player.defrostmsg0.y = 410;
-			player.defrostmsg0.alpha = 1;
-			player.defrostmsg0.sort = 1;
-			player.defrostmsg0.fontscale = 1.4;
-			player.defrostmsg0 setText(&"SHIFT_FTAG_DEFROSTING");
-		}
+	if ( isDefined( self.defrostingmsg ) )
+		for ( index = 0; index < self.defrostingmsg.size; index++ )
+			if ( isDefined( self.defrostingmsg[index] ) )
+				self.defrostingmsg[index] destroy();
 
-		if( !isDefined( player.progressbackground0 ) ) {
-			player.progressbackground0 = newClientHudElem(player);
-			player.progressbackground0.alignX = "left";
-			player.progressbackground0.alignY = "middle";
-			player.progressbackground0.horzAlign = "fullscreen";
-			player.progressbackground0.vertAlign = "fullscreen";
-			player.progressbackground0.x = 30;
-			player.progressbackground0.y = 425;
-			player.progressbackground0.alpha = 0.5;
-			player.progressbackground0.sort = 1;
-			player.progressbackground0 setShader("black", (level.barsize + 2), (level.barheight + 2) );
-		}
+	if ( !isDefined( self.defrostingmsg ) )
+		self.defrostingmsg = [];
 
-		if( !isDefined( player.progressbar0 ) ) {
-			player.progressbar0 = newClientHudElem(player);
-			player.progressbar0.alignX = "left";
-			player.progressbar0.alignY = "middle";
-			player.progressbar0.horzAlign = "fullscreen";
-			player.progressbar0.vertAlign = "fullscreen";
-			player.progressbar0.x = 31;
-			player.progressbar0.y = 425;
-			player.progressbar0.sort = 2;
-			player.progressbar0.color = (0.3,1,1);
-			player.progressbar0 setShader("white", 1, level.barheight);
-			player.progressbar0 scaleOverTime(self.maxhealth, level.barsize, level.barheight);
-		}
+	index = self.defrostingmsg.size;
+
+	self.defrostingmsg[index] = newClientHudElem(self);
+	self.defrostingmsg[index].alignX = "left";
+	self.defrostingmsg[index].alignY = "middle";
+	self.defrostingmsg[index].horzAlign = "fullscreen";
+	self.defrostingmsg[index].vertAlign = "fullscreen";
+	self.defrostingmsg[index].x = 16;
+	self.defrostingmsg[index].y = 435;
+	self.defrostingmsg[index].alpha = 1;
+	self.defrostingmsg[index].sort = 1;
+	self.defrostingmsg[index].fontscale = 1.4;
+	self.defrostingmsg[index] setText(&"SHIFT_FTAG_DEFROSTING");
+
+	if( isDefined( player.defrostmsg ) ) {
+		if( isDefined( player.defrostmsg[defrostindex] ) )
+			player.defrostmsg[defrostindex] destroy();
 	} else {
-		if( !isDefined( player.defrostmsg1 ) ) {
-			player.defrostmsg1 = newClientHudElem(player);
-			player.defrostmsg1.alignX = "left";
-			player.defrostmsg1.alignY = "middle";
-			player.defrostmsg1.horzAlign = "fullscreen";
-			player.defrostmsg1.vertAlign = "fullscreen";
-			player.defrostmsg1.x = 30;
-			player.defrostmsg1.y = 435;
-			player.defrostmsg1.alpha = 1;
-			player.defrostmsg1.sort = 1;
-			player.defrostmsg1.fontscale = 1.4;
-			player.defrostmsg1 setText(&"SHIFT_FTAG_DEFROSTING");
-		}
-	
-		if( !isDefined( player.progressbackground1 ) ) {
-			player.progressbackground1 = newClientHudElem(player);
-			player.progressbackground1.alignX = "left";
-			player.progressbackground1.alignY = "middle";
-			player.progressbackground1.horzAlign = "fullscreen";
-			player.progressbackground1.vertAlign = "fullscreen";
-			player.progressbackground1.x = 30;
-			player.progressbackground1.y = 450;
-			player.progressbackground1.alpha = 0.5;
-			player.progressbackground1.sort = 1;
-			player.progressbackground1 setShader("black", (level.barsize + 2), (level.barheight + 2) );
-		}
-
-		if( !isDefined( player.progressbar1 ) ) {
-			player.progressbar1 = newClientHudElem(player);
-			player.progressbar1.alignX = "left";
-			player.progressbar1.alignY = "middle";
-			player.progressbar1.horzAlign = "fullscreen";
-			player.progressbar1.vertAlign = "fullscreen";
-			player.progressbar1.x = 31;
-			player.progressbar1.y = 450;
-			player.progressbar1.sort = 2;
-			player.progressbar1.color = (0.3,1,1);
-			player.progressbar1 setShader("white", 1, level.barheight);
-			player.progressbar1 scaleOverTime(self.maxhealth, level.barsize, level.barheight);
-		}
+		player.defrostmsg = [];
 	}
 
+	tempstring = "^5 Now defrosting ^3" + self.name;
+	player.defrostmsg[defrostindex] = newClientHudElem(player);
+	player.defrostmsg[defrostindex].alignX = "left";
+	player.defrostmsg[defrostindex].alignY = "middle";
+	player.defrostmsg[defrostindex].horzAlign = "fullscreen";
+	player.defrostmsg[defrostindex].vertAlign = "fullscreen";
+	player.defrostmsg[defrostindex].x = player.defrostmsgx;
+	player.defrostmsg[defrostindex].y = player.defrostmsgy;
+	player.defrostmsg[defrostindex].alpha = 1;
+	player.defrostmsg[defrostindex].sort = 1;
+	player.defrostmsg[defrostindex].fontscale = 1.4;
+	player.defrostmsg[defrostindex] setText( tempstring );
+
+	if( isDefined( player.progressbackground ) ) {
+		if( isDefined( player.progressbackground[defrostindex] ) )
+			player.progressbackground[defrostindex] destroy();
+	} else {
+		player.progressbackground = [];
+	}
+
+	player.progressbackground[defrostindex] = newClientHudElem(player);
+	player.progressbackground[defrostindex].alignX = "left";
+	player.progressbackground[defrostindex].alignY = "middle";
+	player.progressbackground[defrostindex].horzAlign = "fullscreen";
+	player.progressbackground[defrostindex].vertAlign = "fullscreen";
+	player.progressbackground[defrostindex].x = player.defrostmsgx;
+	player.progressbackground[defrostindex].y = player.defrostmsgy + 15;
+	player.progressbackground[defrostindex].alpha = 0.5;
+	player.progressbackground[defrostindex].sort = 1;
+	player.progressbackground[defrostindex] setShader("black", (level.barsize + 2), (level.barheight + 2) );
+
+	if( isDefined( player.progressbar ) ) {
+		if( isDefined( player.progressbar[defrostindex] ) )
+			player.progressbar[defrostindex] destroy();
+	} else {
+		player.progressbar = [];
+	}
+
+	player.progressbar[defrostindex] = newClientHudElem(player);
+	player.progressbar[defrostindex].alignX = "left";
+	player.progressbar[defrostindex].alignY = "middle";
+	player.progressbar[defrostindex].horzAlign = "fullscreen";
+	player.progressbar[defrostindex].vertAlign = "fullscreen";
+	player.progressbar[defrostindex].x = player.defrostmsgx + 1;
+	player.progressbar[defrostindex].y = player.defrostmsgy + 15;
+	player.progressbar[defrostindex].sort = 2;
+	player.progressbar[defrostindex].color = (0.3,1,1);
+	player.progressbar[defrostindex] setShader("white", 1, level.barheight);
+	player.progressbar[defrostindex] scaleOverTime(self.maxhealth, level.barsize, level.barheight);
+
+	player.defrostmsgy = player.defrostmsgy - 30;
 	return;
 }
 
@@ -704,9 +674,8 @@ defrostme( player, beam )
 
 	defroststicker = undefined;
 	self.isbeingdefrosted = true;
-	player.isdefrosting1 = self;
 
-	self thread createprogressdisplays( player, 0 );
+	self thread createprogressdisplays( player, self getEntityNumber() );
 
 	if(!beam && level.scr_ftag_defrost["mode"] != 2 )
 	{
@@ -724,9 +693,9 @@ defrostme( player, beam )
 
 	self thread playloopfx(level.fx_defrostmelt,self.origin,0.5,"stop_defrost_fx");
 
-	while( isPlayer(self) && self.sessionstate == "playing" && (self.health < self.maxhealth) && game["state"] != "postgame" && isdefined( self.frozen ) && self.frozen )
+	while( isPlayer(self) && self.sessionstate == "playing" && (self.health < self.maxhealth) && game["state"] != "postgame" && isDefined( self.frozen ) && self.frozen )
 	{
-		if( !isPlayer(player) || player.sessionstate != "playing" || isdefined( player.frozen ) && player.frozen )
+		if( !isPlayer(player) || player.sessionstate != "playing" || isDefined( player.frozen ) && player.frozen )
 			break;
 
 		if( beam && ( !player ftagButtonPressed() || !player islookingatftag(self) ) )
@@ -741,8 +710,8 @@ defrostme( player, beam )
 		width = self.health / self.maxhealth;
 		width = int(level.barsize * width);
 
-		if( isDefined( player.progressbar0 ) )
-			player.progressbar0 setShader("white", width, level.barheight);
+		if ( isDefined( player.progressbar[self getEntityNumber()] ) )
+			player.progressbar[self getEntityNumber()] setShader("white", width, level.barheight);
 
 		if ( level.scr_ftag_defrost["cube"] )
 			self.ice.origin = self.ice.origin - (0,0, ( 60 / self.maxhealth ) );
@@ -750,18 +719,30 @@ defrostme( player, beam )
 			self thread rotatemycube(player);
 
 		self.health++;
-		player.healthgiven++;
+
+		if ( isDefined( player.healthgiven ) && isDefined( player.healthgiven[self getEntityNumber()] ) )
+			player.healthgiven[self getEntityNumber()]++;
+		else
+			player.healthgiven[self getEntityNumber()] = 1;
+
 		wait level.scr_ftag_defrost["time"];
 	}
 
-	if( isDefined( self.defrostingmsg ) )
-		self.defrostingmsg destroy();
-	if( isDefined( player.defrostmsg0 ) )
-		player.defrostmsg0 destroy();
-	if( isDefined( player.progressbackground0 ) )
-		player.progressbackground0 destroy();
-	if( isDefined( player.progressbar0 ) )
-		player.progressbar0 destroy();
+	player.defrostmsgy = player.defrostmsgy + 30;
+
+	if ( isDefined( self.defrostingmsg ) )
+		for ( index = 0; index < self.defrostingmsg.size; index++ )
+			if ( isDefined( self.defrostingmsg[index] ) )
+				self.defrostingmsg[index] destroy();
+
+	if ( isDefined( player.defrostmsg ) && isDefined( player.defrostmsg[self getEntityNumber()] ) )
+		player.defrostmsg[self getEntityNumber()] destroy();
+
+	if ( isDefined( player.progressbackground ) && isDefined( player.progressbackground[self getEntityNumber()] ) )
+		player.progressbackground[self getEntityNumber()] destroy();
+
+	if ( isDefined( player.progressbar ) && isDefined( player.progressbar[self getEntityNumber()] ) )
+		player.progressbar[self getEntityNumber()] destroy();
 
 	if( self.health + 1 >= self.maxhealth ) {
 		self thread defrosted(player, beam, defroststicker);
@@ -774,80 +755,14 @@ defrostme( player, beam )
 	}
 
 	self.isbeingdefrosted = false;
-	player.isdefrosting1 = undefined;
 	self notify("stop_defrost_fx");
 }
 
-
-defrostme2( player, beam )
-{
-	if ( level.inOvertime )
-		return;
-
-	self.isbeingdefrosted = true;
-	player.isdefrosting2 = self;
-
-	self thread createprogressdisplays( player, 1 );
-
-	if( !isDefined(self.defrostprogresstime) )
-		self.defrostprogresstime = 0;
-
-	self.cubeisrotating = false;
-	self.rotang = 0;
-
-	self thread playloopfx(level.fx_defrostmelt,self.origin,0.5,"stop_defrost_fx");
-
-	while( isPlayer(self) && self.sessionstate == "playing" && (self.health < self.maxhealth) && game["state"] != "postgame" && isdefined( self.frozen ) && self.frozen )
-	{
-		if( !isPlayer(player) || player.sessionstate != "playing" || isdefined( player.frozen ) && player.frozen )
-			break;
-		if( beam && ( !player ftagButtonPressed() || !player islookingatftag(self) ) )
-			break;
-		if( !beam && distance( self.origin, player.origin ) >= level.scr_ftag_defrost["dist"] )
-			break;
-
-		if( beam )
-			self thread dobeam(player);
-
-		width = self.health / self.maxhealth;
-		width = int(level.barsize * width);
-
-		if( isDefined( player.progressbar1 ) )
-			player.progressbar1 setShader("white", width, level.barheight);
-
-		if ( level.scr_ftag_defrost["cube"] )
-			self.ice.origin = self.ice.origin - (0,0, ( 60 / self.maxhealth ) );
-		if ( level.scr_ftag_defrost["cube"] && isDefined( self.cubeisrotating ) && self.cubeisrotating == false)
-			self thread rotatemycube(player);
-		self.health++;
-		player.healthgiven2++;
-		wait level.scr_ftag_defrost["time"];
-	}
-
-	if( isDefined( self.defrostingmsg ) )
-		self.defrostingmsg destroy();
-	if( isDefined( player.defrostmsg1 ) )
-		player.defrostmsg1 destroy();
-	if( isDefined( player.progressbackground1 ) )
-		player.progressbackground1 destroy();
-	if( isDefined( player.progressbar1 ) )
-		player.progressbar1 destroy();
-
-	if( self.health + 1 >= self.maxhealth )
-		self thread defrosted( player, false, false );
-
-	self.isbeingdefrosted = false;
-	player.isdefrosting2 = undefined;
-	self notify("stop_defrost_fx");
-}
 
 defrosted(player, beam, defroststicker)
 {
 	self setClientdvars( "cg_drawhealth", 0 );
 	self setClientDvar( "ui_healthoverlay", 0 );
-
-	if( isDefined(self.defrostingmsg ) )
-		self.defrostingmsg destroy();
 
 	if(isDefined(player))
 	{
@@ -871,10 +786,8 @@ defrosted(player, beam, defroststicker)
 			//Code to find players who defrosted me
 			if ( player.team == self.team ) {
 				value = 0;
-				if ( isdefined( player.healthgiven ) && player.healthgiven > 0 )
-					value = int( ( ( player.healthgiven + 1 ) / self.maxhealth ) * level.defrostpoint );
-				else if ( isdefined( player.healthgiven2 ) && player.healthgiven2 > 0 )
-					value = int( ( ( player.healthgiven2 + 1 ) / self.maxhealth ) * level.defrostpoint );
+				if ( isDefined( player.healthgiven[self getEntityNumber()] ) && player.healthgiven[self getEntityNumber()] > 0 )
+					value = int( ( ( player.healthgiven[self getEntityNumber()] + 1 ) / self.maxhealth ) * level.defrostpoint );
 
 				if ( value >= 1 ) {
 					if ( value >= level.defrostpoint )
@@ -893,12 +806,11 @@ defrosted(player, beam, defroststicker)
 						player iprintlnbold(&"SHIFT_FTAG_HUD_POINTS", value);
 					}
 
-					if ( !isdefined(level.defrostplayers) )
+					if ( !isDefined(level.defrostplayers) )
 						level.defrostplayers = player.name;
 					else
 						level.defrostplayers += " & " + player.name;
-					player.healthgiven = 0;
-					player.healthgiven2 = 0;
+					player.healthgiven = [];
 				}
 			}
 		}
@@ -1001,7 +913,7 @@ islookingatftag(who)
 
 	if( trace["fraction"] != 1 )
 	{
-		if( isdefined( trace["entity"] ) && trace["entity"] == who )
+		if( isDefined( trace["entity"] ) && trace["entity"] == who )
 			return true;
 		else
 			return false;
