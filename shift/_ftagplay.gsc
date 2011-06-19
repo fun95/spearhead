@@ -786,7 +786,7 @@ defrosted(player, beam, defroststicker)
 			//Code to find players who defrosted me
 			if ( player.team == self.team ) {
 				value = 0;
-				if ( isDefined( player.healthgiven[self getEntityNumber()] ) && player.healthgiven[self getEntityNumber()] > 0 )
+				if ( isDefined( player.healthgiven ) && isDefined( player.healthgiven[self getEntityNumber()] ) && player.healthgiven[self getEntityNumber()] > 0 )
 					value = int( ( ( player.healthgiven[self getEntityNumber()] + 1 ) / self.maxhealth ) * level.defrostpoint );
 
 				if ( value >= 1 ) {
