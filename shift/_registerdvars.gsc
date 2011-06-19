@@ -1,19 +1,19 @@
 //+----------------------------------------------------------------------------------------------------------------------------------+
 //¦ Call of Duty 4: Modern Warfare                                                                                                   ¦
 //¦----------------------------------------------------------------------------------------------------------------------------------¦
-//¦ Mod				: [SHIFT]SPEARHEAD INTERNATIONAL FREEZETAG                                                           ¦
-//¦ Modifications By		: [SHIFT]Newfie                                                                                      ¦
+//¦ Mod                 : [SHIFT]SPEARHEAD INTERNATIONAL FREEZETAG                                                                   ¦
+//¦ Modifications By    : [SHIFT]Newfie                                                                                              ¦
 //+----------------------------------------------------------------------------------------------------------------------------------+
-//¦ Colour Codes For RGB	Colour Codes For Text                                                                                ¦
+//¦ Colour Codes RGB    Colour Codes For Text                                                                                        ¦
 //+----------------------------------------------------------------------------------------------------------------------------------+
-//¦ Black  0 0 0		^0 = Black                                                                                           ¦
-//¦ White  1 1 1 		^7 = White                                                                                           ¦
-//¦ Red    1 0 0		^1 = Red                                                                                             ¦
-//¦ Green  0 1 0		^2 = Green                                                                                           ¦
-//¦ Blue   0 0 1		^4 = Blue                                                                                            ¦
-//¦ Yellow 1 1 0		^3 = Yellow                                                                                          ¦
-//¦ 				^5 = Cyan                                                                                            ¦
-//¦ 				^6 = pink/Magenta                                                                                    ¦
+//¦ Black  0 0 0        ^0 = Black                                                                                                   ¦
+//¦ White  1 1 1        ^7 = White                                                                                                   ¦
+//¦ Red    1 0 0        ^1 = Red                                                                                                     ¦
+//¦ Green  0 1 0        ^2 = Green                                                                                                   ¦
+//¦ Blue   0 0 1        ^4 = Blue                                                                                                    ¦
+//¦ Yellow 1 1 0        ^3 = Yellow                                                                                                  ¦
+//¦                     ^5 = Cyan                                                                                                    ¦
+//¦                     ^6 = pink/Magenta                                                                                            ¦
 //+----------------------------------------------------------------------------------------------------------------------------------+
 
 #include shift\_utils;
@@ -36,11 +36,6 @@ init()
 	level.scr_hud_hardcore_show_minimap = int( defaultvalues[0] );
 	level.scr_hud_hardcore_show_compass = int( defaultvalues[1] );
 	level.scr_hud_show_inventory = int( defaultvalues[2] );
-
-//logprint( "Minimap = " + level.scr_hud_hardcore_show_minimap + "\n" );
-//logprint( "compass = " + level.scr_hud_hardcore_show_compass + "\n" );
-//logprint( "inventory = " + level.scr_hud_show_inventory + "\n" );
-
 
 	// Set new compact defrost values from single dvar
 	level.scr_ftag_defrost_values = getdvardefault( "scr_ftag_defrost_values", "string", "50;0;1;15;50;0;0;1;use" );
