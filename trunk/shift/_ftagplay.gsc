@@ -126,7 +126,7 @@ onPrecacheFtag()
 	}
 
 	level.fx_defrostmelt = loadFx("freezetag/defrostmelt");
-	level.barsize = 100;
+	level.barsize = 80;
 	level.barheight = 3;
 
 	level.objused = [];
@@ -315,8 +315,15 @@ onSpawnFtagPlayer()
 		self.freezeorigin = undefined;
 	}
 
-	self setClientdvars( "cg_drawhealth", 0 );
-	self setClientDvar( "ui_healthoverlay", 0 );
+	if( level.scr_shift_gameplay["healthbar"] ) {
+		self setClientdvars( "cg_drawhealth", 1 );
+		self setClientDvar( "ui_healthoverlay", 1 );
+		self setClientDvar( "ui_frozen", 0 );
+	} else {
+		self setClientdvars( "cg_drawhealth", 0 );
+		self setClientDvar( "ui_healthoverlay", 0 );
+		self setClientDvar( "ui_frozen", 0 );
+	}
 
 	self.defrostmsgx = 30;
 	self.defrostmsgy = 410;
@@ -444,8 +451,15 @@ freezeme(attacker)
 	self.health = 1;
 	self.statusicon = "hud_freeze";
 
-	self setClientdvars( "cg_drawhealth", 1 );
-	self setClientDvar( "ui_healthoverlay", 1 );
+	if( level.scr_shift_gameplay["healthbar"] ) {
+		self setClientdvars( "cg_drawhealth", 1 );
+		self setClientDvar( "ui_healthoverlay", 1 );
+		self setClientDvar( "ui_frozen", 1 );
+	} else {
+		self setClientdvars( "cg_drawhealth", 0 );
+		self setClientDvar( "ui_healthoverlay", 0 );
+		self setClientDvar( "ui_frozen", 0 );
+	}
 
 	// Check if we are in overtime and need to disable spawn
 	if ( level.inOvertime )
@@ -662,7 +676,8 @@ createprogressdisplays( player, defrostindex )
 	player.progressbar[defrostindex] setShader("white", 1, level.barheight);
 	player.progressbar[defrostindex] scaleOverTime(self.maxhealth, level.barsize, level.barheight);
 
-	player.defrostmsgy = player.defrostmsgy - 30;
+	player.defrostmsgx = player.defrostmsgx + 100;
+	//player.defrostmsgy = player.defrostmsgy - 30;
 	return;
 }
 
@@ -728,7 +743,8 @@ defrostme( player, beam )
 		wait level.scr_ftag_defrost["time"];
 	}
 
-	player.defrostmsgy = player.defrostmsgy + 30;
+	player.defrostmsgx = player.defrostmsgx - 100;
+	//player.defrostmsgy = player.defrostmsgy + 30;
 
 	if ( isDefined( self.defrostingmsg ) )
 		for ( index = 0; index < self.defrostingmsg.size; index++ )
@@ -761,8 +777,15 @@ defrostme( player, beam )
 
 defrosted(player, beam, defroststicker)
 {
-	self setClientdvars( "cg_drawhealth", 0 );
-	self setClientDvar( "ui_healthoverlay", 0 );
+	if( level.scr_shift_gameplay["healthbar"] ) {
+		self setClientdvars( "cg_drawhealth", 1 );
+		self setClientDvar( "ui_healthoverlay", 1 );
+		self setClientDvar( "ui_frozen", 0 );
+	} else {
+		self setClientdvars( "cg_drawhealth", 0 );
+		self setClientDvar( "ui_healthoverlay", 0 );
+		self setClientDvar( "ui_frozen", 0 );
+	}
 
 	if(isDefined(player))
 	{

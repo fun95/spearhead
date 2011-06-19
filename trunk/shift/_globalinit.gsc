@@ -20,6 +20,7 @@ init()
 {
 	// Initialize shift modules
 	thread shift\_annoykill::init();
+	thread shift\_healthpacks::init();
 	thread shift\_playerstats::init();
 	thread shift\_showunrealmess::init();
 	thread shift\_shiftmenu::init();
