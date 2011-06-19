@@ -1,112 +1,112 @@
 //+----------------------------------------------------------------------------------------------------------------------------------+
 //¦ Call of Duty 4: Modern Warfare                                                                                                   ¦
 //¦----------------------------------------------------------------------------------------------------------------------------------¦
-//¦ Mod				: [SHIFT]SPEARHEAD INTERNATIONAL FREEZETAG                                                           ¦
-//¦ Modifications By		: [SHIFT]Newfie                                                                                      ¦
+//¦ Mod                 : [SHIFT]SPEARHEAD INTERNATIONAL FREEZETAG                                                                   ¦
+//¦ Modifications By    : [SHIFT]Newfie                                                                                              ¦
 //+----------------------------------------------------------------------------------------------------------------------------------+
-//¦ Colour Codes For RGB	Colour Codes For Text                                                                                ¦
+//¦ Colour Codes RGB    Colour Codes For Text                                                                                        ¦
 //+----------------------------------------------------------------------------------------------------------------------------------+
-//¦ Black  0 0 0		^0 = Black                                                                                           ¦
-//¦ White  1 1 1 		^7 = White                                                                                           ¦
-//¦ Red    1 0 0		^1 = Red                                                                                             ¦
-//¦ Green  0 1 0		^2 = Green                                                                                           ¦
-//¦ Blue   0 0 1		^4 = Blue                                                                                            ¦
-//¦ Yellow 1 1 0		^3 = Yellow                                                                                          ¦
-//¦ 				^5 = Cyan                                                                                            ¦
-//¦ 				^6 = pink/Magenta                                                                                    ¦
+//¦ Black  0 0 0        ^0 = Black                                                                                                   ¦
+//¦ White  1 1 1        ^7 = White                                                                                                   ¦
+//¦ Red    1 0 0        ^1 = Red                                                                                                     ¦
+//¦ Green  0 1 0        ^2 = Green                                                                                                   ¦
+//¦ Blue   0 0 1        ^4 = Blue                                                                                                    ¦
+//¦ Yellow 1 1 0        ^3 = Yellow                                                                                                  ¦
+//¦                     ^5 = Cyan                                                                                                    ¦
+//¦                     ^6 = pink/Magenta                                                                                            ¦
 //+----------------------------------------------------------------------------------------------------------------------------------+
 
 VERSION          "1"
 CONFIG           "C:\trees\cod3\cod3\bin\StringEd.cfg"
 FILENOTES        ""
 
-REFERENCE	LOGOTEXT
+REFERENCE       LOGOTEXT
 LANG_ENGLISH	"^2[SHIFT] ^1SPEARHEAD ^3INTERNATIONAL ^5FREEZETAG"
 
-REFERENCE	FREEZETAG
+REFERENCE       FREEZETAG
 LANG_ENGLISH	"^2[SHIFT] ^5FREEZETAG ^2GAMEPLAY"
 
 //+----------------------------------------------------------------------------------------+
 //¦ Quick Voice Bind Menu                                                                  ¦
 //+----------------------------------------------------------------------------------------+
 
-REFERENCE	VOICEBIND_FOLLOW_ME
+REFERENCE       VOICEBIND_FOLLOW_ME
 LANG_ENGLISH	"On me!"
 
-REFERENCE	VOICEBIND_MOVE_IN
+REFERENCE       VOICEBIND_MOVE_IN
 LANG_ENGLISH	"Move in!"
 
-REFERENCE	VOICEBIND_FALL_BACK
+REFERENCE       VOICEBIND_FALL_BACK
 LANG_ENGLISH	"Fall back!"
 
-REFERENCE	VOICEBIND_SUPPRESSING_FIRE
+REFERENCE       VOICEBIND_SUPPRESSING_FIRE
 LANG_ENGLISH	"Base of fire!"
 
-REFERENCE	VOICEBIND_ATTACK_LEFT_FLANK
+REFERENCE       VOICEBIND_ATTACK_LEFT_FLANK
 LANG_ENGLISH	"Attack left flank!"
 
-REFERENCE	VOICEBIND_ATTACK_RIGHT_FLANK
+REFERENCE       VOICEBIND_ATTACK_RIGHT_FLANK
 LANG_ENGLISH	"Attack right flank!"
 
-REFERENCE	VOICEBIND_HOLD_THIS_POSITION
+REFERENCE       VOICEBIND_HOLD_THIS_POSITION
 LANG_ENGLISH	"Hold this position!"
 
-REFERENCE	VOICEBIND_REGROUP
+REFERENCE       VOICEBIND_REGROUP
 LANG_ENGLISH	"Regroup!"
 
-REFERENCE	VOICEBIND_ENEMY_SPOTTED
+REFERENCE       VOICEBIND_ENEMY_SPOTTED
 LANG_ENGLISH	"Contact!"
 
-REFERENCE	VOICEBIND_ENEMIES_SPOTTED
+REFERENCE       VOICEBIND_ENEMIES_SPOTTED
 LANG_ENGLISH	"Multiple contacts!"
 
-REFERENCE	VOICEBIND_IM_IN_POSITION
+REFERENCE       VOICEBIND_IM_IN_POSITION
 LANG_ENGLISH	"In position."
 
-REFERENCE	VOICEBIND_AREA_SECURE
+REFERENCE       VOICEBIND_AREA_SECURE
 LANG_ENGLISH	"Area secure!"
 
-REFERENCE	VOICEBIND_WATCH_SIX
+REFERENCE       VOICEBIND_WATCH_SIX
 LANG_ENGLISH	"Watch your six!"
 
-REFERENCE	VOICEBIND_SNIPER
+REFERENCE       VOICEBIND_SNIPER
 LANG_ENGLISH	"Sniper!"
 
-REFERENCE	VOICEBIND_NEED_REINFORCEMENTS
+REFERENCE       VOICEBIND_NEED_REINFORCEMENTS
 LANG_ENGLISH	"Need reinforcements!"
 
-REFERENCE	VOICEBIND_YES_SIR
+REFERENCE       VOICEBIND_YES_SIR
 LANG_ENGLISH	"Roger."
 
-REFERENCE	VOICEBIND_NO_SIR
+REFERENCE       VOICEBIND_NO_SIR
 LANG_ENGLISH	"Negative."
 
-REFERENCE	VOICEBIND_IM_ON_MY_WAY
+REFERENCE       VOICEBIND_IM_ON_MY_WAY
 LANG_ENGLISH	"Moving."
 
-REFERENCE	VOICEBIND_SORRY
+REFERENCE       VOICEBIND_SORRY
 LANG_ENGLISH	"Sorry."
 
-REFERENCE	VOICEBIND_GREAT_SHOT
+REFERENCE       VOICEBIND_GREAT_SHOT
 LANG_ENGLISH	"Nice shot!"
 
-REFERENCE	VOICEBIND_COME_ON
+REFERENCE       VOICEBIND_COME_ON
 LANG_ENGLISH	"Come on."
 
-REFERENCE	VOICEBIND
+REFERENCE       VOICEBIND
 LANG_ENGLISH	"Quick Command Binds"
 
 //+----------------------------------------------------------------------------------------------------------------------------------+
 //¦ Unreal Message Strings                                                                                                           ¦
 //+----------------------------------------------------------------------------------------------------------------------------------+
 
-REFERENCE	HEADSHOT
+REFERENCE       HEADSHOT
 LANG_ENGLISH	"^2HEADSHOT"
 
-REFERENCE	FIRSTBLOOD_REPORT_ALL
+REFERENCE       FIRSTBLOOD_REPORT_ALL
 LANG_ENGLISH	"^2FIRSTBLOOD AWARDED TO"
 
-REFERENCE	FIRSTBLOOD_REPORT_SELF
+REFERENCE       FIRSTBLOOD_REPORT_SELF
 LANG_ENGLISH	"^2FIRSTBLOOD"
 
 //+----------------------------------------------------------------------------------------------------------------------------------+
@@ -197,73 +197,73 @@ LANG_ENGLISH 	"^5All the ^3Spetsnaz^5 have been frozen!"
 //******************************************************************************
 // Shift Rcon Menu
 //******************************************************************************
-REFERENCE	TITLE
+REFERENCE       TITLE
 LANG_ENGLISH 	"RCON MENU"
 
-REFERENCE	MAP_CONTROL
+REFERENCE       MAP_CONTROL
 LANG_ENGLISH 	"^3Map Control Panel"
 
-REFERENCE	MAP_LOAD
+REFERENCE       MAP_LOAD
 LANG_ENGLISH 	"Load Map/Gametype"
 
-REFERENCE	SET_NEXT
+REFERENCE       SET_NEXT
 LANG_ENGLISH 	"Set as Next Map/Gametype"
 
-REFERENCE	MAP_END
+REFERENCE       MAP_END
 LANG_ENGLISH 	"End Current Map"
 
-REFERENCE	MAP_FASTRESTART
+REFERENCE       MAP_FASTRESTART
 LANG_ENGLISH 	"Fast Restart Map"
 
-REFERENCE	MAP_RESTART
+REFERENCE       MAP_RESTART
 LANG_ENGLISH 	"Restart Current Map"
 
-REFERENCE	MAP_NEXT
+REFERENCE       MAP_NEXT
 LANG_ENGLISH 	"Rotate to Next Map"
 
-REFERENCE	SHOW_WARNING
+REFERENCE       SHOW_WARNING
 LANG_ENGLISH	"Announce Warning"
 
-REFERENCE	PLAYER_CONTROL
+REFERENCE       PLAYER_CONTROL
 LANG_ENGLISH 	"^3Player Control Panel"
 
-REFERENCE	PLAYER_KILL
+REFERENCE       PLAYER_KILL
 LANG_ENGLISH 	"Kill Player"
 
-REFERENCE	PLAYER_KICK
+REFERENCE       PLAYER_KICK
 LANG_ENGLISH 	"Kick Player"
 
-REFERENCE	PLAYER_BAN
+REFERENCE       PLAYER_BAN
 LANG_ENGLISH 	"Ban Player"
 
-REFERENCE	FREEZETAG_ON
+REFERENCE       FREEZETAG_ON
 LANG_ENGLISH 	"Turn on freezetag"
 
-REFERENCE	FREEZETAG_OFF
+REFERENCE       FREEZETAG_OFF
 LANG_ENGLISH 	"Turn off freezetag"
 
-REFERENCE	BEGIN_MATCH
+REFERENCE       BEGIN_MATCH
 LANG_ENGLISH	"Begin Match"
 
-REFERENCE	CLAN_ALLIES
+REFERENCE       CLAN_ALLIES
 LANG_ENGLISH	"Set clan as allies"
 
-REFERENCE	CLAN_AXIS
+REFERENCE       CLAN_AXIS
 LANG_ENGLISH	"set clan as axis"
 
-REFERENCE	MATCH_SWITCH
+REFERENCE       MATCH_SWITCH
 LANG_ENGLISH	"Switch Teams"
 
-REFERENCE	KICK_NONCLAN
+REFERENCE       KICK_NONCLAN
 LANG_ENGLISH	"Kick Non Clan"
 
-REFERENCE	TEAM_SWITCH_ALLIES
+REFERENCE       TEAM_SWITCH_ALLIES
 LANG_ENGLISH	"Switching clan members to allies"
 
-REFERENCE	TEAM_SWITCH_AXIS
+REFERENCE       TEAM_SWITCH_AXIS
 LANG_ENGLISH	"Switching clan members to axis"
 
-REFERENCE	TEAM_SWITCH
+REFERENCE       TEAM_SWITCH
 LANG_ENGLISH	"Switching Teams"
 
 //+----------------------------------------------------------------------------------------------------------------------------------+
@@ -279,13 +279,13 @@ LANG_ENGLISH    "GAMEPLAY IN ^3LIVE ^7MODE, ^1DO NOT ^7DISTURB!"
 REFERENCE       HAVENOPERMISSION
 LANG_ENGLISH    "YOU ^1DO NOT ^7HAVE PERMISSION TO JOIN THIS MATCH!"
 
-REFERENCE	MATCH_LIVE
+REFERENCE       MATCH_LIVE
 LANG_ENGLISH	"Match is now live!!!"
 
-REFERENCE	KICKING_NON_MEMBERS
+REFERENCE       KICKING_NON_MEMBERS
 LANG_ENGLISH	"^3Removing Non Clan members from the server!"
 
-REFERENCE	KICKED_NON_MEMBERS
+REFERENCE       KICKED_NON_MEMBERS
 LANG_ENGLISH	"^3All Non Clan members have been removed from the server!"
 
 //+----------------------------------------------------------------------------------------------------------------------------------+

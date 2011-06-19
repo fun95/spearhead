@@ -18,6 +18,8 @@ echo    Adding images...
 echo    Adding sounds...
 7za a -r -tzip z_shift.iwd sound\*.mp3 > NUL
 7za a -r -tzip z_shift.iwd sound\*.wav > NUL
+echo    Adding weapons...
+7za a -r -tzip z_shift.iwd weapons\mp\*_mp > NUL
 
 echo  New z_shift.iwd file successfully built!
 echo _________________________________________________________________
@@ -49,7 +51,6 @@ xcopy shift ..\..\raw\shift /SYI > NUL
 
 copy /Y mod.csv ..\..\zone_source > NUL
 cd ..\..\bin > NUL
-
 
 echo    Compiling mod...
 linker_pc.exe -language english -compress -cleanup mod 
