@@ -13,11 +13,14 @@ echo.
 echo  Building z_shift.iwd:
 echo    Deleting old z_shift.iwd file...
 del z_shift.iwd
+del z_shift_spearhead.iwd
 echo    Adding images...
 7za a -r -tzip z_shift.iwd images\*.iwi > NUL
 echo    Adding sounds...
-7za a -r -tzip z_shift.iwd sound\*.mp3 > NUL
-7za a -r -tzip z_shift.iwd sound\*.wav > NUL
+7za a -r -tzip z_shift.iwd sound\shift\*.mp3 > NUL
+7za a -r -tzip z_shift.iwd sound\shift\*.wav > NUL
+echo    Adding spearhead sounds...
+7za a -r -tzip z_shift_spearhead.iwd sound\spearhead\*.mp3 > NUL
 echo    Adding weapons...
 7za a -r -tzip z_shift.iwd weapons\mp\*_mp > NUL
 

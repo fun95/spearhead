@@ -71,7 +71,7 @@
 
 		// ------------------ TREE TITLE ------------------
 
-		CHOICE_MENU_TITLE( "@SHIFT_TITLE" )
+		CHOICE_MENU_TITLE( "@SHIFT_RCON_MENU" )
 
 		// ------------------ buttons ---------------------
 		//#define BACK_OPEN open "class";

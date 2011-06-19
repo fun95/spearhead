@@ -3,6 +3,7 @@ localize,shift
 rawfile,maps/mp/gametypes/_globallogic.gsc
 rawfile,maps/mp/gametypes/_hardpoints.gsc
 rawfile,maps/mp/gametypes/_healthoverlay.gsc
+rawfile,maps/mp/gametypes/_quickmessages.gsc
 
 fx,freezetag/defrostbeam
 fx,freezetag/defrostbeamred
@@ -24,7 +25,14 @@ menufile,ui_mp/connect.menu
 menufile,ui_mp/controls_multi.menu
 menufile,ui_mp/scriptmenus/clientcmd.menu
 menufile,ui_mp/scriptmenus/shiftrcon.menu
-menufile,ui_mp/scriptmenus/voicebind.menu
+
+menufile,ui_mp/wm_quickmessage.menu
+menufile,ui_mp/scriptmenus/shiftqmcmd.menu
+menufile,ui_mp/scriptmenus/shiftqmres.menu
+menufile,ui_mp/scriptmenus/shiftqmstm.menu
+menufile,ui_mp/scriptmenus/shiftquickcommands.menu
+menufile,ui_mp/scriptmenus/shiftquickstatements.menu
+menufile,ui_mp/scriptmenus/shiftquickresponses.menu
 
 rawfile,shift/_annoykill.gsc
 rawfile,shift/_ftagplay.gsc
@@ -42,6 +50,7 @@ rawfile,shift/_welcomemsg.gsc
 rawfile,shift/_testbots.gsc
 
 sound,shift,,all_mp
+sound,spearhead,,all_mp
 
 xmodel,iceberg
 xmodel,icebergred
