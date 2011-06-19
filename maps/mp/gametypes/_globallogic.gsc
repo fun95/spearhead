@@ -4119,6 +4119,8 @@ Callback_PlayerConnect()
 	self.statusicon = "";
 
 	level notify( "connected", self );
+
+	self setClientDvar( "ui_frozen", 0 );
 	
 //	self thread fakeLag();
 	if ( level.console && self getEntityNumber() == 0 )

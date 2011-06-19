@@ -137,12 +137,22 @@
 		}
 		itemDef
 		{
-			name "hud_freeze"
+			name "hud_cross1"
 			rect 142 447 12 12 //rect 132 467 12 12
 			forecolor 1.0 1.0 1.0 0.3
-			background "hud_freeze"
+			background "hud_cross1"
 			ownerdraw CG_PLAYER_BAR_HEALTH_BACK
-			visible when( !flashbanged() && !ui_active() && NOT_SPECTATING && team( name ) != "TEAM_SPECTATOR" );
+			visible when( !flashbanged() && !ui_active() && NOT_SPECTATING && team( name ) != "TEAM_SPECTATOR" && dvarInt( ui_frozen ) == 0 );
+			decoration
+		}
+		itemDef
+		{
+			name "hud_cross2"
+			rect 142 447 12 12 //rect 132 467 12 12
+			forecolor 1.0 1.0 1.0 0.3
+			background "hud_cross2"
+			ownerdraw CG_PLAYER_BAR_HEALTH_BACK
+			visible when( !flashbanged() && !ui_active() && NOT_SPECTATING && team( name ) != "TEAM_SPECTATOR" && dvarInt( ui_frozen ) == 1 );
 			decoration
 		}
 	}

@@ -54,15 +54,17 @@ init()
 
 
 	// Set new compact gameplay values from single dvar
-	level.scr_ftag_gameplay_values = getdvardefault( "scr_ftag_gameplay_values", "string", "0;0;10;0;0" );
+	level.scr_ftag_gameplay_values = getdvardefault( "scr_ftag_gameplay_values", "string", "0;0;0;0;10;0;0" );
 	defaultvalues = strtok( level.scr_ftag_gameplay_values, ";" );
 
 	level.scr_shift_gameplay = [];
-	level.scr_shift_gameplay["ftag"] = int( defaultvalues[0] );
-	level.scr_shift_gameplay["spawn"] = int( defaultvalues[1] );
-	level.scr_shift_gameplay["clock"] = int( defaultvalues[2] );
-	level.scr_shift_gameplay["join"] = int( defaultvalues[3] );
-	level.scr_shift_gameplay["unreal"] = int( defaultvalues[4] );
+	level.scr_shift_gameplay["healthbar"] = int( defaultvalues[0] );
+	level.scr_shift_gameplay["health"] = int( defaultvalues[1] );
+	level.scr_shift_gameplay["ftag"] = int( defaultvalues[2] );
+	level.scr_shift_gameplay["spawn"] = int( defaultvalues[3] );
+	level.scr_shift_gameplay["clock"] = int( defaultvalues[4] );
+	level.scr_shift_gameplay["join"] = int( defaultvalues[5] );
+	level.scr_shift_gameplay["unreal"] = int( defaultvalues[6] );
 
 
 	// Freezetag Variable

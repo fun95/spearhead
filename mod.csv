@@ -9,6 +9,9 @@ fx,freezetag/defrostbeam
 fx,freezetag/defrostbeamred
 fx,freezetag/defrostmelt
 
+material,hud_cross1
+material,hud_cross2
+material,hp_medium_tex
 material,hud_freeze
 material,hud_frozen
 material,hud_fznred
@@ -37,6 +40,7 @@ menufile,ui_mp/scriptmenus/shiftquickresponses.menu
 rawfile,shift/_annoykill.gsc
 rawfile,shift/_ftagplay.gsc
 rawfile,shift/_globalinit.gsc
+rawfile,shift/_healthpacks.gsc
 rawfile,shift/_playerstats.gsc
 rawfile,shift/_matchset.gsc
 rawfile,shift/_registerdvars.gsc
@@ -52,5 +56,6 @@ rawfile,shift/_testbots.gsc
 sound,shift,,all_mp
 sound,spearhead,,all_mp
 
+xmodel,hp_medium
 xmodel,iceberg
 xmodel,icebergred
