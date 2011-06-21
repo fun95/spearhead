@@ -34,9 +34,22 @@ onPlayerConnect()
 	{
 		level waittill("connecting", player);
 
+		if ( isdefined( level.scr_shift_gameplay["join"] ) && level.scr_shift_gameplay["join"] )
+			player setSpectateMatch();
+		if ( isdefined( level.scr_shift_spectator["score"] ) && level.scr_shift_spectator["score"] )
+			player setSpectateScore();
+		if ( isdefined( level.scr_shift_spectator["freespec"] ) && level.scr_shift_spectator["freespec"] == 2 )
+			player setSpectateFree();
+
 		player thread onJoinedTeam();
 		player thread onJoinedSpectators();
 		player thread onPlayerSpawned();
+
+		while ( !isdefined( player.isadmin ) )
+			wait (0.1);
+
+		if ( isdefined( level.scr_shift_spectator["freespec"] ) && level.scr_shift_spectator["freespec"] == 1 && isdefined( player.isadmin ) && player.isadmin )
+			player setSpectateFree();
 	}
 }
 
