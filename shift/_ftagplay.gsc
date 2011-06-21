@@ -178,9 +178,6 @@ onStartFtagGame()
 	level thread onPrecacheFtag();
 	level thread onPlayerConnect();
 	level thread monitorFrozenPlayerScore();
-
-	if ( level.scr_shift_hud["team"] )
-		level thread inithud();
 }
 
 onPlayerConnect()
@@ -332,6 +329,9 @@ onSpawnFtagPlayer()
 	self.beam = false;
 
 	wait(0.05);
+
+	if ( level.scr_shift_hud["team"] )
+		self thread inithud();
 
 	if ( level.inOvertime )
 		self thread SetOvertimeSpec();
@@ -598,26 +598,16 @@ waitfordefrostbyaim()
 createprogressdisplays( player, defrostindex )
 {
 	if ( isDefined( self.defrostingmsg ) )
-		for ( index = 0; index < self.defrostingmsg.size; index++ )
-			if ( isDefined( self.defrostingmsg[index] ) )
-				self.defrostingmsg[index] destroy();
+		self.defrostingmsg destroy();
 
-	if ( !isDefined( self.defrostingmsg ) )
-		self.defrostingmsg = [];
-
-	index = self.defrostingmsg.size;
-
-	self.defrostingmsg[index] = newClientHudElem(self);
-	self.defrostingmsg[index].alignX = "left";
-	self.defrostingmsg[index].alignY = "middle";
-	self.defrostingmsg[index].horzAlign = "fullscreen";
-	self.defrostingmsg[index].vertAlign = "fullscreen";
-	self.defrostingmsg[index].x = 16;
-	self.defrostingmsg[index].y = 435;
-	self.defrostingmsg[index].alpha = 1;
-	self.defrostingmsg[index].sort = 1;
-	self.defrostingmsg[index].fontscale = 1.4;
-	self.defrostingmsg[index] setText(&"SHIFT_FTAG_DEFROSTING");
+	self.defrostingmsg = self createFontString( "default", 1.4 );
+	self.defrostingmsg.archived = false;
+	self.defrostingmsg.hideWhenInMenu = true;
+	self.defrostingmsg setPoint( "BOTTOMLEFT", undefined, 25, -35 );
+	self.defrostingmsg.alpha = 1;
+	self.defrostingmsg.sort = 1;
+	self.defrostingmsg.color = (1,1,1);
+	self.defrostingmsg setText(&"SHIFT_FTAG_DEFROSTING");
 
 	if( isDefined( player.defrostmsg ) ) {
 		if( isDefined( player.defrostmsg[defrostindex] ) )
@@ -747,9 +737,7 @@ defrostme( player, beam )
 	//player.defrostmsgy = player.defrostmsgy + 30;
 
 	if ( isDefined( self.defrostingmsg ) )
-		for ( index = 0; index < self.defrostingmsg.size; index++ )
-			if ( isDefined( self.defrostingmsg[index] ) )
-				self.defrostingmsg[index] destroy();
+		self.defrostingmsg destroy();
 
 	if ( isDefined( player.defrostmsg ) && isDefined( player.defrostmsg[self getEntityNumber()] ) )
 		player.defrostmsg[self getEntityNumber()] destroy();
@@ -1095,111 +1083,100 @@ calcspeed(speed, origin1, moveto)
 
 inithud()
 {
-	al_x = 530;
-	al_y = 45;
+	al_x = -150;
+	al_y = 40;
 	ax_x = al_x + 64;
 	ax_y = al_y;
 
-	level.numalliesicon = newHudelem();
-	level.numalliesicon.alignX = "center";
-	level.numalliesicon.alignY = "middle";
-	level.numalliesicon.horzAlign = "fullscreen";
-	level.numalliesicon.vertAlign = "fullscreen";
-	level.numalliesicon.x = al_x;
-	level.numalliesicon.y = al_y;
-	level.numalliesicon.sort = 10;
-	level.numalliesicon.color = (1,1,1);
-	level.numalliesicon setShader(game["icons"]["allies"],32,32);
+	numalliesicon = self createIcon( game["icons"]["allies"], 32, 32 );
+	numalliesicon setPoint( "TOPRIGHT", undefined, al_x, al_y );
+	numalliesicon.archived = true;
+	numalliesicon.hideWhenInMenu = true;
+	numalliesicon.sort = 1;
+	numalliesicon.alpha = 1;
 
-	level.numallies = newHudelem();
-	level.numallies.alignX = "right";
-	level.numallies.alignY = "middle";
-	level.numallies.horzAlign = "fullscreen";
-	level.numallies.vertAlign = "fullscreen";
-	level.numallies.x = al_x + 32;
-	level.numallies.y = al_y;
-	level.numallies.sort = 10;
-	level.numallies.color = (1,1,1);
-	level.numallies.fontscale = 1.4;
-	level.numallies setValue(1);
+	numfrozenalliesicon = self createIcon( "hud_freeze", 32, 32 );
+	numfrozenalliesicon setPoint( "TOPRIGHT", undefined, al_x, al_y + 32 );
+	numfrozenalliesicon.archived = true;
+	numfrozenalliesicon.hideWhenInMenu = true;
+	numfrozenalliesicon.sort = 1;
+	numfrozenalliesicon.alpha = 1;
 
-	level.numfrozenalliesicon = newHudelem();
-	level.numfrozenalliesicon.alignX = "center";
-	level.numfrozenalliesicon.alignY = "middle";
-	level.numfrozenalliesicon.horzAlign = "fullscreen";
-	level.numfrozenalliesicon.vertAlign = "fullscreen";
-	level.numfrozenalliesicon.x = al_x;
-	level.numfrozenalliesicon.y = al_y + 32;
-	level.numfrozenalliesicon.sort = 10;
-	level.numfrozenalliesicon.color = (1,1,1);
-	level.numfrozenalliesicon setShader("hud_freeze",32,32);
+	numaxisicon = self createIcon( game["icons"]["axis"], 32, 32 );
+	numaxisicon setPoint( "TOPRIGHT", undefined, ax_x, ax_y );
+	numaxisicon.archived = true;
+	numaxisicon.hideWhenInMenu = true;
+	numaxisicon.sort = 1;
+	numaxisicon.alpha = 1;
 
-	level.numfrozenallies = newHudelem();
-	level.numfrozenallies.alignX = "right";
-	level.numfrozenallies.alignY = "middle";
-	level.numfrozenallies.horzAlign = "fullscreen";
-	level.numfrozenallies.vertAlign = "fullscreen";
-	level.numfrozenallies.x = al_x + 32;
-	level.numfrozenallies.y = al_y + 32;
-	level.numfrozenallies.sort = 10;
-	level.numfrozenallies.color = (1,1,1);
-	level.numfrozenallies.fontscale = 1.4;
-	level.numfrozenallies setValue(1);
+	numfrozenaxisicon = self createIcon( "hud_freeze", 32, 32 );
+	numfrozenaxisicon setPoint( "TOPRIGHT", undefined, ax_x, ax_y + 32 );
+	numfrozenaxisicon.archived = true;
+	numfrozenaxisicon.hideWhenInMenu = true;
+	numfrozenaxisicon.sort = 1;
+	numfrozenaxisicon.alpha = 1;
 
-	level.numaxisicon = newHudelem();
-	level.numaxisicon.alignX = "center";
-	level.numaxisicon.alignY = "middle";
-	level.numaxisicon.horzAlign = "fullscreen";
-	level.numaxisicon.vertAlign = "fullscreen";
-	level.numaxisicon.x = ax_x;
-	level.numaxisicon.y = ax_y;
-	level.numaxisicon.sort = 10;
-	level.numaxisicon.color = (1,1,1);
-	level.numaxisicon setShader(game["icons"]["axis"],32,32);
+	numallies = self createFontString( "objective", 1.4 );
+	numallies.archived = true;
+	numallies.hideWhenInMenu = true;
+	numallies setPoint( "TOPRIGHT", undefined, al_x + 12, al_y + 8 );
+	numallies.sort = 1;
+	numallies.alpha = 1;
+	numallies.color = (1,1,1);
+	numallies setValue( 0 );
 
-	level.numaxis = newHudelem();
-	level.numaxis.alignX = "right";
-	level.numaxis.alignY = "middle";
-	level.numaxis.horzAlign = "fullscreen";
-	level.numaxis.vertAlign = "fullscreen";
-	level.numaxis.x = ax_x + 32;
-	level.numaxis.y = ax_y;
-	level.numaxis.sort = 10;
-	level.numaxis.color = (1,1,1);
-	level.numaxis.fontscale = 1.4;
-	level.numaxis setValue(1);
+	numfrozenallies = self createFontString( "objective", 1.4 );
+	numfrozenallies.archived = true;
+	numfrozenallies.hideWhenInMenu = true;
+	numfrozenallies setPoint( "TOPRIGHT", undefined, al_x + 12, al_y + 40 );
+	numfrozenallies.sort = 1;
+	numfrozenallies.alpha = 1;
+	numfrozenallies.color = (1,1,1);
+	numfrozenallies setValue( 0 );
 
-	level.numfrozenaxisicon = newHudelem();
-	level.numfrozenaxisicon.alignX = "center";
-	level.numfrozenaxisicon.alignY = "middle";
-	level.numfrozenaxisicon.horzAlign = "fullscreen";
-	level.numfrozenaxisicon.vertAlign = "fullscreen";
-	level.numfrozenaxisicon.x = ax_x;
-	level.numfrozenaxisicon.y = ax_y + 32;
-	level.numfrozenaxisicon.sort = 10;
-	level.numfrozenaxisicon.color = (1,1,1);
-	level.numfrozenaxisicon setShader("hud_freeze",32,32);
+	numaxis = self createFontString( "objective", 1.4 );
+	numaxis.archived = true;
+	numaxis.hideWhenInMenu = true;
+	numaxis setPoint( "TOPRIGHT", undefined, ax_x + 12, ax_y + 8 );
+	numaxis.sort = 1;
+	numaxis.alpha = 1;
+	numaxis.color = (1,1,1);
+	numaxis setValue( 0 );
 
-	level.numfrozenaxis = newHudelem();
-	level.numfrozenaxis.alignX = "right";
-	level.numfrozenaxis.alignY = "middle";
-	level.numfrozenaxis.horzAlign = "fullscreen";
-	level.numfrozenaxis.vertAlign = "fullscreen";
-	level.numfrozenaxis.x = ax_x + 32;
-	level.numfrozenaxis.y = ax_y + 32;
-	level.numfrozenaxis.sort = 10;
-	level.numfrozenaxis.color = (1,1,1);
-	level.numfrozenaxis.fontscale = 1.4;
-	level.numfrozenaxis setValue(1);
+	numfrozenaxis = self createFontString( "objective", 1.4 );
+	numfrozenaxis.archived = true;
+	numfrozenaxis.hideWhenInMenu = true;
+	numfrozenaxis setPoint( "TOPRIGHT", undefined, ax_x + 12, ax_y + 40 );
+	numfrozenaxis.sort = 1;
+	numfrozenaxis.alpha = 1;
+	numfrozenaxis.color = (1,1,1);
+	numfrozenaxis setValue( 0 );
 
-	while(1)
-	{
-		level.numallies setValue(numofplayersnotfrozen("allies"));
-		level.numfrozenallies setValue(numofplayersfrozen("allies"));
-		level.numaxis setValue(numofplayersnotfrozen("axis"));
-		level.numfrozenaxis setValue(numofplayersfrozen("axis"));
-		wait 0.1;
-	}
+	while ( isDefined( self ) && isAlive(self) )	{
+		wait (0.05);
+		
+		numallies setValue(numofplayersnotfrozen("allies"));
+		numfrozenallies setValue(numofplayersfrozen("allies"));
+		numaxis setValue(numofplayersnotfrozen("axis"));
+		numfrozenaxis setValue(numofplayersfrozen("axis"));
+	}	
+	
+	if ( isDefined( numalliesicon ) )
+		numalliesicon destroy();
+	if ( isDefined( numfrozenalliesicon ) )
+		numfrozenalliesicon destroy();
+	if ( isDefined( numaxisicon ) )
+		numaxisicon destroy();
+	if ( isDefined( numfrozenaxisicon ) )
+		numfrozenaxisicon destroy();
+	if ( isDefined( numallies ) )
+		numallies destroy();
+	if ( isDefined( numfrozenallies ) )
+		numfrozenallies destroy();
+	if ( isDefined( numaxis ) )
+		numaxis destroy();
+	if ( isDefined( numfrozenaxis ) )
+		numfrozenaxis destroy();
 }
 
 

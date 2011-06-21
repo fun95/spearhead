@@ -73,6 +73,8 @@ init()
 		ui_gameplay_ftag = level.scr_shift_gameplay["ftag"];
 		setdvar( "ui_gameplay_ftag", ui_gameplay_ftag );
 		makeDvarServerInfo( "ui_gameplay_ftag" );
+	} else {
+		level.scr_shift_gameplay["ftag"] = tempvalue;
 	}
 
 
