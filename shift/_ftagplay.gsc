@@ -54,7 +54,8 @@ init()
 	if ( isDefined( level.scr_shift_gameplay["spawn"] ) && level.scr_shift_gameplay["spawn"] )
 		level.onSpawnPlayer = ::onSpawnPlayer;
 
-	gametype = "freezetag";
+	gametype = game["dialog"]["gametype"];
+	gametype += ";freezetag";
 	game["dialog"]["gametype"] = gametype;	
 }
 
