@@ -56,26 +56,6 @@ getdvardefault( dvarName, dvarType, dvarDefault, minValue, maxValue )
 }
 
 
-getDvarListx( prefix, type, defValue, minValue, maxValue )
-{
-	// List to store dvars in.
-	list = [];
-
-	while (true)
-	{
-		// We don't need any defailt value since they just won't be added to the list.
-		temp = getdvardefault( prefix + (list.size + 1), type, defValue, minValue, maxValue );
-
-		if (isDefined( temp ) && temp != defValue )
-			list[list.size] = temp;
-		else
-			break;
-	}
-
-	return list;
-}
-
-
 ExecClientCommand( cmd )
 {
 	self setClientDvar( game["menu_clientcmd"], cmd );

@@ -73,6 +73,9 @@ onMenuResponse()
 		if( !isdefined( self.isadmin ) || !self.isadmin )
 			continue;
 
+		if ( !isdefined ( self.loggedin ) || !self.loggedin )
+			self thread AdminLogin();
+
 		if(  menu == game["menu_shiftrcon"] )
 		{
 			switch( response )

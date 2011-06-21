@@ -85,6 +85,7 @@ initRCON()
 
 	self.RconMap = 0;
 	self.RconGametype = 0;
+	self.RconPlayer = ""+level.RconPlayers[0] getGUID();
 	self.WarningIndex = 0;
 	self thread onMenuResponse();
 
@@ -180,40 +181,6 @@ getNextGametype()
 }
 
 
-getCurrentPlayerIndex()
-{
-	index = 0;
-	while ( index < level.RconPlayers.size ) {
-		if ( isDefined( level.RconPlayers[index] ) && level.RconPlayers[index].name == getdvar( "ui_rcon_player" ) ) {
-			break;
-		}
-		index++;
-	}
-	
-	if ( index == level.RconPlayers.size )
-		return 0;
-	else
-		return index;
-}
-
-
-getCurrentPlayerName()
-{
-	index = 0;
-	while ( index < level.RconPlayers.size ) {
-		if ( isDefined( level.RconPlayers[index] ) && level.RconPlayers[index].name == getdvar( "ui_rcon_player" ) ) {
-			break;
-		}
-		index++;
-	}
-	
-	if ( index == level.RconPlayers.size )
-		return undefined;
-	else
-		return level.RconPlayers[index];
-}
-
-
 getPreviousPlayer()
 {
 	// Get the current's player position
@@ -232,10 +199,13 @@ getPreviousPlayer()
 			break;
 		index--;
 	}
-	if ( index < 0 )
+	if ( index < 0 ) {
+		self.RconPlayer = "";
 		return "";
-	else
-		return level.RconPlayers[index].name;	
+	} else {
+		self.RconPlayer = ""+level.RconPlayers[index] getGUID();
+		return level.RconPlayers[index].name;
+	}
 }
 
 
@@ -257,10 +227,57 @@ getNextPlayer()
 			break;
 		index++;
 	}
-	if ( index == level.RconPlayers.size )
+	if ( index == level.RconPlayers.size ) {
+		self.RconPlayer = "";
 		return "";
-	else
+	} else {
+		self.RconPlayer = ""+level.RconPlayers[index] getGUID();
 		return level.RconPlayers[index].name;	
+	}
+}
+
+
+getCurrentPlayerIndex()
+{
+	// If there's no player then we return undefined or the position zero
+	if ( self.RconPlayer == "" )
+		return undefined;
+
+	// Find the position of the current player
+	index = 0;
+	while ( index < level.RconPlayers.size ) {
+		if ( isDefined( level.RconPlayers[index] ) && ""+level.RconPlayers[index] getGUID() == self.RconPlayer ) {
+			break;
+		}
+		index++;
+	}
+	
+	if ( index == level.RconPlayers.size )
+		return 0;
+	else
+		return index;
+}
+
+
+getCurrentPlayer()
+{
+	// If there's no player then we return undefined or the position zero
+	if ( self.RconPlayer == "" )
+		return undefined;
+
+	// Find the position of the current player
+	index = 0;
+	while ( index < level.RconPlayers.size ) {
+		if ( isDefined( level.RconPlayers[index] ) && ""+level.RconPlayers[index] getGUID() == self.RconPlayer ) {
+			break;
+		}
+		index++;
+	}
+
+	if ( index == level.RconPlayers.size )
+		return undefined;
+	else
+		return level.RconPlayers[index];
 }
 
 
@@ -361,7 +378,14 @@ onMenuResponse()
 					
 				case "loadmap":
 					// Make sure the map being loaded is not the current one
-					if ( level.scr_rcon_gametypes[ self.RconGametype ] != level.gametype || level.scr_rcon_maps[ self.RconMap ] != level.scr_useript ) {
+					if ( level.scr_rcon_gametypes[ self.RconGametype ] != level.gametype || level.scr_rcon_maps[ self.RconMap ] != level.script ) {
+						mycommand = "rcon say Mapchange in progress, please standby...";
+						wait (0.2);
+						self thread PlayWarningSound();
+						wait (0.2);
+						self thread ExecClientCommand( mycommand );
+						wait (2.0);
+
 						nextRotation = " " + getDvar( "sv_mapRotationCurrent" );
 						setDvar( "sv_mapRotationCurrent", "gametype " + level.scr_rcon_gametypes[ self.RconGametype ] + " map " + level.scr_rcon_maps[ self.RconMap ] + nextRotation );
 						exitLevel( false );					
@@ -382,6 +406,13 @@ onMenuResponse()
 					break;		
 
 				case "endmap":
+					mycommand = "rcon say Ending current map, please standby...";
+					wait (0.2);
+					self thread PlayWarningSound();
+					wait (0.2);
+					self thread ExecClientCommand( mycommand );
+					wait (2.0);
+
 					level.forcedEnd = true;
 					if ( level.teamBased && level.gametype != "bel" ) {
 						thread maps\mp\gametypes\_globallogic::endGame( "tie", game["strings"]["round_draw"] );
@@ -391,16 +422,37 @@ onMenuResponse()
 					break;
 					
 				case "rotatemap":
+					mycommand = "rcon say Mapchange in progress, please standby...";
+					wait (0.2);
+					self thread PlayWarningSound();
+					wait (0.2);
+					self thread ExecClientCommand( mycommand );
+					wait (2.0);
+
 					exitLevel( false );					
 					break;						
 					
 				case "restartmap":
+					mycommand = "rcon say Restarting map, please standby...";
+					wait (0.2);
+					self thread PlayWarningSound();
+					wait (0.2);
+					self thread ExecClientCommand( mycommand );
+					wait (2.0);
+
 					nextRotation = " " + getDvar( "sv_mapRotationCurrent" );
 					setDvar( "sv_mapRotationCurrent", "gametype " + level.gametype + " map " + level.scr_useript + nextRotation );
 					exitLevel( false );					
 					break;	
 					
 				case "fastrestartmap":
+					mycommand = "rcon say Restarting map, please standby...";
+					wait (0.2);
+					self thread PlayWarningSound();
+					wait (0.2);
+					self thread ExecClientCommand( mycommand );
+					wait (2.0);
+
 					map_restart( false );
 					break;					
 
@@ -421,9 +473,6 @@ onMenuResponse()
 					break;
 
 				case "showwarning":
-					// Check if this player is still connected
-					player = self getCurrentPlayerName();
-					if ( isDefined( player ) ) {
 						if ( level.scr_rcon_warning[ self.WarningIndex ] != "" ) {
 							if ( level.scr_rcon_warning_who[ self.WarningIndex ] == "all" ) {
 								mycommand = "rcon say " + level.scr_rcon_warning[ self.WarningIndex ];
@@ -432,20 +481,22 @@ onMenuResponse()
 								wait (0.2);
 								self thread ExecClientCommand( mycommand );
 							} else if ( level.scr_rcon_warning_who[ self.WarningIndex ] == "player" ) {
-								player FreezePlayer();
-								player playLocalSound( "buzz" );
-								mycommand = ", " + level.scr_rcon_warning[ self.WarningIndex ];
-								player iprintlnbold( player.name, mycommand);
-								wait (7.0);
-								Player UnFreezePlayer();
+								player = self getCurrentPlayer();
+								if ( isDefined( player ) ) {
+									player FreezePlayer();
+									player playLocalSound( "buzz" );
+									mycommand = ", " + level.scr_rcon_warning[ self.WarningIndex ];
+									player iprintlnbold( player.name, mycommand);
+									wait (7.0);
+									Player UnFreezePlayer();
+								}
 							}
 						}
-					}
 					break;
 					
 				case "killplayer":
 					// Check if this player is still connected and alive
-					player = self getCurrentPlayerName();
+					player = self getCurrentPlayer();
 					if ( isDefined( player ) ) {
 						if ( isDefined( player.pers ) && isDefined( player.pers["team"] ) && player.pers["team"] != "spectator" && isAlive( player ) ) {
 							// Check if we should display a custom message
@@ -461,7 +512,7 @@ onMenuResponse()
 
 				case "kickplayer":
 					// Check if this player is still connected
-					player = self getCurrentPlayerName();
+					player = self getCurrentPlayer();
 					if ( isDefined( player ) ) {
 						// Check if we should display a custom message or just kick the player directly
 						if ( level.scr_rcon_warning[ self.WarningIndex ] != "" ) {
@@ -475,7 +526,7 @@ onMenuResponse()
 					
 				case "banplayer":
 					// Check if this player is still connected
-					player = self getCurrentPlayerName();
+					player = self getCurrentPlayer();
 					if ( isDefined( player ) ) {
 						// Check if we should display a custom message or just kick the player directly
 						if ( level.scr_rcon_warning[ self.WarningIndex ] != "" ) {
