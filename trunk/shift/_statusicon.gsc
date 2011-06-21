@@ -22,6 +22,14 @@
 
 init()
 {
+	// scr_shift_dvar = new values
+	// Load the clan tags
+	level.scr_clan_tags = ( getdvar( "scr_clan_tags" ) == "" );
+	level.scr_clan_tags = strtok( level.scr_clan_tags, ";" );
+
+	// Set new compact clan member values from single dvar
+	level.scr_clan_member_status = getdvar( "scr_clan_member_status" );
+
 	// If the statusicons is not enabled then there's nothing else to do here
 	if ( !isdefined( level.scr_clan_member_status ) || level.scr_clan_member_status == "" ) 
 		return;
@@ -144,7 +152,7 @@ SetStatusIcon()
 {
 	self endon("disconnect");
 
-	if ( isdefined( level.scr_shift_gameplay["ftag"] ) && level.scr_shift_gameplay["ftag"] && isdefined(self.frozen) && self.frozen )
+	if ( isdefined( level.scr_shift_dvar["gpftag"] ) && level.scr_shift_dvar["gpftag"] && isdefined(self.frozen) && self.frozen )
 		return;
 
 	if ( self.isadmin ) 
@@ -155,6 +163,65 @@ SetStatusIcon()
 		self.statusicon = "hud_status_bmem";
 	else if ( isdefined(self.iscmember) && self.iscmember )
 		self.statusicon = "hud_status_cmem";
+
+	return;
+}
+
+
+getmemberstatus()
+{
+	self endon("disconnect");
+	
+	self.isadmin = 0;
+	self.isamember = 0;
+	self.isbmember = 0;
+	self.iscmember = 0;
+	self.isclanmember = 0;
+
+	if ( self isPlayerClanMember( level.scr_clan_tags ) )
+		self.isclanmember = 1;
+
+	self setClientDvars( "ui_force_allies", 0,
+	                     "ui_force_axis", 0 );
+
+	// Set member status
+	if ( !isdefined( level.scr_clan_member_status ) || level.scr_clan_member_status == "" ) 
+		return;
+
+	// Set new compact clan member values from single dvar
+	clanmembers = strtok( level.scr_clan_member_status, ";" );
+	level.scr_clan_member_status_guid = [];
+	level.scr_clan_member_status_class = [];
+
+	// Analyze the members and add them to the list
+	for ( i=0; i < clanmembers.size; i++ ) {
+		substring = strtok( clanmembers[i], "," );
+		memberindex = level.scr_clan_member_status_guid.size;
+		level.scr_clan_member_status_guid[memberindex] = substring[0];
+		level.scr_clan_member_status_class[memberindex] = substring[1];
+	}
+
+	memberindex = 0;
+	while ( memberindex < level.scr_clan_member_status_guid.size ) {
+		if ( isDefined( level.scr_clan_member_status_guid[memberindex] ) && issubstr( level.scr_clan_member_status_guid[memberindex], self getGuid() ) ) {
+			break;
+		}
+		memberindex++;
+	}
+	
+	if ( memberindex == level.scr_clan_member_status_guid.size )
+		return;
+
+	if ( issubstr( level.scr_clan_member_status_class[memberindex], "admin" ) ) {
+		self.isadmin = 1;
+		if ( !isdefined ( self.loggedin ) || !self.loggedin )
+			self thread AdminLogin();
+	} else if ( issubstr( level.scr_clan_member_status_class[memberindex], "alpha" ) )
+		self.isamember = 1;
+	else if ( issubstr( level.scr_clan_member_status_class[memberindex], "beta" ) )
+		self.isbmember = 1;
+	else if ( issubstr( level.scr_clan_member_status_class[memberindex], "charlie" ) )
+		self.iscmember = 1;
 
 	return;
 }
