@@ -482,6 +482,9 @@ LANG_ENGLISH	"^3All Non Clan members have been removed from the server!"
 //¦ Players Stats HUD                                                                                                                ¦
 //+----------------------------------------------------------------------------------------------------------------------------------+
 
+REFERENCE		PLAYER_GUID
+LANG_ENGLISH	"^7Your GUID is ^3&&1^7."
+
 REFERENCE       HUD_SCORE
 LANG_ENGLISH    "^5SCORE^3 "
 

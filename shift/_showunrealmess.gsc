@@ -21,7 +21,7 @@
 init()
 {
 	// If messages are disabled then there's nothing else to do here
-	if ( !isdefined( level.scr_shift_gameplay["unreal"] ) || !level.scr_shift_gameplay["unreal"] )
+	if ( !isdefined( level.scr_shift_dvar["gpunreal"] ) || !level.scr_shift_dvar["gpunreal"] )
 		return;
 
 	level thread onPlayerConnect();

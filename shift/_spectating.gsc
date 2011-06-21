@@ -22,7 +22,7 @@
 init()
 {
 	// If spectator score or Admin spec are not enabled then there's nothing else to do here
-	if ( ( !isdefined( level.scr_shift_spectator["score"] ) || !level.scr_shift_spectator["score"] ) && ( !isdefined( level.scr_shift_spectator["freespec"] ) || !level.scr_shift_spectator["freespec"] ) && ( !isdefined( level.scr_shift_gameplay["join"] ) || !level.scr_shift_gameplay["join"] ) )
+	if ( ( !isdefined( level.scr_shift_dvar["specscore"] ) || !level.scr_shift_dvar["specscore"] ) && ( !isdefined( level.scr_shift_dvar["specfree"] ) || !level.scr_shift_dvar["specfree"] ) && ( !isdefined( level.scr_shift_dvar["gpjoin"] ) || !level.scr_shift_dvar["gpjoin"] ) )
 		return;
 
 	level thread onPlayerConnect();
@@ -34,11 +34,11 @@ onPlayerConnect()
 	{
 		level waittill("connecting", player);
 
-		if ( isdefined( level.scr_shift_gameplay["join"] ) && level.scr_shift_gameplay["join"] )
+		if ( isdefined( level.scr_shift_dvar["gpjoin"] ) && level.scr_shift_dvar["gpjoin"] )
 			player setSpectateMatch();
-		if ( isdefined( level.scr_shift_spectator["score"] ) && level.scr_shift_spectator["score"] )
+		if ( isdefined( level.scr_shift_dvar["specscore"] ) && level.scr_shift_dvar["specscore"] )
 			player setSpectateScore();
-		if ( isdefined( level.scr_shift_spectator["freespec"] ) && level.scr_shift_spectator["freespec"] == 2 )
+		if ( isdefined( level.scr_shift_dvar["specfree"] ) && level.scr_shift_dvar["specfree"] == 2 )
 			player setSpectateFree();
 
 		player thread onJoinedTeam();
@@ -48,7 +48,7 @@ onPlayerConnect()
 		while ( !isdefined( player.isadmin ) )
 			wait (0.1);
 
-		if ( isdefined( level.scr_shift_spectator["freespec"] ) && level.scr_shift_spectator["freespec"] == 1 && isdefined( player.isadmin ) && player.isadmin )
+		if ( isdefined( level.scr_shift_dvar["specfree"] ) && level.scr_shift_dvar["specfree"] == 1 && isdefined( player.isadmin ) && player.isadmin )
 			player setSpectateFree();
 	}
 }
@@ -93,13 +93,13 @@ onJoinedSpectators()
 	{
 		self waittill("never_joined_team");
 		self RemoveSpectateScore();
-		if ( isdefined( level.scr_shift_gameplay["join"] ) && level.scr_shift_gameplay["join"] )
+		if ( isdefined( level.scr_shift_dvar["gpjoin"] ) && level.scr_shift_dvar["gpjoin"] )
 			self setSpectateMatch();
-		if ( isdefined( level.scr_shift_spectator["score"] ) && level.scr_shift_spectator["score"] )
+		if ( isdefined( level.scr_shift_dvar["specscore"] ) && level.scr_shift_dvar["specscore"] )
 			self setSpectateScore();
-		if ( isdefined( level.scr_shift_spectator["freespec"] ) && level.scr_shift_spectator["freespec"] == 2 )
+		if ( isdefined( level.scr_shift_dvar["specfree"] ) && level.scr_shift_dvar["specfree"] == 2 )
 			self setSpectateFree();
-		else if ( isdefined( level.scr_shift_spectator["freespec"] ) && level.scr_shift_spectator["freespec"] == 1 && isdefined( self.isadmin ) && self.isadmin )
+		else if ( isdefined( level.scr_shift_dvar["specfree"] ) && level.scr_shift_dvar["specfree"] == 1 && isdefined( self.isadmin ) && self.isadmin )
 			self setSpectateFree();
 	}
 }

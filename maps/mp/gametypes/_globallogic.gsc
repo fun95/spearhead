@@ -324,7 +324,7 @@ default_onOneLeftEvent( team )
 			if ( !isDefined( player.pers["team"] ) || player.pers["team"] != team )
 				continue;
 
-			if ( isdefined( level.scr_shift_gameplay["unreal"] ) && level.scr_shift_gameplay["unreal"] )
+			if ( isdefined( level.scr_shift_dvar["gpunreal"] ) && level.scr_shift_dvar["gpunreal"] )
 				player maps\mp\gametypes\_globallogic::leaderDialogOnPlayer( "last_alive" );
 		}
 	}
@@ -598,11 +598,11 @@ matchshownowlive()
 		game["matchReadyUpText"] destroy();
 
 	// Let players know we are live
+	game["scrim"]["players"] = undefined;
 	game["scrim"]["status"] = &"SHIFT_LIVEMATCH";
 	game["scrim"]["islive"] = true;
 
 	players = level.players;
-	tempindex = 0;
 	for ( index = 0; index < players.size; index++ )
 	{
 		player = players[index];
@@ -610,12 +610,11 @@ matchshownowlive()
 		if ( isdefined (player.matchstatus) )
 			player.matchstatus setText( game["scrim"]["status"] );
 
-		if ( player.team == "allies" || player.team == "axis" ) {
-			if ( isdefined( game["scrim"]["names"] ) )
-				game["scrim"]["names"] += player.name + ";";
+		if ( player.pers["team"] == "allies" || player.pers["team"] == "axis" ) {
+			if ( isdefined( game["scrim"]["players"] ) )
+				game["scrim"]["players"] += player getGUID() + ";";
 			else
-				game["scrim"]["names"] = player.name + ";";
-			tempindex++;
+				game["scrim"]["players"] = player getGUID() + ";";
 		}
 	}
 }
@@ -2114,10 +2113,9 @@ menuAutoAssign()
 	
 	self closeMenus();
 
-	if ( isdefined ( game["scrim"]["islive"] ) && game["scrim"]["islive"] && isdefined( level.scr_shift_gameplay["join"] ) && level.scr_shift_gameplay["join"] ) {
-		tempindex = 0;
+	if ( isdefined ( game["scrim"]["islive"] ) && game["scrim"]["islive"] && isdefined( level.scr_shift_dvar["gpjoin"] ) && level.scr_shift_dvar["gpjoin"] ) {
 		ismatchplayer = false;
-		if ( isdefined( game["scrim"]["names"] ) && issubstr( game["scrim"]["names"], self.name ) )
+		if ( isdefined( game["scrim"]["players"] ) && issubstr( game["scrim"]["players"], self getGUID() ) )
 			ismatchplayer = true;
 		if ( !ismatchplayer ) {
 			self iprintlnbold(&"SHIFT_HAVENOPERMISSION");
@@ -2289,10 +2287,9 @@ menuAllies()
 {
 	self closeMenus();
 
-	if ( isdefined ( game["scrim"]["islive"] ) && game["scrim"]["islive"] && isdefined( level.scr_shift_gameplay["join"] ) && level.scr_shift_gameplay["join"] ) {
-		tempindex = 0;
+	if ( isdefined ( game["scrim"]["islive"] ) && game["scrim"]["islive"] && isdefined( level.scr_shift_dvar["gpjoin"] ) && level.scr_shift_dvar["gpjoin"] ) {
 		ismatchplayer = false;
-		if ( isdefined( game["scrim"]["names"] ) && issubstr( game["scrim"]["names"], self.name ) )
+		if ( isdefined( game["scrim"]["players"] ) && issubstr( game["scrim"]["players"], self getGUID() ) )
 			ismatchplayer = true;
 		if ( !ismatchplayer ) {
 			self iprintlnbold(&"SHIFT_HAVENOPERMISSION");
@@ -2348,10 +2345,9 @@ menuAxis()
 {
 	self closeMenus();
 
-	if ( isdefined ( game["scrim"]["islive"] ) && game["scrim"]["islive"] && isdefined( level.scr_shift_gameplay["join"] ) && level.scr_shift_gameplay["join"] ) {
-		tempindex = 0;
+	if ( isdefined ( game["scrim"]["islive"] ) && game["scrim"]["islive"] && isdefined( level.scr_shift_dvar["gpjoin"] ) && level.scr_shift_dvar["gpjoin"] ) {
 		ismatchplayer = false;
-		if ( isdefined( game["scrim"]["names"] ) && issubstr( game["scrim"]["names"], self.name ) )
+		if ( isdefined( game["scrim"]["players"] ) && issubstr( game["scrim"]["players"], self getGUID() ) )
 			ismatchplayer = true;
 		if ( !ismatchplayer ) {
 			self iprintlnbold(&"SHIFT_HAVENOPERMISSION");
@@ -3611,7 +3607,7 @@ removeSpawnMessageShortly( delay )
 
 Callback_StartGameType()
 {
-	if ( isdefined ( level.scr_shift_gameplay["ftag"] ) && level.scr_shift_gameplay["ftag"] )
+	if ( isdefined ( level.scr_shift_dvar["gpftag"] ) && level.scr_shift_dvar["gpftag"] )
 		level thread shift\_ftagplay::init();
 
 	level.prematchPeriod = 0;
@@ -3874,7 +3870,7 @@ Callback_StartGameType()
 		game["scrim"]["status"] = &"SHIFT_PREMATCH";
 		game["scrim"]["islive"] = false;
 		game["scrim"]["announcelive"] = false;
-		game["scrim"]["names"] = undefined;
+		game["scrim"]["players"] = undefined;
 		game["strings"]["match__is_live"] = &"SHIFT_MATCH_LIVE";
 
 		// first round, so set up prematch
@@ -4566,7 +4562,7 @@ Callback_PlayerDamage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, s
 		return;
 	
 	self notify( "player_struck", eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, psOffsetTime );
-	if ( isdefined ( level.scr_shift_gameplay["ftag"] ) && level.scr_shift_gameplay["ftag"] && isdefined( self.frozen ) && self.frozen ) 
+	if ( isdefined ( level.scr_shift_dvar["gpftag"] ) && level.scr_shift_dvar["gpftag"] && isdefined( self.frozen ) && self.frozen ) 
 		return;
 
 	prof_begin( "Callback_PlayerDamage flags/tweaks" );

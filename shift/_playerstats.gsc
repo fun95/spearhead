@@ -20,7 +20,7 @@
 
 init()
 {
-	if ( !isdefined( level.scr_shift_hud["stats"] ) || !level.scr_shift_hud["stats"] )
+	if ( !isdefined( level.scr_shift_dvar["hudstats"] ) || !level.scr_shift_dvar["hudstats"] )
 		return;
 
 	level thread onPlayerConnect();

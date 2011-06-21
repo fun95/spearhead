@@ -21,7 +21,7 @@
 init()
 {
 	// If healthpacks are disabled then there's nothing else to do here
-	if ( !isdefined( level.scr_shift_gameplay["health"] ) || !level.scr_shift_gameplay["health"] )
+	if ( !isdefined( level.scr_shift_dvar["gphealth"] ) || !level.scr_shift_dvar["gphealth"] )
 		return;
 
 	if ( level.hardcoreMode )

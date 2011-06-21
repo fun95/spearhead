@@ -80,7 +80,7 @@ initRCON()
 		"ui_rcon_map", self getMapName( toLower( getDvar( "mapname" ) ) ),
 		"ui_rcon_gametype", getGameType( toLower( getDvar( "g_gametype" ) ) ),
 		"ui_rcon_player", level.RconPlayers[0].name,
-		"ui_rcon_warning", level.scr_rcon_warning_abv[0]
+		"ui_rcon_warning", level.scr_shift_rcon_warn_abv[0]
 	);
 
 	self.RconMap = 0;
@@ -285,23 +285,23 @@ getPreviousWarning()
 {
 	// Check if we are going outside the array
 	if ( self.WarningIndex == 0 ) {
-		self.WarningIndex = level.scr_rcon_warning_abv.size - 1;
+		self.WarningIndex = level.scr_shift_rcon_warn_abv.size - 1;
 	} else {
 		self.WarningIndex--;
 	}
-	return level.scr_rcon_warning_abv[self.WarningIndex];	
+	return level.scr_shift_rcon_warn_abv[self.WarningIndex];	
 }
 
 
 getNextWarning()
 {
 	// Check if we are going outside the array
-	if ( self.WarningIndex == level.scr_rcon_warning_abv.size - 1 ) {
+	if ( self.WarningIndex == level.scr_shift_rcon_warn_abv.size - 1 ) {
 		self.WarningIndex = 0;
 	} else {
 		self.WarningIndex++;
 	}
-	return level.scr_rcon_warning_abv[self.WarningIndex];		
+	return level.scr_shift_rcon_warn_abv[self.WarningIndex];		
 }
 
 
@@ -473,22 +473,23 @@ onMenuResponse()
 					break;
 
 				case "showwarning":
-						if ( level.scr_rcon_warning[ self.WarningIndex ] != "" ) {
-							if ( level.scr_rcon_warning_who[ self.WarningIndex ] == "all" ) {
-								mycommand = "rcon say " + level.scr_rcon_warning[ self.WarningIndex ];
+						if ( level.scr_shift_rcon_warn[ self.WarningIndex ] != "" ) {
+							if ( level.scr_shift_rcon_warn_who[ self.WarningIndex ] == "all" ) {
+								mycommand = "rcon say " + level.scr_shift_rcon_warn[ self.WarningIndex ];
 								wait (0.2);
 								self thread PlayWarningSound();
 								wait (0.2);
 								self thread ExecClientCommand( mycommand );
-							} else if ( level.scr_rcon_warning_who[ self.WarningIndex ] == "player" ) {
+							} else if ( level.scr_shift_rcon_warn_who[ self.WarningIndex ] == "player" ) {
 								player = self getCurrentPlayer();
 								if ( isDefined( player ) ) {
 									player FreezePlayer();
 									player playLocalSound( "buzz" );
-									mycommand = ", " + level.scr_rcon_warning[ self.WarningIndex ];
+									mycommand = ", " + level.scr_shift_rcon_warn[ self.WarningIndex ];
 									player iprintlnbold( player.name, mycommand);
 									wait (7.0);
 									Player UnFreezePlayer();
+									logprint( self.name + " has given a warning to " + player.name + ", GUID = " + player getGUID() + " \n" );
 								}
 							}
 						}
@@ -500,9 +501,10 @@ onMenuResponse()
 					if ( isDefined( player ) ) {
 						if ( isDefined( player.pers ) && isDefined( player.pers["team"] ) && player.pers["team"] != "spectator" && isAlive( player ) ) {
 							// Check if we should display a custom message
-							if ( level.scr_rcon_warning[ self.WarningIndex ] != "" ) {
-								player iprintlnbold( level.scr_rcon_warning[ self.WarningIndex ] );
+							if ( level.scr_shift_rcon_warn[ self.WarningIndex ] != "" ) {
+								player iprintlnbold( level.scr_shift_rcon_warn[ self.WarningIndex ] );
 							} 
+							logprint( self.name + " has force killed " + player.name + ", GUID = " + player getGUID() + " \n" );
 							player suicide();
 						}
 					} else {
@@ -515,10 +517,11 @@ onMenuResponse()
 					player = self getCurrentPlayer();
 					if ( isDefined( player ) ) {
 						// Check if we should display a custom message or just kick the player directly
-						if ( level.scr_rcon_warning[ self.WarningIndex ] != "" ) {
-							player iprintlnbold( level.scr_rcon_warning[ self.WarningIndex ] );
+						if ( level.scr_shift_rcon_warn[ self.WarningIndex ] != "" ) {
+							player iprintlnbold( level.scr_shift_rcon_warn[ self.WarningIndex ] );
 							wait (3.0);
 						}
+						logprint( self.name + " has force kicked " + player.name + ", GUID = " + player getGUID() + " \n" );
 						kick( player getEntityNumber() );
 					}
 					self setClientDvar( "ui_rcon_player", self getNextPlayer() );
@@ -529,22 +532,23 @@ onMenuResponse()
 					player = self getCurrentPlayer();
 					if ( isDefined( player ) ) {
 						// Check if we should display a custom message or just kick the player directly
-						if ( level.scr_rcon_warning[ self.WarningIndex ] != "" ) {
-							player iprintlnbold( level.scr_rcon_warning[ self.WarningIndex ] );
+						if ( level.scr_shift_rcon_warn[ self.WarningIndex ] != "" ) {
+							player iprintlnbold( level.scr_shift_rcon_warn[ self.WarningIndex ] );
 							wait (3.0);
-						}						
+						}	
+						logprint( self.name + " has banned " + player.name + ", GUID = " + player getGUID() + " \n" );					
 						ban( player getEntityNumber() );
 					}
 					self setClientDvar( "ui_rcon_player", self getNextPlayer() );
 					break;	
 
 				case "freezetag":
-					if ( isdefined ( level.scr_shift_gameplay["ftag"] ) && level.scr_shift_gameplay["ftag"] )
-						level.scr_shift_gameplay["ftag"] = 0;
+					if ( isdefined ( level.scr_shift_dvar["gpftag"] ) && level.scr_shift_dvar["gpftag"] )
+						level.scr_shift_dvar["gpftag"] = 0;
 					else
-						level.scr_shift_gameplay["ftag"] = 1;
+						level.scr_shift_dvar["gpftag"] = 1;
 
-					setdvar( "ui_gameplay_ftag", level.scr_shift_gameplay["ftag"] );
+					setdvar( "ui_gameplay_ftag", level.scr_shift_dvar["gpftag"] );
 					makeDvarServerInfo( "ui_gameplay_ftag" );
 					break;
 

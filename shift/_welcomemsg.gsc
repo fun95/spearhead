@@ -20,10 +20,10 @@
 
 init()
 {
-	if ( !isdefined( level.scr_shift_hud["welcome"] ) || !level.scr_shift_hud["welcome"] )
+	if ( !isdefined( level.scr_shift_dvar["hudwelcome"] ) || level.scr_shift_dvar["hudwelcome"] == "none" )
 		return;
 
-	if ( !isdefined( level.scr_shift_hud["delay"] ) || !level.scr_shift_hud["delay"] )
+	if ( !isdefined( level.scr_shift_dvar["huddelay"] ) || !level.scr_shift_dvar["huddelay"] )
 		return;
 
 	level thread onPlayerConnect();
@@ -55,7 +55,7 @@ displaywelcomeMsg()
 {
 	if ( !isDefined(self.pers["welcomeMsgDone"]) )
 	{
-		wait level.scr_shift_hud["delay"];
+		wait level.scr_shift_dvar["huddelay"];
 		self thread welcomeMsg();
 		while (!isDefined(self.pers["welcomeMsgDone"]))
 			wait .50;
@@ -65,6 +65,7 @@ displaywelcomeMsg()
 welcomeMsg()
 {
 	wait .50;
-	self iprintlnbold( level.scr_shift_hud["welcome"] + ", " + self.name );
+	self iprintlnbold( level.scr_shift_dvar["hudwelcome"] + ", " + self.name );
+	self iprintln( &"SHIFT_PLAYER_GUID", self getGuid() );
 	self.pers["welcomeMsgDone"] = true;
 }

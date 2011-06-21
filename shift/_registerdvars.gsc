@@ -20,132 +20,77 @@
 
 init()
 {
-	// Load the clan tags
-	level.scr_clan_tags = ( getdvar( "scr_clan_tags" ) == "" );
-	level.scr_clan_tags = strtok( level.scr_clan_tags, " " );
-
-
-	// Set new compact clan member values from single dvar
-	level.scr_clan_member_status = getdvar( "scr_clan_member_status" );
-
-
-	// Set new compact HARDCORE values from single dvar
-	level.scr_hardcore_options = getdvardefault( "scr_hardcore_options", "string", "0;0;0" );
-	defaultvalues = strtok( level.scr_hardcore_options, ";" );
-
-	level.scr_hud_hardcore_show_minimap = int( defaultvalues[0] );
-	level.scr_hud_hardcore_show_compass = int( defaultvalues[1] );
-	level.scr_hud_show_inventory = int( defaultvalues[2] );
-
-	// Set new compact defrost values from single dvar
-	level.scr_ftag_defrost_values = getdvardefault( "scr_ftag_defrost_values", "string", "50;0;1;15;50;0;0;1;use" );
-	defaultvalues = strtok( level.scr_ftag_defrost_values, ";" );
-
-	level.scr_ftag_defrost = [];
-	level.scr_ftag_defrost["score"] = int( defaultvalues[0] );
-	level.scr_ftag_defrost["mode"] = int( defaultvalues[1] );
-	level.scr_ftag_defrost["respawn"] = int( defaultvalues[2] );
-	level.scr_ftag_defrost["time"] = int( defaultvalues[3] ) / 100;
-	level.scr_ftag_defrost["dist"] = int( defaultvalues[4] );
-	level.scr_ftag_defrost["auto"] = int( defaultvalues[5] );
-	level.scr_ftag_defrost["beam"] = int( defaultvalues[6] );
-	level.scr_ftag_defrost["cube"] = int( defaultvalues[7] );
-	level.scr_ftag_defrost["button"] = defaultvalues[8];
+	// Set new compact string values from single dvar
+	level getMultidvar( "scr_shift_string_values", "string", "hudwelcome;ftagbutton", "none;use" );
 
 
 	// Set new compact gameplay values from single dvar
-	level.scr_ftag_gameplay_values = getdvardefault( "scr_ftag_gameplay_values", "string", "0;0;0;0;10;0;0" );
-	defaultvalues = strtok( level.scr_ftag_gameplay_values, ";" );
-
-	level.scr_shift_gameplay = [];
-	level.scr_shift_gameplay["healthbar"] = int( defaultvalues[0] );
-	level.scr_shift_gameplay["health"] = int( defaultvalues[1] );
-	level.scr_shift_gameplay["ftag"] = int( defaultvalues[2] );
-	level.scr_shift_gameplay["spawn"] = int( defaultvalues[3] );
-	level.scr_shift_gameplay["clock"] = int( defaultvalues[4] );
-	level.scr_shift_gameplay["join"] = int( defaultvalues[5] );
-	level.scr_shift_gameplay["unreal"] = int( defaultvalues[6] );
+	level getMultidvar( "scr_shift_gameplay_values", "int", "gpftag;gphealthbar;gphealth;gpspawn;gpclock;gpjoin;gpunreal", "0;0;0;0;10;0;0" );
 
 
-	// Freezetag Variable
-	tempvalue = getdvardefault( "ui_gameplay_ftag", "int", 2, 0, 2 );
-	if( tempvalue == 2 ) {
-		ui_gameplay_ftag = level.scr_shift_gameplay["ftag"];
-		setdvar( "ui_gameplay_ftag", ui_gameplay_ftag );
-		makeDvarServerInfo( "ui_gameplay_ftag" );
-	} else {
-		level.scr_shift_gameplay["ftag"] = tempvalue;
-	}
+	// Set new compact defrost values from single dvar
+	level getMultidvar( "scr_shift_ftag_defrost_values", "int", "ftagscore;ftagmode;ftagrespawn;ftagtime;ftagdist;ftagauto;ftagbeam;ftagrotate", "50;0;1;15;50;0;0;1" );
 
 
 	// Set new compact HUD message values from single dvar
-	level.scr_hud_display_options = getdvardefault( "scr_hud_display_options", "string", "0;0;0;0;0;0" );
-	defaultvalues = strtok( level.scr_hud_display_options, ";" );
-
-	level.scr_shift_hud = [];
-	level.scr_shift_hud["center"] = int( defaultvalues[0] );
-	level.scr_shift_hud["left"] = int( defaultvalues[1] );
-	level.scr_shift_hud["team"] = int( defaultvalues[2] );
-	level.scr_shift_hud["stats"] = int( defaultvalues[3] );
-	level.scr_shift_hud["delay"] = int( defaultvalues[4] );
-	level.scr_shift_hud["welcome"] = int( defaultvalues[5] );
+	level getMultidvar( "scr_shift_hud_values", "int", "hudcenter;hudleft;hudteam;hudstats;huddelay", "0;0;0;0;0" );
 
 
 	// Set new compact annoy feature values from single dvar
-	level.scr_annoy_feature_options = getdvardefault( "scr_annoy_feature_options", "string", "0;4000;200;0;0" );
-	defaultvalues = strtok( level.scr_annoy_feature_options, ";" );
-
-	level.scr_ftag_annoy = [];
-	level.scr_ftag_annoy["warn"] = int( defaultvalues[0] );
-	level.scr_ftag_annoy["time"] = int( defaultvalues[1] );
-	level.scr_ftag_annoy["dist"] = int( defaultvalues[2] );
-	level.scr_ftag_annoy["shots"] = int( defaultvalues[3] );
-	level.scr_ftag_annoy["knife"] = int( defaultvalues[4] );
+	level getMultidvar( "scr_shift_ftag_annoy_values", "int", "annoywarn;annoytime;annoydist;annoyshots;annoyknife", "0;4000;200;0;0" );
 
 
 	// Set new compact spectator options from single dvar
-	level.scr_spectator_options = getdvardefault( "scr_spectator_options", "string", "0;0;90;0" );
-	defaultvalues = strtok( level.scr_spectator_options, ";" );
+	level getMultidvar( "scr_shift_spectator_values", "int", "specfree;specot;specottime;specscore", "0;0;90;0" );
 
-	level.scr_shift_spectator = [];
-	level.scr_shift_spectator["freespec"] = int( defaultvalues[0] );
-	level.scr_shift_spectator["otspec"] = int( defaultvalues[1] );
-	level.scr_shift_spectator["ottime"] = int( defaultvalues[2] );
-	level.scr_shift_spectator["score"] = int( defaultvalues[3] );
+
+	// Freezetag Variable
+	if ( getdvar( "ui_gameplay_ftag" ) == "" )
+		tempvalue = 2;
+	else
+		tempvalue = getdvarint( "ui_gameplay_ftag" );
+
+	if( tempvalue == 2 ) {
+		ui_gameplay_ftag = level.scr_shift_dvar["gpftag"];
+		setdvar( "ui_gameplay_ftag", ui_gameplay_ftag );
+		makeDvarServerInfo( "ui_gameplay_ftag" );
+	} else {
+		level.scr_shift_dvar["gpftag"] = tempvalue;
+	}
 
 
 	// Set new compact Rcon warning message options from single dvar
-	level.scr_rcon_warning_player = getdvardefault( "scr_rcon_warning_player", "string", "" );
-	defaultvalues = strtok( level.scr_rcon_warning_player, ";" );
+	level.scr_shift_rcon_warn_player = getdvardefault( "scr_shift_rcon_warn_player", "string", "" );
+	defaultvalues = strtok( level.scr_shift_rcon_warn_player, ";" );
 
-	level.scr_rcon_warning_who = [];
-	level.scr_rcon_warning_abv = [];
-	level.scr_rcon_warning = [];
+	level.scr_shift_rcon_warn_who = [];
+	level.scr_shift_rcon_warn_abv = [];
+	level.scr_shift_rcon_warn = [];
 	
 	// Add no custom warning option
-	level.scr_rcon_warning_who[0] = "";
-	level.scr_rcon_warning_abv[0] = "No Warning Message";
-	level.scr_rcon_warning[0] = "";
+	level.scr_shift_rcon_warn_who[0] = "";
+	level.scr_shift_rcon_warn_abv[0] = "No Warning Message";
+	level.scr_shift_rcon_warn[0] = "";
 
 	// Add all other custom warnings
 	for ( i=0; i < defaultvalues.size; i++ ) {
-		newElement = level.scr_rcon_warning_abv.size;
-		level.scr_rcon_warning_who[newElement] = "player";
-		level.scr_rcon_warning_abv[newElement] = defaultvalues[i];
+		newElement = level.scr_shift_rcon_warn_abv.size;
+		level.scr_shift_rcon_warn_who[newElement] = "player";
+		level.scr_shift_rcon_warn_abv[newElement] = defaultvalues[i];
 		i++;
-		level.scr_rcon_warning[newElement] = defaultvalues[i];
+		level.scr_shift_rcon_warn[newElement] = defaultvalues[i];
 	}
 
-	level.scr_rcon_warning_all = getdvardefault( "scr_rcon_warning_all", "string", "" );
-	defaultvalues = strtok( level.scr_rcon_warning_all, ";" );
+	level.scr_shift_rcon_warn_all = getdvardefault( "scr_shift_rcon_warn_all", "string", "" );
+	defaultvalues = strtok( level.scr_shift_rcon_warn_all, ";" );
 
 	// Add all other custom warnings
 	for ( i=0; i < defaultvalues.size; i++ ) {
-		newElement = level.scr_rcon_warning_abv.size;
-		level.scr_rcon_warning_who[newElement] = "all";
-		level.scr_rcon_warning_abv[newElement] = defaultvalues[i];
+		newElement = level.scr_shift_rcon_warn_abv.size;
+		level.scr_shift_rcon_warn_who[newElement] = "all";
+		level.scr_shift_rcon_warn_abv[newElement] = defaultvalues[i];
 		i++;
-		level.scr_rcon_warning[newElement] = defaultvalues[i];
+		level.scr_shift_rcon_warn[newElement] = defaultvalues[i];
 	}
 
 
@@ -173,6 +118,15 @@ init()
 	// Add all custom messages
 	for ( i=2; i < defaultvalues.size; i++ )
 		level.scr_shift_banner_messages[level.scr_shift_banner_messages.size] = defaultvalues[i];
+
+
+	// Set new compact HARDCORE values from single dvar
+	level.scr_hud_hardcore_options = getdvardefault( "scr_hud_hardcore_options", "string", "0;0;0" );
+	defaultvalues = strtok( level.scr_hud_hardcore_options, ";" );
+
+	level.scr_hud_hardcore_show_minimap = int( defaultvalues[0] );
+	level.scr_hud_hardcore_show_compass = int( defaultvalues[1] );
+	level.scr_hud_show_inventory = int( defaultvalues[2] );
 
 
 	precacheShader( "hudStopwatch" );
