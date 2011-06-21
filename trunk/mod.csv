@@ -43,6 +43,7 @@ rawfile,shift/_globalinit.gsc
 rawfile,shift/_healthpacks.gsc
 rawfile,shift/_playerstats.gsc
 rawfile,shift/_matchset.gsc
+rawfile,shift/_messages.gsc
 rawfile,shift/_registerdvars.gsc
 rawfile,shift/_showunrealmess.gsc
 rawfile,shift/_shiftmenu.gsc

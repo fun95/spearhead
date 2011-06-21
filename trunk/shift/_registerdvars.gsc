@@ -148,6 +148,33 @@ init()
 		level.scr_rcon_warning[newElement] = defaultvalues[i];
 	}
 
+
+	// Set new compact server message options from single dvar
+	level.scr_shift_server_messages = getdvardefault( "scr_shift_server_messages", "string", "0;15" );
+	defaultvalues = strtok( level.scr_shift_server_messages, ";" );
+
+	level.scr_shift_server_messages = [];
+	level.scr_shift_server_messages["messages"] = int( defaultvalues[0] );
+	level.scr_shift_server_messages["msgdelay"] = int( defaultvalues[1] );
+
+	// Add all custom messages
+	for ( i=2; i < defaultvalues.size; i++ )
+		level.scr_shift_server_messages[level.scr_shift_server_messages.size] = defaultvalues[i];
+
+
+	// Set new compact banner message options from single dvar
+	level.scr_shift_banner_messages = getdvardefault( "scr_shift_banner_messages", "string", "0;15" );
+	defaultvalues = strtok( level.scr_shift_banner_messages, ";" );
+
+	level.scr_shift_banner_messages = [];
+	level.scr_shift_banner_messages["messages"] = int( defaultvalues[0] );
+	level.scr_shift_banner_messages["msgdelay"] = int( defaultvalues[1] );
+
+	// Add all custom messages
+	for ( i=2; i < defaultvalues.size; i++ )
+		level.scr_shift_banner_messages[level.scr_shift_banner_messages.size] = defaultvalues[i];
+
+
 	precacheShader( "hudStopwatch" );
 	precacheShader("overlay_low_health");
 	return;

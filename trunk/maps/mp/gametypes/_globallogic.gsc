@@ -5949,7 +5949,15 @@ playLeaderDialogOnPlayer( dialog, team )
 		self.leaderDialogGroup = group;
 	}
 
-	self playLocalSound( game["voice"][team]+game["dialog"][dialog] );
+	if ( isDefined( game["dialog"][dialog] ) ) {
+		dialogs = strtok( game["dialog"][dialog], ";" );
+		for ( idialog = 0; idialog < dialogs.size; idialog++ ) {
+			dialog = dialogs[idialog];
+			self playLocalSound( game["voice"][team]+dialog );
+			wait ( 3.0 );
+		}
+	}
+	//self playLocalSound( game["voice"][team]+game["dialog"][dialog] );
 
 	wait ( 3.0 );
 	self.leaderDialogActive = false;
