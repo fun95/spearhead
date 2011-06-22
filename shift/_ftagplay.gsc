@@ -91,7 +91,6 @@ onPrecacheFtag()
 	precacheString( &"SHIFT_FTAG_DEFROSTED_UNKNOWN" );
 	precacheString( &"SHIFT_FTAG_AUTO_DEFROSTED" );
 	precacheString( &"SHIFT_FTAG_HUD_POINTS" );
-	precacheString( &"SHIFT_FTAG_HUD_DEFROSTED" );
 	precacheString( &"SHIFT_FTAG_HUD_DEFROSTEDBY" );
 	precacheString( &"SHIFT_FTAG_HUD_AUTO_DEFROSTED" );
 	precacheString( &"SHIFT_FTAG_HUD_FROZENBY" );
@@ -127,7 +126,7 @@ onPrecacheFtag()
 	}
 
 	level.fx_defrostmelt = loadFx("freezetag/defrostmelt");
-	level.barsize = 80;
+	level.barwidth = 80;
 	level.barheight = 3;
 
 	level.objused = [];
@@ -323,8 +322,8 @@ onSpawnFtagPlayer()
 		self setClientDvar( "ui_frozen", 0 );
 	}
 
-	self.defrostmsgx = 30;
-	self.defrostmsgy = 410;
+	self.defrostmsgx = 25;
+	self.defrostmsgy = 425;
 	self.isbeingdefrosted = false;
 	self.healthgiven = [];
 	self.beam = false;
@@ -418,17 +417,18 @@ onPlayerFrozen( eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHi
 		self.freezeorigin = undefined;
 	}
 
-	if ( level.scr_shift_dvar["hudcenter"] ) {
-		if( isDefined( attacker ) && isPlayer( attacker ) && attacker != self ) {
+	if( isDefined( attacker ) && isPlayer( attacker ) && attacker != self ) {
+		if ( level.scr_shift_dvar["hudcenter"] ) {
 			self iprintlnbold(&"SHIFT_FTAG_HUD_FROZENBY" , attacker.name);
 			attacker iprintlnbold(&"SHIFT_FTAG_HUD_YOUFROZE" , self.name);
-			if ( level.scr_shift_dvar["hudleft"] )
-				iPrintln(&"SHIFT_FTAG_FROZE" , attacker.name , self.name);
-		} else {
-			self iprintlnbold(&"SHIFT_FTAG_HUD_YOUFROZE_SELF");
-			if ( level.scr_shift_dvar["hudleft"] )
-				iPrintln(&"SHIFT_FTAG_HUD_FROZE_HIMSELF" , self.name);
 		}
+		if ( level.scr_shift_dvar["hudleft"] )
+			iPrintln(&"SHIFT_FTAG_FROZE" , attacker.name , self.name);
+	} else {
+		if ( level.scr_shift_dvar["hudcenter"] )
+			self iprintlnbold(&"SHIFT_FTAG_HUD_YOUFROZE_SELF");
+		if ( level.scr_shift_dvar["hudleft"] )
+			iPrintln(&"SHIFT_FTAG_HUD_FROZE_HIMSELF" , self.name);
 	}
 }
 
@@ -604,7 +604,7 @@ createprogressdisplays( player, defrostindex )
 	self.defrostingmsg = self createFontString( "default", 1.4 );
 	self.defrostingmsg.archived = false;
 	self.defrostingmsg.hideWhenInMenu = true;
-	self.defrostingmsg setPoint( "BOTTOMLEFT", undefined, 25, -35 );
+	self.defrostingmsg setPoint( "BOTTOMLEFT", undefined, self.defrostmsgx, -35 );
 	self.defrostingmsg.alpha = 1;
 	self.defrostingmsg.sort = 1;
 	self.defrostingmsg.color = (1,1,1);
@@ -617,7 +617,6 @@ createprogressdisplays( player, defrostindex )
 		player.defrostmsg = [];
 	}
 
-	tempstring = "^5 Now defrosting ^3" + self.name;
 	player.defrostmsg[defrostindex] = newClientHudElem(player);
 	player.defrostmsg[defrostindex].alignX = "left";
 	player.defrostmsg[defrostindex].alignY = "middle";
@@ -628,7 +627,7 @@ createprogressdisplays( player, defrostindex )
 	player.defrostmsg[defrostindex].alpha = 1;
 	player.defrostmsg[defrostindex].sort = 1;
 	player.defrostmsg[defrostindex].fontscale = 1.4;
-	player.defrostmsg[defrostindex] setText( tempstring );
+	player.defrostmsg[defrostindex] setText( "^5Now Defrosting ^3" + self.name );
 
 	if( isDefined( player.progressbackground ) ) {
 		if( isDefined( player.progressbackground[defrostindex] ) )
@@ -646,7 +645,7 @@ createprogressdisplays( player, defrostindex )
 	player.progressbackground[defrostindex].y = player.defrostmsgy + 15;
 	player.progressbackground[defrostindex].alpha = 0.5;
 	player.progressbackground[defrostindex].sort = 1;
-	player.progressbackground[defrostindex] setShader("black", (level.barsize + 2), (level.barheight + 2) );
+	player.progressbackground[defrostindex] setShader("black", (level.barwidth + 2), (level.barheight + 2) );
 
 	if( isDefined( player.progressbar ) ) {
 		if( isDefined( player.progressbar[defrostindex] ) )
@@ -665,7 +664,6 @@ createprogressdisplays( player, defrostindex )
 	player.progressbar[defrostindex].sort = 2;
 	player.progressbar[defrostindex].color = (0.3,1,1);
 	player.progressbar[defrostindex] setShader("white", 1, level.barheight);
-	player.progressbar[defrostindex] scaleOverTime(self.maxhealth, level.barsize, level.barheight);
 
 	player.defrostmsgx = player.defrostmsgx + 100;
 	//player.defrostmsgy = player.defrostmsgy - 30;
@@ -713,11 +711,13 @@ defrostme( player, beam )
 		if( beam )
 			self thread dobeam(player);
 
-		width = self.health / self.maxhealth;
-		width = int(level.barsize * width);
+		meltedpercentage = self.health / self.maxhealth;
+		meltedpercentage = int(level.barwidth * meltedpercentage);
 
-		if ( isDefined( player.progressbar[self getEntityNumber()] ) )
-			player.progressbar[self getEntityNumber()] setShader("white", width, level.barheight);
+		if ( isDefined( player.progressbar[self getEntityNumber()] ) ) {
+			player.progressbar[self getEntityNumber()] setShader("white", meltedpercentage, level.barheight);
+			player.progressbar[self getEntityNumber()] scaleOverTime(self.maxhealth, level.barwidth, level.barheight);
+		}
 
 		if ( level.scr_shift_dvar["ftagrotate"] )
 			self.ice.origin = self.ice.origin - (0,0, ( 60 / self.maxhealth ) );
@@ -813,10 +813,11 @@ defrosted(player, beam, defroststicker)
 					player.assists = player maps\mp\gametypes\_globallogic::getPersStat( "assists" );
 					player.pers["defrost"] = player.assists;
 
-					if ( level.scr_shift_dvar["hudcenter"] ) {
-						player iprintlnbold(&"SHIFT_FTAG_HUD_DEFROSTED", self.name);
-						player iprintlnbold(&"SHIFT_FTAG_HUD_POINTS", value);
-					}
+					if ( level.scr_shift_dvar["hudcenter"] )
+						player iprintlnbold(&"SHIFT_FTAG_HUD_POINTS", value, self.name );
+
+					if ( level.scr_shift_dvar["hudleft"] )
+						player iPrintln(&"SHIFT_FTAG_HUD_POINTS", value, self.name );
 
 					if ( !isDefined(level.defrostplayers) )
 						level.defrostplayers = player.name;

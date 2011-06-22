@@ -334,7 +334,7 @@ REFERENCE 		FTAG_FROZE
 LANG_ENGLISH 	"&&1 ^5Froze ^3&&2"
 
 REFERENCE 		FTAG_HUD_POINTS
-LANG_ENGLISH 	"^5You have been awarded ^3&&1 ^5points!"
+LANG_ENGLISH 	"^5You have been awarded ^3&&1 ^5points for defrosting ^3&&2!"
 
 REFERENCE 		FTAG_DEFROSTED
 LANG_ENGLISH 	"&&1 ^5Defrosted ^3&&2"
@@ -344,9 +344,6 @@ LANG_ENGLISH 	"UnKnown"
 
 REFERENCE 		FTAG_AUTO_DEFROSTED
 LANG_ENGLISH 	"&&1 ^3Auto ^5Defrosted"
-
-REFERENCE 		FTAG_HUD_DEFROSTED
-LANG_ENGLISH 	"^3You ^5Defrosted ^3&&1"
 
 REFERENCE 		FTAG_HUD_DEFROSTEDBY
 LANG_ENGLISH 	"^3You were ^5Defrosted by ^3&&1"
