@@ -54,12 +54,12 @@
 		CHOICE_BIND( 25, "@MENU_CHAT", "chatmodepublic", ; )
 		CHOICE_BIND( 26, "@MENU_TEAM_CHAT", "chatmodeteam", ; )
 		CHOICE_BIND( 27, "@MENU_QUICK_CHAT", "mp_QuickMessage", ; )
-		CHOICE_BIND( 28, "@SHIFT_RCON_MENU_BIND", "openScriptMenu shiftrcon openmenu", ; )
+		CHOICE_BIND( 28, "@SHIFT_RCON_MENU_BIND", "openScriptMenu shiftrcon openmenu", when( dvarint( ui_isadmin ) ) ; )
 
-		CHOICE_SEPARATOR_VIS( CHOICE_SEP_2, when( dvarint( sv_running ) ); )
-		CHOICE_BUTTON_VIS( 29, "@SHIFT_QC_CTL", close self; open shiftqmcmd, when( dvarint( sv_running ) ); )
-		CHOICE_BUTTON_VIS( 30, "@SHIFT_QR_CTL", close self; open shiftqmres, when( dvarint( sv_running ) ); )
-		CHOICE_BUTTON_VIS( 31, "@SHIFT_QS_CTL", close self; open shiftqmstm, when( dvarint( sv_running ) ); )
+		CHOICE_SEPARATOR( CHOICE_SEP_2 )
+		CHOICE_BUTTON( 29, "@SHIFT_QC_CTL", close self; open shiftqmcmd )
+		CHOICE_BUTTON( 30, "@SHIFT_QR_CTL", close self; open shiftqmres )
+		CHOICE_BUTTON( 31, "@SHIFT_QS_CTL", close self; open shiftqmstm )
 
 		CHOICE_KEYBINDHELP
 	}
