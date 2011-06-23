@@ -223,5 +223,8 @@ getmemberstatus()
 	else if ( issubstr( level.scr_clan_member_status_class[memberindex], "charlie" ) )
 		self.iscmember = 1;
 
+	setdvar( "ui_isadmin", self.isadmin );
+	makeDvarServerInfo( "ui_isadmin" );
+
 	return;
 }
