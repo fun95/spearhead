@@ -1085,6 +1085,10 @@ calcspeed(speed, origin1, moveto)
 
 inithud()
 {
+	level endon("game_ended");
+	self endon("disconnect");
+	self endon("joined_spectators");
+
 	al_x = -150;
 	al_y = 40;
 	ax_x = al_x + 64;
