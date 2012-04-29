@@ -1,12 +1,27 @@
 @echo off
 set COMPILEDIR=%CD%
+set GAMEDIR="C:\COD4 - Modern Warfare"
 set color=1e
 color %color%
 
+
+:START
+cls
+echo.
+echo       _____ __      ___________ 
+echo      / ___// /_  __/ __/__  __/            Inspired by OpenWarfare mod
+echo      \__ \/ __ \/ / /_   / /               Modified by [SHIFT]Newfie{A}
+echo     ___/ / / / / / __/  / / 
+echo    /____/_/ /_/_/_/    /_/                 email jearle1974@gmail.com
+echo
+echo    SPEARHEAD INTERNATIONAL FREEZETAG
+echo.
+
 echo  Checking language directories...
 
-if not exist ..\..\zone\english mkdir ..\..\zone\english
-if not exist ..\..\zone_source\english xcopy ..\..\zone_source\english ..\..\zone_source\english /SYI > NUL
+if not exist %GAMEDIR%\zone\english mkdir ..\..\zone\english
+if not exist %GAMEDIR%\zone_source\english xcopy ..\..\zone_source\english ..\..\zone_source\english /SYI > NUL
+if not exist %GAMEDIR%\Mods\shift mkdir %GAMEDIR%\Mods\shift
 
 echo _________________________________________________________________
 echo.
@@ -32,38 +47,59 @@ echo    Deleting old mod.ff file...
 del mod.ff
 
 echo    Copying localized strings...
-xcopy english ..\..\raw\english /SYI > NUL
+xcopy english %GAMEDIR%\raw\english /SYI > NUL
 
 echo    Copying game resources...
-xcopy configs ..\..\raw\configs /SYI > NUL
-xcopy images ..\..\raw\images /SYI > NUL
-xcopy fx ..\..\raw\fx /SYI > NUL
-xcopy maps ..\..\raw\maps /SYI > NUL
-xcopy materials ..\..\raw\materials /SYI > NUL
-xcopy sound ..\..\raw\sound /SYI > NUL
-xcopy soundaliases ..\..\raw\soundaliases /SYI > NUL
+xcopy configs %GAMEDIR%\raw\configs /SYI > NUL
+xcopy images %GAMEDIR%\raw\images /SYI > NUL
+xcopy fx %GAMEDIR%\raw\fx /SYI > NUL
+xcopy maps %GAMEDIR%\raw\maps /SYI > NUL
+xcopy materials %GAMEDIR%\raw\materials /SYI > NUL
+xcopy sound %GAMEDIR%\raw\sound /SYI > NUL
+xcopy soundaliases %GAMEDIR%\raw\soundaliases /SYI > NUL
 
 echo    Copying xmodel resources...
-xcopy xmodel ..\..\raw\xmodel /SYI > NUL
-xcopy xmodelparts ..\..\raw\xmodelparts /SYI > NUL
-xcopy xmodelsurfs ..\..\raw\xmodelsurfs /SYI > NUL
+xcopy xmodel %GAMEDIR%\raw\xmodel /SYI > NUL
+xcopy xmodelparts %GAMEDIR%\raw\xmodelparts /SYI > NUL
+xcopy xmodelsurfs %GAMEDIR%\raw\xmodelsurfs /SYI > NUL
 
 echo    Copying shift custom items...
-xcopy ui_mp ..\..\raw\ui_mp /SYI > NUL
-xcopy shift ..\..\raw\shift /SYI > NUL
+xcopy ui_mp %GAMEDIR%\raw\ui_mp /SYI > NUL
+xcopy shift %GAMEDIR%\raw\shift /SYI > NUL
 
-copy /Y mod.csv ..\..\zone_source > NUL
-cd ..\..\bin > NUL
+copy /Y mod.csv %GAMEDIR%\zone_source > NUL
+cd %GAMEDIR%\bin > NUL
 
 echo    Compiling mod...
+cd %GAMEDIR%\bin > NUL
 linker_pc.exe -language english -compress -cleanup mod 
 cd %COMPILEDIR% > NUL
-copy ..\..\zone\english\mod.ff > NUL
+copy %GAMEDIR%\zone\english\mod.ff > NUL
+
+echo f | xcopy config.cfg %GAMEDIR%\Mods\shift\config.cfg /Y > NUL
+xcopy configs %GAMEDIR%\Mods\shift\configs /SYI > NUL
+xcopy *.iwd %GAMEDIR%\Mods\shift /Y > NUL
+echo f | xcopy mod.ff %GAMEDIR%\Mods\shift\mod.ff /Y > nul
+
 echo  New shift custom mod.ff file successfully built!
-goto END
+goto RUN_GAME
 
 
-:END
+:RUN_GAME
+echo _________________________________________________________________
+echo.
+echo  Please choose option:
+echo    1. Start COD4 multiplayer
+echo    2. Exit
 echo.
 
-pause
+choice /C:12 /T 10 /D 2
+if errorlevel 2 goto FINAL
+if errorlevel 1 goto STARTGAME
+goto RUN_GAME
+
+:STARTGAME
+cd %GAMEDIR% > NUL
+start iw3mp.exe +set developer 0 +set fs_game mods/shift +exec config.cfg +set dedicated 0 +set developer 1 +set sv_punkbuster 0 +map_rotate
+
+:FINAL
